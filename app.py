@@ -32,11 +32,18 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Load Data from SQLite Database
+# 3. Load Data & Automatically Detect Table Name from SQLite Database
 @st.cache_data
 def load_data():
     conn = sqlite3.connect("wildfire_pipeline.db")
-    df = pd.read_sql_query("SELECT * FROM wildfire_anomalies", conn)
+    cursor = conn.cursor()
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    tables = cursor.fetchall()
+    if not tables:
+        conn.close()
+        raise Exception("No tables found in SQLite database.")
+    table_name = tables[0][0]  # Automatically picks the first table found
+    df = pd.read_sql_query(f"SELECT * FROM {table_name}", conn)
     conn.close()
     return df
 
@@ -51,28 +58,33 @@ with st.sidebar:
     st.header("🎛️ Pipeline Controls")
     st.markdown("Filter global satellite thermal detections by risk severity.")
     
-    available_tiers = ["All"] + sorted(df["risk_tier"].dropna().unique().tolist())
+    available_tiers = ["All"] + sorted(df["risk_tier"].dropna().unique().tolist()) if "risk_tier" in df.columns else ["All"]
     selected_tier = st.selectbox("Select Risk Tier", available_tiers, index=0)
     
-    min_brightness = float(df["brightness"].min())
-    max_brightness = float(df["brightness"].max())
-    brightness_range = st.slider(
-        "Brightness Threshold (Kelvin)",
-        min_value=min_brightness,
-        max_value=max_brightness,
-        value=(min_brightness, max_brightness)
-    )
+    if "brightness" in df.columns:
+        min_brightness = float(df["brightness"].min())
+        max_brightness = float(df["brightness"].max())
+        brightness_range = st.slider(
+            "Brightness Threshold (Kelvin)",
+            min_value=min_brightness,
+            max_value=max_brightness,
+            value=(min_brightness, max_brightness)
+        )
+    else:
+        brightness_range = (0.0, 500.0)
     
     st.divider()
     st.caption("📡 **Data Source:** NASA FIRMS VIIRS NOAA-20")
     st.caption("🗄️ **Storage:** Validated SQLite DB")
 
-# Apply filters
-filtered_df = df[
-    (df["brightness"] >= brightness_range[0]) &
-    (df["brightness"] <= brightness_range[1])
-]
-if selected_tier != "All":
+# Apply filters safely
+filtered_df = df.copy()
+if "brightness" in filtered_df.columns:
+    filtered_df = filtered_df[
+        (filtered_df["brightness"] >= brightness_range[0]) &
+        (filtered_df["brightness"] <= brightness_range[1])
+    ]
+if selected_tier != "All" and "risk_tier" in filtered_df.columns:
     filtered_df = filtered_df[filtered_df["risk_tier"] == selected_tier]
 
 # 5. Header Section
@@ -84,31 +96,31 @@ kpi1, kpi2, kpi3, kpi4 = st.columns(4)
 with kpi1:
     st.metric("Total Detections", f"{len(filtered_df):,}")
 with kpi2:
-    avg_b = filtered_df["brightness"].mean() if not filtered_df.empty else 0
+    avg_b = filtered_df["brightness"].mean() if not filtered_df.empty and "brightness" in filtered_df.columns else 0
     st.metric("Mean Brightness", f"{avg_b:.2f} K")
 with kpi3:
-    extreme_cnt = len(filtered_df[filtered_df["risk_tier"] == "Extreme"])
+    extreme_cnt = len(filtered_df[filtered_df["risk_tier"] == "Extreme"]) if "risk_tier" in filtered_df.columns else 0
     st.metric("Extreme Risk Alerts", f"{extreme_cnt}")
 with kpi4:
-    high_cnt = len(filtered_df[filtered_df["risk_tier"] == "High"])
+    high_cnt = len(filtered_df[filtered_df["risk_tier"] == "High"]) if "risk_tier" in filtered_df.columns else 0
     st.metric("High Risk Anomalies", f"{high_cnt}")
 
 st.markdown("---")
 
-# 7. Organized Tabbed Workspace (Prevents cluttered single-panel scrolling)
+# 7. Organized Tabbed Workspace
 tab_map, tab_eda, tab_data = st.tabs([
     "🌍 Geospatial Satellite Map",
     "📊 Statistical EDA Plots",
     "📋 Telemetry Records & Export"
 ])
 
-# TAB 1: Full-Width Interactive Esri Map + Quick Breakdown
+# TAB 1: Map
 with tab_map:
     map_col, summary_col = st.columns([3, 1])
     
     with map_col:
         st.subheader("Esri Satellite Thermal Overlay")
-        if not filtered_df.empty:
+        if not filtered_df.empty and "latitude" in filtered_df.columns and "longitude" in filtered_df.columns:
             center_lat = filtered_df["latitude"].mean()
             center_lon = filtered_df["longitude"].mean()
             m = folium.Map(
@@ -127,18 +139,21 @@ with tab_map:
                     color=color_map.get(tier, "#00cc66"),
                     fill=True,
                     fill_opacity=0.85,
-                    popup=f"<b>Tier:</b> {tier}<br><b>Brightness:</b> {row['brightness']} K<br><b>Date:</b> {row['acq_date']}"
+                    popup=f"<b>Tier:</b> {tier}<br><b>Brightness:</b> {row.get('brightness', 'N/A')} K<br><b>Date:</b> {row.get('acq_date', 'N/A')}"
                 ).add_to(m)
             
             st_folium(m, width=None, height=480, use_container_width=True)
         else:
-            st.warning("No thermal detections match your current filter.")
+            st.warning("No geographic coordinates found to render map.")
 
     with summary_col:
         st.subheader("Risk Breakdown")
-        tier_counts = filtered_df["risk_tier"].value_counts().reset_index()
-        tier_counts.columns = ["Risk Tier", "Count"]
-        st.dataframe(tier_counts, use_container_width=True, hide_index=True)
+        if "risk_tier" in filtered_df.columns:
+            tier_counts = filtered_df["risk_tier"].value_counts().reset_index()
+            tier_counts.columns = ["Risk Tier", "Count"]
+            st.dataframe(tier_counts, use_container_width=True, hide_index=True)
+        else:
+            st.info("No risk tier column found.")
         
         st.info(
             "**Legend:**\n"
@@ -148,42 +163,43 @@ with tab_map:
             "- 🟢 **Low:** < 310 K"
         )
 
-# TAB 2: Clean 3-Chart Statistical EDA Grid
+# TAB 2: EDA Plots
 with tab_eda:
     st.subheader("Exploratory Data Analysis (EDA)")
-    if not filtered_df.empty:
+    if not filtered_df.empty and "brightness" in filtered_df.columns:
         plt.style.use("dark_background")
         fig, axes = plt.subplots(1, 3, figsize=(16, 4.8))
         fig.patch.set_facecolor("#0E1117")
         
-        # Chart 1: Brightness Distribution
+        # Chart 1
         sns.histplot(filtered_df["brightness"], bins=20, kde=True, color="#ff6b6b", ax=axes[0])
         axes[0].set_title("Brightness Temperature Distribution", fontsize=11, fontweight="bold")
-        axes[0].set_xlabel("Brightness (Kelvin)")
         axes[0].set_facecolor("#161B22")
         
-        # Chart 2: Risk Tier Counts
-        order = [t for t in ["Extreme", "High", "Moderate", "Low"] if t in filtered_df["risk_tier"].unique()]
-        sns.countplot(data=filtered_df, x="risk_tier", order=order, hue="risk_tier", palette="rocket", legend=False, ax=axes[1])
+        # Chart 2
+        if "risk_tier" in filtered_df.columns:
+            order = [t for t in ["Extreme", "High", "Moderate", "Low"] if t in filtered_df["risk_tier"].unique()]
+            sns.countplot(data=filtered_df, x="risk_tier", order=order, hue="risk_tier", palette="rocket", legend=False, ax=axes[1])
         axes[1].set_title("Detections by Risk Tier", fontsize=11, fontweight="bold")
-        axes[1].set_xlabel("Risk Tier")
         axes[1].set_facecolor("#161B22")
         
-        # Chart 3: Brightness vs Latitude
-        sns.scatterplot(data=filtered_df, x="latitude", y="brightness", hue="risk_tier", palette="viridis", ax=axes[2])
+        # Chart 3
+        if "latitude" in filtered_df.columns:
+            sns.scatterplot(data=filtered_df, x="latitude", y="brightness", hue="risk_tier" if "risk_tier" in filtered_df.columns else None, palette="viridis", ax=axes[2])
         axes[2].set_title("Brightness vs. Latitude Correlation", fontsize=11, fontweight="bold")
-        axes[2].set_xlabel("Latitude (°)")
         axes[2].set_facecolor("#161B22")
         
         plt.tight_layout()
         st.pyplot(fig)
         
         st.subheader("Statistical Summary (`describe()`)")
-        st.dataframe(filtered_df[["brightness", "latitude", "longitude"]].describe().T, use_container_width=True)
+        numeric_cols = [c for c in ["brightness", "latitude", "longitude"] if c in filtered_df.columns]
+        if numeric_cols:
+            st.dataframe(filtered_df[numeric_cols].describe().T, use_container_width=True)
     else:
-        st.warning("No data available to plot.")
+        st.warning("No numeric data available to plot.")
 
-# TAB 3: Full-Width Clean Data Table + One-Click Downloads
+# TAB 3: Data Table & Downloads
 with tab_data:
     st.subheader("Validated SQLite Telemetry Records")
     
