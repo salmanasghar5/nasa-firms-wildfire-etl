@@ -3,145 +3,196 @@ import pandas as pd
 import sqlite3
 import folium
 from streamlit_folium import st_folium
-import json
-import os
 import matplotlib.pyplot as plt
 import seaborn as sns
+import io
 
-# Set professional seaborn theme
-sns.set_theme(style="whitegrid")
-
+# 1. Force full-screen wide layout & clean page title
 st.set_page_config(
-    page_title="NASA FIRMS Wildfire Monitoring Dashboard",
+    page_title="NASA FIRMS Wildfire Intelligence",
     page_icon="🔥",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-st.title("🔥 NASA FIRMS Real-Time Global Wildfire Monitoring Dashboard")
-st.markdown("Production-grade data engineering pipeline tracking thermal anomalies, risk tiers, and telemetry.")
+# 2. Custom CSS for clean dark/modern KPI cards and spacing
+st.markdown("""
+<style>
+    .block-container {
+        padding-top: 1.5rem;
+        padding-bottom: 2rem;
+    }
+    div[data-testid="metric-container"] {
+        background-color: #161B22;
+        border: 1px solid #30363D;
+        padding: 16px 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+</style>
+""", unsafe_allow_html=True)
 
-# --- LOAD DATA FROM SQLITE DATABASE ---
+# 3. Load Data from SQLite Database
 @st.cache_data
 def load_data():
-    if not os.path.exists("wildfire_pipeline.db"):
-        return pd.DataFrame()
     conn = sqlite3.connect("wildfire_pipeline.db")
-    df = pd.read_sql("SELECT * FROM wildfire_events", conn)
+    df = pd.read_sql_query("SELECT * FROM wildfire_anomalies", conn)
     conn.close()
     return df
 
-df = load_data()
+try:
+    df = load_data()
+except Exception as e:
+    st.error(f"Database load error: {e}")
+    st.stop()
 
-if df.empty:
-    st.warning("⚠️ No wildfire data found in 'wildfire_pipeline.db'. Please run your master pipeline cell first to populate the database!")
-else:
-    # --- SIDEBAR FILTERS ---
-    st.sidebar.header("Dashboard Controls")
-    selected_risk = st.sidebar.selectbox(
-        "Filter by Risk Tier",
-        ["All", "Extreme", "High", "Moderate", "Low"]
+# 4. Sidebar Controls
+with st.sidebar:
+    st.header("🎛️ Pipeline Controls")
+    st.markdown("Filter global satellite thermal detections by risk severity.")
+    
+    available_tiers = ["All"] + sorted(df["risk_tier"].dropna().unique().tolist())
+    selected_tier = st.selectbox("Select Risk Tier", available_tiers, index=0)
+    
+    min_brightness = float(df["brightness"].min())
+    max_brightness = float(df["brightness"].max())
+    brightness_range = st.slider(
+        "Brightness Threshold (Kelvin)",
+        min_value=min_brightness,
+        max_value=max_brightness,
+        value=(min_brightness, max_brightness)
     )
+    
+    st.divider()
+    st.caption("📡 **Data Source:** NASA FIRMS VIIRS NOAA-20")
+    st.caption("🗄️ **Storage:** Validated SQLite DB")
 
-    if selected_risk != "All":
-        filtered_df = df[df['risk_tier'] == selected_risk]
-    else:
-        filtered_df = df
+# Apply filters
+filtered_df = df[
+    (df["brightness"] >= brightness_range[0]) &
+    (df["brightness"] <= brightness_range[1])
+]
+if selected_tier != "All":
+    filtered_df = filtered_df[filtered_df["risk_tier"] == selected_tier]
 
-    # --- TOP METRICS ROW ---
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Total Records Processed", len(df))
-    col2.metric("Average Brightness", f"{round(df['brightness'].mean(), 2)} K")
-    col3.metric("Extreme Risk Count", len(df[df['risk_tier'] == 'Extreme']))
-    col4.metric("High Risk Count", len(df[df['risk_tier'] == 'High']))
+# 5. Header Section
+st.title("🔥 NASA FIRMS Real-Time Wildfire Intelligence")
+st.markdown("Automated ETL & Exploratory Data Analysis pipeline monitoring global thermal anomalies.")
 
-    st.markdown("----")
+# 6. Top Row: 4 Clean Styled KPI Cards
+kpi1, kpi2, kpi3, kpi4 = st.columns(4)
+with kpi1:
+    st.metric("Total Detections", f"{len(filtered_df):,}")
+with kpi2:
+    avg_b = filtered_df["brightness"].mean() if not filtered_df.empty else 0
+    st.metric("Mean Brightness", f"{avg_b:.2f} K")
+with kpi3:
+    extreme_cnt = len(filtered_df[filtered_df["risk_tier"] == "Extreme"])
+    st.metric("Extreme Risk Alerts", f"{extreme_cnt}")
+with kpi4:
+    high_cnt = len(filtered_df[filtered_df["risk_tier"] == "High"])
+    st.metric("High Risk Anomalies", f"{high_cnt}")
 
-    # --- MAP & DATA TABLE LAYOUT ---
-    map_col, table_col = st.columns([1.2, 1])
+st.markdown("---")
 
+# 7. Organized Tabbed Workspace (Prevents cluttered single-panel scrolling)
+tab_map, tab_eda, tab_data = st.tabs([
+    "🌍 Geospatial Satellite Map",
+    "📊 Statistical EDA Plots",
+    "📋 Telemetry Records & Export"
+])
+
+# TAB 1: Full-Width Interactive Esri Map + Quick Breakdown
+with tab_map:
+    map_col, summary_col = st.columns([3, 1])
+    
     with map_col:
-        st.subheader("🌍 Geospatial Satellite Map (Esri Imagery)")
-        map_center = [filtered_df['latitude'].mean(), filtered_df['longitude'].mean()] if not filtered_df.empty else [0, 0]
-        live_map = folium.Map(location=map_center, zoom_start=3, tiles='esri.worldimagery')
+        st.subheader("Esri Satellite Thermal Overlay")
+        if not filtered_df.empty:
+            center_lat = filtered_df["latitude"].mean()
+            center_lon = filtered_df["longitude"].mean()
+            m = folium.Map(
+                location=[center_lat, center_lon],
+                zoom_start=3,
+                tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+                attr="Esri"
+            )
+            color_map = {"Extreme": "#ff2b2b", "High": "#ff8c00", "Moderate": "#ffd700", "Low": "#00cc66"}
+            
+            for _, row in filtered_df.head(300).iterrows():
+                tier = row.get("risk_tier", "Low")
+                folium.CircleMarker(
+                    location=[row["latitude"], row["longitude"]],
+                    radius=6,
+                    color=color_map.get(tier, "#00cc66"),
+                    fill=True,
+                    fill_opacity=0.85,
+                    popup=f"<b>Tier:</b> {tier}<br><b>Brightness:</b> {row['brightness']} K<br><b>Date:</b> {row['acq_date']}"
+                ).add_to(m)
+            
+            st_folium(m, width=None, height=480, use_container_width=True)
+        else:
+            st.warning("No thermal detections match your current filter.")
 
-        for _, row in filtered_df.iterrows():
-            tier = row['risk_tier']
-            color = "red" if tier == "Extreme" else "orange" if tier == "High" else "yellow" if tier == "Moderate" else "green"
+    with summary_col:
+        st.subheader("Risk Breakdown")
+        tier_counts = filtered_df["risk_tier"].value_counts().reset_index()
+        tier_counts.columns = ["Risk Tier", "Count"]
+        st.dataframe(tier_counts, use_container_width=True, hide_index=True)
+        
+        st.info(
+            "**Legend:**\n"
+            "- 🔴 **Extreme:** > 360 K\n"
+            "- 🟠 **High:** 330 – 360 K\n"
+            "- 🟡 **Moderate:** 310 – 330 K\n"
+            "- 🟢 **Low:** < 310 K"
+        )
 
-            folium.CircleMarker(
-                location=[row['latitude'], row['longitude']],
-                radius=6,
-                popup=f"Risk: {tier}<br>Brightness: {row['brightness']}<br>Date: {row['acq_date']}",
-                color=color,
-                fill=True,
-                fill_color=color,
-                fill_opacity=0.8
-            ).add_to(live_map)
-
-        st_folium(live_map, width=650, height=450)
-
-    with table_col:
-        st.subheader("📊 Filtered Telemetry Records")
-        st.dataframe(filtered_df[['latitude', 'longitude', 'brightness', 'risk_tier', 'acq_date']], height=450)
-
-    # --- EXPLORATORY DATA ANALYSIS (EDA) CHARTS SECTION ---
-    st.markdown("----")
-    st.subheader("📈 Statistical EDA & Visual Reports")
-    st.markdown("Academic visualizations analyzing brightness distributions, risk categories, and geospatial correlations.")
-
-    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
-
-    # --- Chart 1: Brightness Temperature Distribution ---
-    sns.histplot(df['brightness'], kde=True, ax=axes[0], color='crimson')
-    axes[0].set_title("Brightness Temperature Distribution")
-    axes[0].set_xlabel("Brightness (Kelvin)")
-    axes[0].set_ylabel("Frequency")
-
-    # --- Chart 2: Wildfire Count by Risk Tier ---
-    risk_order = ['Extreme', 'High', 'Moderate', 'Low']
-    sns.countplot(x='risk_tier', data=df, ax=axes[1], order=[r for r in risk_order if r in df['risk_tier'].unique()], palette='rocket')
-    axes[1].set_title("Thermal Anomalies by Risk Tier")
-    axes[1].set_xlabel("Risk Tier")
-    axes[1].set_ylabel("Record Count")
-
-    # --- Chart 3: Brightness vs. Latitude Correlation Scatter Plot ---
-    if 'latitude' in df.columns and 'brightness' in df.columns:
-        sns.scatterplot(x='latitude', y='brightness', hue='risk_tier', data=df, ax=axes[2], palette='deep')
-        axes[2].set_title("Brightness vs. Latitude Correlation")
+# TAB 2: Clean 3-Chart Statistical EDA Grid
+with tab_eda:
+    st.subheader("Exploratory Data Analysis (EDA)")
+    if not filtered_df.empty:
+        plt.style.use("dark_background")
+        fig, axes = plt.subplots(1, 3, figsize=(16, 4.8))
+        fig.patch.set_facecolor("#0E1117")
+        
+        # Chart 1: Brightness Distribution
+        sns.histplot(filtered_df["brightness"], bins=20, kde=True, color="#ff6b6b", ax=axes[0])
+        axes[0].set_title("Brightness Temperature Distribution", fontsize=11, fontweight="bold")
+        axes[0].set_xlabel("Brightness (Kelvin)")
+        axes[0].set_facecolor("#161B22")
+        
+        # Chart 2: Risk Tier Counts
+        order = [t for t in ["Extreme", "High", "Moderate", "Low"] if t in filtered_df["risk_tier"].unique()]
+        sns.countplot(data=filtered_df, x="risk_tier", order=order, hue="risk_tier", palette="rocket", legend=False, ax=axes[1])
+        axes[1].set_title("Detections by Risk Tier", fontsize=11, fontweight="bold")
+        axes[1].set_xlabel("Risk Tier")
+        axes[1].set_facecolor("#161B22")
+        
+        # Chart 3: Brightness vs Latitude
+        sns.scatterplot(data=filtered_df, x="latitude", y="brightness", hue="risk_tier", palette="viridis", ax=axes[2])
+        axes[2].set_title("Brightness vs. Latitude Correlation", fontsize=11, fontweight="bold")
         axes[2].set_xlabel("Latitude (°)")
-        axes[2].set_ylabel("Brightness (Kelvin)")
+        axes[2].set_facecolor("#161B22")
+        
+        plt.tight_layout()
+        st.pyplot(fig)
+        
+        st.subheader("Statistical Summary (`describe()`)")
+        st.dataframe(filtered_df[["brightness", "latitude", "longitude"]].describe().T, use_container_width=True)
     else:
-        axes[2].text(0.5, 0.5, "Data Unavailable", horizontalalignment='center', verticalalignment='center')
-        axes[2].set_title("Correlation Plot Unavailable")
+        st.warning("No data available to plot.")
 
-    plt.tight_layout()
-    st.pyplot(fig)
-
-    # --- DOWNLOAD SECTION ---
-    st.markdown("----")
-    st.subheader("📥 Export & Reports")
-
-    col_dl1, col_dl2 = st.columns(2)
-
-    with col_dl1:
-        csv_data = df.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            label="Download Full Dataset as CSV",
-            data=csv_data,
-            file_name="wildfire_export.csv",
-            mime="text/csv"
-        )
-
-    with col_dl2:
-        report_summary = {
-            "total_records": len(df),
-            "average_brightness": round(df['brightness'].mean(), 2),
-            "risk_breakdown": df['risk_tier'].value_counts().to_dict()
-        }
-        json_data = json.dumps(report_summary, indent=4)
-        st.download_button(
-            label="Download Summary Report as JSON",
-            data=json_data,
-            file_name="wildfire_report.json",
-            mime="application/json"
-        )
+# TAB 3: Full-Width Clean Data Table + One-Click Downloads
+with tab_data:
+    st.subheader("Validated SQLite Telemetry Records")
+    
+    dl1, dl2, _ = st.columns([1, 1, 4])
+    with dl1:
+        csv_data = filtered_df.to_csv(index=False).encode("utf-8")
+        st.download_button("⬇️ Download CSV", data=csv_data, file_name="wildfire_telemetry.csv", mime="text/csv", use_container_width=True)
+    with dl2:
+        json_data = filtered_df.to_json(orient="records", indent=2).encode("utf-8")
+        st.download_button("⬇️ Download JSON", data=json_data, file_name="wildfire_telemetry.json", mime="application/json", use_container_width=True)
+        
+    st.dataframe(filtered_df, use_container_width=True, height=450)
