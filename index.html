@@ -5,108 +5,41 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SATELLITE LIVE | Intelligence Center</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <style>
-:root {
- --bg:#050d16;
- --panel:#0a1927;
- --line:#17364a;
- --cyan:#20cce9;
- --muted:#7795aa;
- --white:#e7f5fc;
-}
+:root{--bg:#050d16;--panel:#0a1927;--line:#17364a;--cyan:#20cce9;--muted:#7795aa;--white:#e7f5fc}
 *{box-sizing:border-box}
-body{
- margin:0;background:var(--bg);color:var(--white);
- font-family:Inter,Arial,sans-serif;
-}
+body{margin:0;background:var(--bg);color:var(--white);font-family:Inter,Arial,sans-serif}
 .app{display:flex;min-height:100vh}
-.sidebar{
- width:76px;height:100vh;position:fixed;left:0;top:0;
- z-index:1000;background:#06121e;
- border-right:1px solid var(--line);
- display:flex;align-items:center;flex-direction:column;
- padding:17px 9px;gap:9px;
-}
-.logo{
- width:45px;height:45px;border:1px solid #17647c;
- background:#0b3449;border-radius:13px;
- display:grid;place-items:center;font-size:23px;
- color:var(--cyan);margin-bottom:20px;
-}
-.nav-btn{
- width:48px;height:45px;border:0;border-radius:11px;
- background:transparent;color:#7392a7;
- cursor:pointer;font-size:20px;position:relative;
-}
-.nav-btn:hover,.nav-btn.active{
- background:#0c4054;color:#43e1f6;
- box-shadow:inset 3px 0 #20cce9;
-}
-.nav-btn span{
- position:absolute;left:58px;top:12px;padding:7px 10px;
- background:#10293a;border:1px solid #24546c;
- border-radius:6px;font-size:10px;white-space:nowrap;
- display:none;
-}
+.sidebar{width:76px;height:100vh;position:fixed;left:0;top:0;z-index:1000;background:#06121e;border-right:1px solid var(--line);display:flex;align-items:center;flex-direction:column;padding:17px 9px;gap:9px}
+.logo{width:45px;height:45px;border:1px solid #17647c;background:#0b3449;border-radius:13px;display:grid;place-items:center;font-size:23px;color:var(--cyan);margin-bottom:20px}
+.nav-btn{width:48px;height:45px;border:0;border-radius:11px;background:transparent;color:#7392a7;cursor:pointer;font-size:20px;position:relative}
+.nav-btn:hover,.nav-btn.active{background:#0c4054;color:#43e1f6;box-shadow:inset 3px 0 #20cce9}
+.nav-btn span{position:absolute;left:58px;top:12px;padding:7px 10px;background:#10293a;border:1px solid #24546c;border-radius:6px;font-size:10px;white-space:nowrap;display:none}
 .nav-btn:hover span{display:block}
 .nav-bottom{margin-top:auto}
-main{
- margin-left:76px;width:calc(100% - 76px);
- padding:23px 27px;max-width:1900px;
-}
-.topbar{
- display:flex;align-items:center;justify-content:space-between;
- gap:15px;flex-wrap:wrap;margin-bottom:24px;
-}
+main{margin-left:76px;width:calc(100% - 76px);padding:23px 27px;max-width:1900px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;margin-bottom:24px}
 .brand{display:flex;align-items:center;gap:12px}
-.brand-icon{
- height:46px;width:46px;border-radius:13px;
- display:grid;place-items:center;background:#0c4055;
- border:1px solid #176780;font-size:23px;
-}
-.brand h1{
- font-size:20px;letter-spacing:3px;color:var(--cyan);
- margin:0;font-weight:800;
-}
+.brand-icon{height:46px;width:46px;border-radius:13px;display:grid;place-items:center;background:#0c4055;border:1px solid #176780;font-size:23px}
+.brand h1{font-size:20px;letter-spacing:3px;color:var(--cyan);margin:0;font-weight:800}
 .brand p{font-size:9px;color:var(--muted);letter-spacing:1.5px;margin:4px 0 0}
 .actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.pill,.tag{
- border:1px solid var(--line);background:#091a28;
- color:#a4c2d3;border-radius:20px;padding:8px 11px;font-size:9px;
-}
-.live-dot{
- display:inline-block;width:7px;height:7px;border-radius:50%;
- background:#23dba0;margin-right:7px;box-shadow:0 0 9px #23dba0;
-}
-.btn{
- border:1px solid #17637a;background:#0b3449;color:#c7f5ff;
- padding:9px 13px;border-radius:8px;font-size:10px;
- font-weight:700;cursor:pointer;
-}
+.pill,.tag{border:1px solid var(--line);background:#091a28;color:#a4c2d3;border-radius:20px;padding:8px 11px;font-size:9px}
+.live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#23dba0;margin-right:7px;box-shadow:0 0 9px #23dba0}
+.btn{border:1px solid #17637a;background:#0b3449;color:#c7f5ff;padding:9px 13px;border-radius:8px;font-size:10px;font-weight:700;cursor:pointer}
 .btn:hover{background:#10536b}
 .btn.primary{background:#087c9b;color:white}
 .btn.danger{background:#53212b;border-color:#873848}
-.panel,.kpi{
- background:linear-gradient(145deg,#0c1c2b,#081521);
- border:1px solid var(--line);border-radius:13px;
- padding:16px;box-shadow:0 8px 25px #0002;
-}
+.panel,.kpi{background:linear-gradient(145deg,#0c1c2b,#081521);border:1px solid var(--line);border-radius:13px;padding:16px;box-shadow:0 8px 25px #0002}
 .page{display:none;animation:fade .28s ease}
 .page.active{display:block}
-@keyframes fade{
- from{opacity:0;transform:translateY(8px)}
- to{opacity:1;transform:translateY(0)}
-}
-.page-heading{
- display:flex;justify-content:space-between;align-items:center;
- margin-bottom:18px;gap:10px;flex-wrap:wrap;
-}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.page-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:10px;flex-wrap:wrap}
 .page-heading h2{font-size:20px;margin:0;font-weight:700}
 .page-heading p{font-size:11px;color:var(--muted);margin:5px 0 0}
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:15px}
@@ -118,28 +51,13 @@ main{
 .panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:13px}
 .panel-title{font-size:12px;font-weight:700}
 .panel-sub{font-size:10px;color:var(--muted);margin-top:4px}
-#map,#map2{
- width:100%;height:440px;min-height:440px;
- border-radius:9px;background:#071522;z-index:1;
-}
+#map,#map2{width:100%;height:440px;min-height:440px;border-radius:9px;background:#071522;z-index:1}
 .map-panel{position:relative;padding:10px}
-.map-overlay{
- position:absolute;z-index:500;top:23px;left:24px;
- background:#061724ef;border:1px solid #1b536b;
- border-radius:9px;padding:10px 12px;pointer-events:none;
-}
+.map-overlay{position:absolute;z-index:500;top:23px;left:24px;background:#061724ef;border:1px solid #1b536b;border-radius:9px;padding:10px 12px;pointer-events:none}
 .map-overlay b{font-size:10px}
 .map-overlay p{font-size:9px;color:#789caf;margin:4px 0 0}
-.map-count{
- position:absolute;z-index:500;top:24px;right:24px;
- background:#061724ef;border:1px solid #1b536b;
- border-radius:9px;padding:9px;font-size:10px;color:var(--cyan);
-}
-.map-legend{
- position:absolute;z-index:500;bottom:23px;left:23px;
- background:#061724ed;border:1px solid #1b536b;
- border-radius:8px;padding:9px;font-size:9px;
-}
+.map-count{position:absolute;z-index:500;top:24px;right:24px;background:#061724ef;border:1px solid #1b536b;border-radius:9px;padding:9px;font-size:10px;color:var(--cyan)}
+.map-legend{position:absolute;z-index:500;bottom:23px;left:23px;background:#061724ed;border:1px solid #1b536b;border-radius:8px;padding:9px;font-size:9px}
 .dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin:0 4px 0 7px}
 .charts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .chartbox{height:210px;position:relative}
@@ -161,95 +79,33 @@ tr:hover{background:#102638}
 .mini b{display:block;font-size:21px;margin-top:7px}
 .field{margin-bottom:13px}
 .field label{display:block;font-size:9px;color:#88a9bb;margin-bottom:6px;letter-spacing:.5px}
-input,select{
- width:100%;padding:10px;background:#06131e;
- border:1px solid #193b50;border-radius:7px;
- color:#d8edf6;font-size:10px;outline:none;
-}
+input,select{width:100%;padding:10px;background:#06131e;border:1px solid #193b50;border-radius:7px;color:#d8edf6;font-size:10px;outline:none}
 input:focus,select:focus{border-color:var(--cyan)}
 input[type=range]{padding:0;accent-color:var(--cyan)}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .alert-list{display:flex;flex-direction:column;gap:8px;max-height:240px;overflow:auto}
 .alert-item{background:#081724;border:1px solid #17364a;padding:11px;border-radius:8px;font-size:10px}
 .alert-item small{display:block;color:var(--muted);margin-top:5px}
-.description{
- border-left:3px solid var(--cyan);background:#0a2130;
- padding:13px;border-radius:0 8px 8px 0;
- font-size:10px;line-height:1.7;color:#a7c4d5;margin-bottom:14px;
-}
-.satellite-stage{
- height:390px;border-radius:13px;overflow:hidden;
- position:relative;
- background:radial-gradient(ellipse at 50% 50%,#12344b,#071521 48%,#030911);
- border:1px solid #17435a;display:grid;place-items:center;
-}
-.earth{
- width:205px;height:205px;border-radius:50%;position:relative;
- background:
- radial-gradient(ellipse at 38% 45%,#4b9979 0 9%,transparent 10%),
- radial-gradient(ellipse at 66% 61%,#328b75 0 12%,transparent 13%),
- radial-gradient(circle at 50% 50%,#17638a,#0a365e 60%,#04182e 78%);
- box-shadow:0 0 35px #16a9d777,inset -22px -15px 45px #000b;
-}
-.earth:before{
- content:"";position:absolute;inset:-5px;border:1px solid #40c9e5;
- border-radius:50%;box-shadow:0 0 20px #19bce5;
-}
-.orbit{
- position:absolute;width:320px;height:120px;
- border:1px solid #20cce980;border-radius:50%;
- transform:rotate(-25deg);animation:orbit 9s linear infinite;
-}
-.orbit.two{
- width:380px;height:165px;transform:rotate(30deg);
- border-color:#1c83a766;animation-duration:14s;
-}
-.satellite{
- position:absolute;top:50%;left:50%;font-size:25px;
- transform:translate(-50%,-50%);
- filter:drop-shadow(0 0 9px #35dcff);
- animation:satmove 9s linear infinite;z-index:4;
-}
-@keyframes satmove{
- 0%{transform:translate(-160px,-55px) rotate(0)}
- 25%{transform:translate(-40px,-100px) rotate(90deg)}
- 50%{transform:translate(150px,-50px) rotate(180deg)}
- 75%{transform:translate(35px,85px) rotate(270deg)}
- 100%{transform:translate(-160px,-55px) rotate(360deg)}
-}
+.description{border-left:3px solid var(--cyan);background:#0a2130;padding:13px;border-radius:0 8px 8px 0;font-size:10px;line-height:1.7;color:#a7c4d5;margin-bottom:14px}
+.satellite-stage{height:390px;border-radius:13px;overflow:hidden;position:relative;background:radial-gradient(ellipse at 50% 50%,#12344b,#071521 48%,#030911);border:1px solid #17435a;display:grid;place-items:center}
+.earth{width:205px;height:205px;border-radius:50%;position:relative;background:radial-gradient(ellipse at 38% 45%,#4b9979 0 9%,transparent 10%),radial-gradient(ellipse at 66% 61%,#328b75 0 12%,transparent 13%),radial-gradient(circle at 50% 50%,#17638a,#0a365e 60%,#04182e 78%);box-shadow:0 0 35px #16a9d777,inset -22px -15px 45px #000b}
+.earth:before{content:"";position:absolute;inset:-5px;border:1px solid #40c9e5;border-radius:50%;box-shadow:0 0 20px #19bce5}
+.orbit{position:absolute;width:320px;height:120px;border:1px solid #20cce980;border-radius:50%;transform:rotate(-25deg);animation:orbit 9s linear infinite}
+.orbit.two{width:380px;height:165px;transform:rotate(30deg);border-color:#1c83a766;animation-duration:14s}
+.satellite{position:absolute;top:50%;left:50%;font-size:25px;transform:translate(-50%,-50%);filter:drop-shadow(0 0 9px #35dcff);animation:satmove 9s linear infinite;z-index:4}
+@keyframes satmove{0%{transform:translate(-160px,-55px) rotate(0)}25%{transform:translate(-40px,-100px) rotate(90deg)}50%{transform:translate(150px,-50px) rotate(180deg)}75%{transform:translate(35px,85px) rotate(270deg)}100%{transform:translate(-160px,-55px) rotate(360deg)}}
 @keyframes orbit{to{rotate:335deg}}
 .star{position:absolute;width:3px;height:3px;border-radius:50%;background:#8cecff;box-shadow:0 0 7px #8cecff}
-.satellite-info{
- position:absolute;bottom:13px;left:13px;right:13px;
- display:flex;justify-content:space-between;background:#061521dd;
- border:1px solid #17445a;border-radius:9px;padding:11px;gap:10px;flex-wrap:wrap;
-}
+.satellite-info{position:absolute;bottom:13px;left:13px;right:13px;display:flex;justify-content:space-between;background:#061521dd;border:1px solid #17445a;border-radius:9px;padding:11px;gap:10px;flex-wrap:wrap}
 .satellite-info span{font-size:9px;color:#7c9caf}
 .satellite-info b{display:block;font-size:11px;margin-top:5px}
 .footer{text-align:center;color:#58778b;font-size:9px;margin:24px 0 5px}
-.toast{
- display:none;position:fixed;bottom:20px;right:20px;z-index:3000;
- background:#0d293b;border:1px solid #20718b;padding:13px 17px;
- border-radius:9px;font-size:11px;
-}
+.toast{display:none;position:fixed;bottom:20px;right:20px;z-index:3000;background:#0d293b;border:1px solid #20718b;padding:13px 17px;border-radius:9px;font-size:11px}
 @media(max-width:1050px){.layout{grid-template-columns:1fr}}
-@media(max-width:750px){
- .sidebar{width:55px;padding:10px 4px}
- .nav-btn{width:43px}
- main{margin-left:55px;width:calc(100% - 55px);padding:15px 11px}
- .kpis{grid-template-columns:1fr 1fr}
- .two-col,.charts{grid-template-columns:1fr}
- #map,#map2{height:370px;min-height:370px}
- .satellite-stage{height:340px}
-}
-@media(max-width:430px){
- .brand h1{font-size:16px}
- .kpi-value{font-size:22px}
- .field-row{grid-template-columns:1fr}
-}
+@media(max-width:750px){.sidebar{width:55px;padding:10px 4px}.nav-btn{width:43px}main{margin-left:55px;width:calc(100% - 55px);padding:15px 11px}.kpis{grid-template-columns:1fr 1fr}.two-col,.charts{grid-template-columns:1fr}#map,#map2{height:370px;min-height:370px}.satellite-stage{height:340px}}
+@media(max-width:430px){.brand h1{font-size:16px}.kpi-value{font-size:22px}.field-row{grid-template-columns:1fr}}
 </style>
 </head>
-
 <body>
 <div class="app">
 <aside class="sidebar">
@@ -263,28 +119,14 @@ input[type=range]{padding:0;accent-color:var(--cyan)}
 <button class="nav-btn" data-page="settings">⚙<span>Settings</span></button>
 <button class="nav-btn nav-bottom" data-page="about">ⓘ<span>About Project</span></button>
 </aside>
-
 <main>
 <header class="topbar">
-<div class="brand">
-<div class="brand-icon">🛰</div>
-<div>
-<h1>SATELLITE LIVE</h1>
-<p>GLOBAL WILDFIRE INTELLIGENCE & MONITORING SYSTEM</p>
-</div>
-</div>
-<div class="actions">
-<span class="pill"><span class="live-dot"></span><span id="status">DEMO MODE</span></span>
-<span class="pill" id="clock">--:--:--</span>
-<button class="btn primary" id="syncBtn">↻ SYNC DATA</button>
-</div>
+<div class="brand"><div class="brand-icon">🛰</div><div><h1>SATELLITE LIVE</h1><p>GLOBAL WILDFIRE INTELLIGENCE & MONITORING SYSTEM</p></div></div>
+<div class="actions"><span class="pill"><span class="live-dot"></span><span id="status">CONNECTING...</span></span><span class="pill" id="clock">--:--:--</span><button class="btn primary" id="syncBtn">↻ SYNC DATA</button></div>
 </header>
 
 <section class="page active" id="overview">
-<div class="page-heading">
-<div><h2>Intelligence Overview</h2><p>Your global wildfire monitoring command center.</p></div>
-<span class="tag">MISSION CONTROL</span>
-</div>
+<div class="page-heading"><div><h2>Intelligence Overview</h2><p>Your global wildfire monitoring command center.</p></div><span class="tag">MISSION CONTROL</span></div>
 <div class="kpis">
 <div class="kpi"><div class="kpi-label">Active detections</div><div class="kpi-value" id="kpiNodes">0</div><div class="kpi-foot">Satellite hotspot records</div></div>
 <div class="kpi"><div class="kpi-label">Mean brightness</div><div class="kpi-value" id="kpiMean">0 K</div><div class="kpi-foot">Thermal channel</div></div>
@@ -294,43 +136,16 @@ input[type=range]{padding:0;accent-color:var(--cyan)}
 <div class="description"><b>INTELLIGENCE BRIEFING:</b> This overview summarizes detected thermal anomalies, regional wildfire activity and satellite observations. Use the navigation panel to explore each intelligence module independently.</div>
 <div class="layout">
 <div class="left">
-<div class="panel map-panel">
-<div class="map-overlay"><b>GLOBAL FIRE ACTIVITY</b><p>Interactive wildfire hotspot visualization</p></div>
-<div class="map-count" id="mapCount">0 HOTSPOTS</div>
-<div id="map"></div>
-<div class="map-legend">
-RISK:
-<span class="dot" style="background:#35c6ec"></span>Low
-<span class="dot" style="background:#27d69a"></span>Moderate
-<span class="dot" style="background:#ffb547"></span>High
-<span class="dot" style="background:#ff5367"></span>Extreme
-</div>
-</div>
+<div class="panel map-panel"><div class="map-overlay"><b>GLOBAL FIRE ACTIVITY</b><p>Interactive wildfire hotspot visualization</p></div><div class="map-count" id="mapCount">0 HOTSPOTS</div><div id="map"></div><div class="map-legend">RISK: <span class="dot" style="background:#35c6ec"></span>Low <span class="dot" style="background:#27d69a"></span>Moderate <span class="dot" style="background:#ffb547"></span>High <span class="dot" style="background:#ff5367"></span>Extreme</div></div>
 <div class="charts">
 <div class="panel"><div class="panel-head"><b class="panel-title">Risk Severity</b><span class="tag">RISK MIX</span></div><div class="chartbox small"><canvas id="donutRisk"></canvas></div></div>
 <div class="panel"><div class="panel-head"><b class="panel-title">Regional Activity</b><span class="tag">REGIONS</span></div><div class="chartbox small"><canvas id="regionChart"></canvas></div></div>
 </div>
 </div>
 <div class="right">
-<div class="panel">
-<div class="panel-head"><b class="panel-title">Satellite Mission Status</b><span class="tag">MONITORING</span></div>
-<div class="stat-grid">
-<div class="mini"><span>Extreme</span><b id="extCount" style="color:#ff7180">0</b></div>
-<div class="mini"><span>High risk</span><b id="highCount" style="color:#ffc45d">0</b></div>
-<div class="mini"><span>Moderate</span><b id="modCount" style="color:#48d6a7">0</b></div>
-<div class="mini"><span>Low risk</span><b id="lowCount" style="color:#54cbe8">0</b></div>
-</div>
-</div>
-<div class="panel">
-<div class="panel-head"><b class="panel-title">Recent Intelligence</b><span class="tag">LATEST</span></div>
-<div id="recentAlerts" class="alert-list"><div class="panel-sub">No recent records.</div></div>
-</div>
-<div class="panel">
-<b class="panel-title">Explore Intelligence Modules</b>
-<p class="panel-sub">Navigate to specialized tools for deeper analysis.</p>
-<button class="btn" style="width:100%;margin-top:12px" onclick="showPage('tracking')">Explore Satellite Tracking →</button>
-<button class="btn" style="width:100%;margin-top:8px" onclick="showPage('analytics')">Open Advanced Analytics →</button>
-</div>
+<div class="panel"><div class="panel-head"><b class="panel-title">Satellite Mission Status</b><span class="tag">MONITORING</span></div><div class="stat-grid"><div class="mini"><span>Extreme</span><b id="extCount" style="color:#ff7180">0</b></div><div class="mini"><span>High risk</span><b id="highCount" style="color:#ffc45d">0</b></div><div class="mini"><span>Moderate</span><b id="modCount" style="color:#48d6a7">0</b></div><div class="mini"><span>Low risk</span><b id="lowCount" style="color:#54cbe8">0</b></div></div></div>
+<div class="panel"><div class="panel-head"><b class="panel-title">Recent Intelligence</b><span class="tag">LATEST</span></div><div id="recentAlerts" class="alert-list"><div class="panel-sub">No recent records.</div></div></div>
+<div class="panel"><b class="panel-title">Explore Intelligence Modules</b><p class="panel-sub">Navigate to specialized tools for deeper analysis.</p><button class="btn" style="width:100%;margin-top:12px" onclick="showPage('tracking')">Explore Satellite Tracking →</button><button class="btn" style="width:100%;margin-top:8px" onclick="showPage('analytics')">Open Advanced Analytics →</button></div>
 </div>
 </div>
 </section>
@@ -338,21 +153,8 @@ RISK:
 <section class="page" id="mapPage">
 <div class="page-heading"><div><h2>Live Satellite Map</h2><p>Explore worldwide wildfire hotspots and thermal anomalies.</p></div><span class="tag">GEOSPATIAL INTELLIGENCE</span></div>
 <div class="description"><b>MAP INTELLIGENCE:</b> Each marker represents a recorded hotspot. Marker colors indicate the calculated thermal risk category. Select a marker to inspect its coordinates and brightness.</div>
-<div class="panel map-panel">
-<div class="map-overlay"><b>WORLDWIDE FIRE DETECTIONS</b><p>VIIRS / NASA FIRMS observations</p></div>
-<div class="map-count" id="mapCount2">0 HOTSPOTS</div>
-<div id="map2"></div>
-<div class="map-legend">
-<span class="dot" style="background:#35c6ec"></span>Low
-<span class="dot" style="background:#27d69a"></span>Moderate
-<span class="dot" style="background:#ffb547"></span>High
-<span class="dot" style="background:#ff5367"></span>Extreme
-</div>
-</div>
-<div class="two-col" style="margin-top:14px">
-<div class="panel"><b class="panel-title">Detection Coverage</b><p class="panel-sub" id="coverageText">Waiting for observations.</p></div>
-<div class="panel"><b class="panel-title">Map Instructions</b><p class="panel-sub">Use your mouse or touch to pan and zoom. Select hotspot markers to see their thermal readings.</p></div>
-</div>
+<div class="panel map-panel"><div class="map-overlay"><b>WORLDWIDE FIRE DETECTIONS</b><p>VIIRS / NASA FIRMS observations</p></div><div class="map-count" id="mapCount2">0 HOTSPOTS</div><div id="map2"></div><div class="map-legend"><span class="dot" style="background:#35c6ec"></span>Low <span class="dot" style="background:#27d69a"></span>Moderate <span class="dot" style="background:#ffb547"></span>High <span class="dot" style="background:#ff5367"></span>Extreme</div></div>
+<div class="two-col" style="margin-top:14px"><div class="panel"><b class="panel-title">Detection Coverage</b><p class="panel-sub" id="coverageText">Waiting for observations.</p></div><div class="panel"><b class="panel-title">Map Instructions</b><p class="panel-sub">Use your mouse or touch to pan and zoom. Select hotspot markers to see their thermal readings.</p></div></div>
 </section>
 
 <section class="page" id="tracking">
@@ -360,46 +162,17 @@ RISK:
 <div class="description"><b>TRACKING INTELLIGENCE:</b> This module provides an illustrative satellite orbit animation. It does not represent verified real-time orbital telemetry. NASA FIRMS hotspot observations are displayed separately.</div>
 <div class="layout">
 <div class="left">
-<div class="panel">
-<div class="panel-head"><b class="panel-title">Orbital Visualization</b><span class="tag">ANIMATED ORBIT</span></div>
+<div class="panel"><div class="panel-head"><b class="panel-title">Orbital Visualization</b><span class="tag">ANIMATED ORBIT</span></div>
 <div class="satellite-stage">
-<div class="star" style="top:12%;left:18%"></div>
-<div class="star" style="top:22%;left:80%"></div>
-<div class="star" style="top:75%;left:12%"></div>
-<div class="star" style="top:82%;left:82%"></div>
-<div class="star" style="top:10%;left:55%"></div>
-<div class="earth"></div>
-<div class="orbit"></div><div class="orbit two"></div>
-<div class="satellite">🛰</div>
-<div class="satellite-info">
-<div><span>MISSION</span><b>ORBITAL VISUALIZATION</b></div>
-<div><span>STATUS</span><b style="color:#40dca9">ANIMATION ACTIVE</b></div>
-<div><span>MODE</span><b>ILLUSTRATIVE</b></div>
-</div>
-</div>
-</div>
-<div class="panel">
-<div class="panel-head"><b class="panel-title">Satellite Mission Information</b><span class="tag">REFERENCE</span></div>
-<div class="stat-grid">
-<div class="mini"><span>Observation system</span><b style="font-size:13px">VIIRS</b></div>
-<div class="mini"><span>Data organization</span><b style="font-size:13px">NASA FIRMS</b></div>
-<div class="mini"><span>Detection type</span><b style="font-size:13px">Thermal</b></div>
-<div class="mini"><span>Visualization</span><b style="font-size:13px">Orbital</b></div>
-</div>
-</div>
+<div class="star" style="top:12%;left:18%"></div><div class="star" style="top:22%;left:80%"></div><div class="star" style="top:75%;left:12%"></div><div class="star" style="top:82%;left:82%"></div><div class="star" style="top:10%;left:55%"></div>
+<div class="earth"></div><div class="orbit"></div><div class="orbit two"></div><div class="satellite">🛰</div>
+<div class="satellite-info"><div><span>MISSION</span><b>ORBITAL VISUALIZATION</b></div><div><span>STATUS</span><b style="color:#40dca9">ANIMATION ACTIVE</b></div><div><span>MODE</span><b>ILLUSTRATIVE</b></div></div>
+</div></div>
+<div class="panel"><div class="panel-head"><b class="panel-title">Satellite Mission Information</b><span class="tag">REFERENCE</span></div><div class="stat-grid"><div class="mini"><span>Observation system</span><b style="font-size:13px">VIIRS</b></div><div class="mini"><span>Data organization</span><b style="font-size:13px">NASA FIRMS</b></div><div class="mini"><span>Detection type</span><b style="font-size:13px">Thermal</b></div><div class="mini"><span>Visualization</span><b style="font-size:13px">Orbital</b></div></div></div>
 </div>
 <div class="right">
-<div class="panel">
-<div class="panel-head"><b class="panel-title">Observation Status</b><span class="tag">DATA FEED</span></div>
-<div class="mini"><span>Current hotspot observations</span><b id="trackingCount">0</b></div>
-<div class="mini" style="margin-top:9px"><span>Data source</span><b style="font-size:14px" id="trackingSource">Demo records</b></div>
-<div class="mini" style="margin-top:9px"><span>Last update</span><b style="font-size:12px" id="trackingTime">--</b></div>
-</div>
-<div class="panel">
-<div class="panel-head"><b class="panel-title">Tracking Explanation</b></div>
-<p class="panel-sub" style="line-height:1.9">The animated satellite illustrates orbital motion around Earth. The wildfire monitoring system uses satellite-derived thermal detections to identify possible fire activity. Actual satellite position, altitude and velocity require a separate verified orbital tracking data source.</p>
-<button class="btn primary" style="width:100%;margin-top:12px" onclick="showPage('mapPage')">View Fire Activity Map →</button>
-</div>
+<div class="panel"><div class="panel-head"><b class="panel-title">Observation Status</b><span class="tag">DATA FEED</span></div><div class="mini"><span>Current hotspot observations</span><b id="trackingCount">0</b></div><div class="mini" style="margin-top:9px"><span>Data source</span><b style="font-size:14px" id="trackingSource">Connecting...</b></div><div class="mini" style="margin-top:9px"><span>Last update</span><b style="font-size:12px" id="trackingTime">--</b></div></div>
+<div class="panel"><div class="panel-head"><b class="panel-title">Tracking Explanation</b></div><p class="panel-sub" style="line-height:1.9">The animated satellite illustrates orbital motion around Earth. The wildfire monitoring system uses satellite-derived thermal detections to identify possible fire activity. Actual satellite position, altitude and velocity require a separate verified orbital tracking data source.</p><button class="btn primary" style="width:100%;margin-top:12px" onclick="showPage('mapPage')">View Fire Activity Map →</button></div>
 </div>
 </div>
 </section>
@@ -419,20 +192,9 @@ RISK:
 <div class="page-heading"><div><h2>Detection Records</h2><p>Search, filter and export satellite hotspot observations.</p></div><span class="tag">TELEMETRY DATABASE</span></div>
 <div class="description"><b>RECORD INTELLIGENCE:</b> Each row contains a hotspot's geographic coordinates, brightness and risk category.</div>
 <div class="panel">
-<div class="field-row">
-<div class="field"><label>SEARCH REGION OR RISK</label><input id="searchInput" placeholder="Search..."></div>
-<div class="field"><label>FILTER RISK CATEGORY</label><select id="riskFilter"><option value="all">All categories</option><option>Extreme</option><option>High</option><option>Moderate</option><option>Low</option></select></div>
-</div>
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-<span class="panel-sub" id="recordCount">0 records</span>
-<button class="btn primary" id="exportBtn">↓ Export CSV</button>
-</div>
-<div class="table-wrap">
-<table>
-<thead><tr><th>Region</th><th>Latitude</th><th>Longitude</th><th>Brightness</th><th>Risk</th><th>Source</th></tr></thead>
-<tbody id="dataTableBody"></tbody>
-</table>
-</div>
+<div class="field-row"><div class="field"><label>SEARCH REGION OR RISK</label><input id="searchInput" placeholder="Search..."></div><div class="field"><label>FILTER RISK CATEGORY</label><select id="riskFilter"><option value="all">All categories</option><option>Extreme</option><option>High</option><option>Moderate</option><option>Low</option></select></div></div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span class="panel-sub" id="recordCount">0 records</span><button class="btn primary" id="exportBtn">↓ Export CSV</button></div>
+<div class="table-wrap"><table><thead><tr><th>Region</th><th>Latitude</th><th>Longitude</th><th>Brightness</th><th>Risk</th><th>Source</th></tr></thead><tbody id="dataTableBody"></tbody></table></div>
 </div>
 </section>
 
@@ -441,147 +203,79 @@ RISK:
 <div class="description"><b>ALERT INTELLIGENCE:</b> Set a thermal threshold to identify high-brightness observations. A browser siren can be activated manually.</div>
 <div class="layout">
 <div class="left">
-<div class="panel">
-<div class="panel-head"><b class="panel-title">Thermal Alert Configuration</b><span class="tag">THRESHOLD CONTROL</span></div>
-<div class="field">
-<label>ALERT THRESHOLD</label>
-<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:8px"><span>300 K</span><b id="threshVal" style="color:var(--cyan)">330 K</b><span>390 K</span></div>
-<input type="range" id="threshSlider" min="300" max="390" value="330">
-</div>
+<div class="panel"><div class="panel-head"><b class="panel-title">Thermal Alert Configuration</b><span class="tag">THRESHOLD CONTROL</span></div>
+<div class="field"><label>ALERT THRESHOLD</label><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:8px"><span>300 K</span><b id="threshVal" style="color:var(--cyan)">330 K</b><span>390 K</span></div><input type="range" id="threshSlider" min="300" max="390" value="330"></div>
 <div class="mini" id="sirenStatus">Monitoring thermal detections.</div>
-<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-<button class="btn danger" id="sirenBtn">♫ Enable Siren</button>
-<button class="btn" id="stopSiren">Stop Siren</button>
+<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn danger" id="sirenBtn">♫ Enable Siren</button><button class="btn" id="stopSiren">Stop Siren</button></div>
 </div>
-</div>
-<div class="panel">
-<div class="panel-head"><b class="panel-title">Discord Alert Dispatch</b><span class="tag">NOTIFICATIONS</span></div>
-<div class="field"><label>DISCORD WEBHOOK URL</label><input id="webhookInput" type="password" placeholder="Enter Discord webhook URL"></div>
-<button class="btn primary" id="dispatchBtn" style="width:100%">Send Alert Notification</button>
-<p class="panel-sub" style="line-height:1.6;margin-top:10px">Do not expose webhook URLs in a public GitHub repository. Use a secure backend for production.</p>
-</div>
+<div class="panel"><div class="panel-head"><b class="panel-title">Discord Alert Dispatch</b><span class="tag">NOTIFICATIONS</span></div><div class="field"><label>DISCORD WEBHOOK URL</label><input id="webhookInput" type="password" placeholder="Enter Discord webhook URL"></div><button class="btn primary" id="dispatchBtn" style="width:100%">Send Alert Notification</button><p class="panel-sub" style="line-height:1.6;margin-top:10px">Do not expose webhook URLs in a public GitHub repository. Use a secure backend for production.</p></div>
 </div>
 <div class="right">
-<div class="panel">
-<div class="panel-head"><b class="panel-title">Alert Statistics</b><span class="tag">LIVE COUNTS</span></div>
-<div class="mini"><span>Critical detections</span><b id="alertCritical" style="color:#ff7786">0</b></div>
-<div class="mini" style="margin-top:10px"><span>Configured threshold</span><b id="alertThreshold">330 K</b></div>
-</div>
-<div class="panel">
-<div class="panel-head"><b class="panel-title">Alert History</b><button class="btn" id="clearAlerts">Clear History</button></div>
-<div class="alert-list" id="alertHistory"><div class="panel-sub">No alerts recorded.</div></div>
-</div>
+<div class="panel"><div class="panel-head"><b class="panel-title">Alert Statistics</b><span class="tag">LIVE COUNTS</span></div><div class="mini"><span>Critical detections</span><b id="alertCritical" style="color:#ff7786">0</b></div><div class="mini" style="margin-top:10px"><span>Configured threshold</span><b id="alertThreshold">330 K</b></div></div>
+<div class="panel"><div class="panel-head"><b class="panel-title">Alert History</b><button class="btn" id="clearAlerts">Clear History</button></div><div class="alert-list" id="alertHistory"><div class="panel-sub">No alerts recorded.</div></div></div>
 </div>
 </div>
 </section>
 
 <section class="page" id="settings">
 <div class="page-heading"><div><h2>System Settings</h2><p>Configure data feeds and monitoring preferences.</p></div><span class="tag">CONFIGURATION</span></div>
-<div class="description"><b>SYSTEM CONFIGURATION:</b> Connect your NASA FIRMS data source to request wildfire detections. Demonstration mode works without an API key.</div>
+<div class="description"><b>SYSTEM CONFIGURATION:</b> NASA FIRMS is connected centrally by the website owner. Visitors do not need an API key. Choose a dataset and date range, then synchronize.</div>
 <div class="two-col">
 <div class="panel">
 <div class="panel-head"><b class="panel-title">NASA FIRMS Configuration</b><span class="tag">DATA SOURCE</span></div>
-<div class="field"><label>NASA FIRMS MAP KEY</label><input id="apiKeyInput" type="password" placeholder="Enter your FIRMS MAP key"></div>
-<div class="field"><label>SATELLITE DATASET</label>
-<select id="dataset">
-<option value="VIIRS_NOAA20_NRT">VIIRS NOAA-20 NRT</option>
-<option value="VIIRS_NOAA21_NRT">VIIRS NOAA-21 NRT</option>
-<option value="VIIRS_SNPP_NRT">VIIRS SNPP NRT</option>
-<option value="MODIS_NRT">MODIS NRT</option>
-</select></div>
+<div class="mini" style="margin-bottom:13px"><span>NASA FIRMS connection</span><b style="font-size:13px;color:#48d6a7">Managed by SATELLITE LIVE</b><small style="display:block;color:#7795aa;margin-top:6px">Your API key is stored securely on the server. Visitors never see or enter it.</small></div>
+<div class="field"><label>SATELLITE DATASET</label><select id="dataset"><option value="VIIRS_NOAA20_NRT">VIIRS NOAA-20 NRT</option><option value="VIIRS_NOAA21_NRT">VIIRS NOAA-21 NRT</option><option value="VIIRS_SNPP_NRT">VIIRS SNPP NRT</option><option value="MODIS_NRT">MODIS NRT</option></select></div>
 <div class="field"><label>DATA RANGE</label><select id="days"><option value="1">Last 1 day</option><option value="2">Last 2 days</option><option value="3" selected>Last 3 days</option></select></div>
-<button class="btn primary" id="saveSettings" style="width:100%">Save & Synchronize</button>
+<button class="btn primary" id="saveSettings" style="width:100%">Synchronize NASA Data</button>
 </div>
 <div class="panel">
 <div class="panel-head"><b class="panel-title">System Information</b><span class="tag">SYSTEM</span></div>
-<div class="mini"><span>Application</span><b style="font-size:13px">SATELLITE LIVE</b></div>
-<div class="mini" style="margin-top:9px"><span>Map engine</span><b style="font-size:13px">Leaflet / Esri</b></div>
-<div class="mini" style="margin-top:9px"><span>Chart engine</span><b style="font-size:13px">Chart.js</b></div>
-<div class="mini" style="margin-top:9px"><span>Data source</span><b style="font-size:13px" id="sourceInfo">Demo records</b></div>
-<p class="panel-sub" style="line-height:1.7;margin-top:12px">NASA API access may require a secure backend proxy if your hosting environment blocks direct requests.</p>
-<button class="btn" id="demoBtn" style="width:100%">Load Demonstration Data</button>
+<div class="mini"><span>Application</span><b style="font-size:13px">SATELLITE LIVE</b></div><div class="mini" style="margin-top:9px"><span>Map engine</span><b style="font-size:13px">Leaflet / Esri</b></div><div class="mini" style="margin-top:9px"><span>Chart engine</span><b style="font-size:13px">Chart.js</b></div><div class="mini" style="margin-top:9px"><span>Data source</span><b style="font-size:13px" id="sourceInfo">Connecting...</b></div>
+<p class="panel-sub" style="line-height:1.7;margin-top:12px">Connection is handled by a secure Vercel API endpoint. The private NASA key is never sent to the browser.</p><button class="btn" id="demoBtn" style="width:100%">Load Demonstration Data</button>
 </div>
 </div>
 </section>
 
 <section class="page" id="about">
 <div class="page-heading"><div><h2>About Satellite Live</h2><p>Wildfire intelligence and satellite observation platform.</p></div><span class="tag">PROJECT INFORMATION</span></div>
-<div class="panel">
-<div style="font-size:35px">🛰</div>
-<h2 style="font-size:19px;color:var(--cyan)">SATELLITE LIVE</h2>
-<p class="panel-sub" style="line-height:2;max-width:750px">Satellite Live is a wildfire monitoring dashboard designed to visualize thermal hotspot observations, analyze geographic patterns and present important detection information in an interactive interface.</p>
-<div class="two-col" style="margin-top:20px">
-<div class="mini"><b style="font-size:13px">NASA FIRMS</b><span>Wildfire observation data</span></div>
-<div class="mini"><b style="font-size:13px">Interactive Maps</b><span>Geographic hotspot visualization</span></div>
-<div class="mini"><b style="font-size:13px">Data Analytics</b><span>Thermal and regional analysis</span></div>
-<div class="mini"><b style="font-size:13px">Alert Center</b><span>Threshold-based monitoring</span></div>
-</div>
+<div class="panel"><div style="font-size:35px">🛰</div><h2 style="font-size:19px;color:var(--cyan)">SATELLITE LIVE</h2><p class="panel-sub" style="line-height:2;max-width:750px">Satellite Live is a wildfire monitoring dashboard designed to visualize thermal hotspot observations, analyze geographic patterns and present important detection information in an interactive interface.</p>
+<div class="two-col" style="margin-top:20px"><div class="mini"><b style="font-size:13px">NASA FIRMS</b><span>Wildfire observation data</span></div><div class="mini"><b style="font-size:13px">Interactive Maps</b><span>Geographic hotspot visualization</span></div><div class="mini"><b style="font-size:13px">Data Analytics</b><span>Thermal and regional analysis</span></div><div class="mini"><b style="font-size:13px">Alert Center</b><span>Threshold-based monitoring</span></div></div>
 </div>
 </section>
-
 <div class="footer">SATELLITE LIVE · WILDFIRE INTELLIGENCE SYSTEM · NASA FIRMS DATA</div>
 </main>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script>
-let data=[];
-let maps={};
-let mapMarkers={overview:[],mapPage:[]};
-let charts={};
-let alertLog=[];
+let data=[],maps={},mapMarkers={overview:[],mapPage:[]},charts={},alertLog=[];
 let audioCtx=null,osc=null,sirenEnabled=false;
 const $=id=>document.getElementById(id);
-
-const colors={
- Extreme:'#ff5367',
- High:'#ffb547',
- Moderate:'#27d69a',
- Low:'#35c6ec'
-};
+const colors={Extreme:'#ff5367',High:'#ffb547',Moderate:'#27d69a',Low:'#35c6ec'};
 
 function showPage(id){
  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-
- const page=$(id);
- if(!page)return;
+ const page=$(id);if(!page)return;
  page.classList.add('active');
-
  const btn=document.querySelector(`[data-page="${id}"]`);
  if(btn)btn.classList.add('active');
-
  window.scrollTo({top:0,behavior:'smooth'});
-
  requestAnimationFrame(()=>{
-  if(id==='mapPage' && maps.mapPage){
-   maps.mapPage.invalidateSize(true);
-   renderMap('mapPage');
-  }
-  if(id==='overview' && maps.overview){
-   maps.overview.invalidateSize(true);
-   renderMap('overview');
+  if((id==='mapPage'||id==='overview')&&maps[id]){
+   maps[id].invalidateSize(true);renderMap(id);
   }
   if(id==='analytics')renderCharts();
  });
 }
-
-document.querySelectorAll('.nav-btn').forEach(b=>{
- b.addEventListener('click',()=>showPage(b.dataset.page));
-});
+document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
 
 function notify(msg){
- $('toast').textContent=msg;
- $('toast').style.display='block';
+ $('toast').textContent=msg;$('toast').style.display='block';
  setTimeout(()=>$('toast').style.display='none',3500);
 }
-
-function updateClock(){
- $('clock').textContent=new Date().toLocaleTimeString();
-}
-setInterval(updateClock,1000);
-updateClock();
+function updateClock(){$('clock').textContent=new Date().toLocaleTimeString()}
+setInterval(updateClock,1000);updateClock();
 
 function regionOf(lat,lon){
  if(lat>=15&&lat<=75&&lon>=-170&&lon<=-50)return'North America';
@@ -591,53 +285,31 @@ function regionOf(lat,lon){
  if(lat>=0&&lat<=78&&lon>45)return'Asia';
  return'Oceania';
 }
-
-function riskOf(b){
- return b>=360?'Extreme':b>=330?'High':b>=310?'Moderate':'Low';
-}
+function riskOf(b){return b>=360?'Extreme':b>=330?'High':b>=310?'Moderate':'Low'}
 
 function createMap(element){
  const m=L.map(element,{zoomControl:true,worldCopyJump:true}).setView([15,15],2);
- L.tileLayer(
-  'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-  {attribution:'Tiles © Esri',maxZoom:18}
- ).addTo(m);
+ L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{attribution:'Tiles © Esri',maxZoom:18}).addTo(m);
  return m;
 }
-
 maps.overview=createMap('map');
 maps.mapPage=createMap('map2');
 
 function demoData(){
  const clusters=[
-  {lat:4,lon:22,n:28},
-  {lat:-3,lon:115,n:30},
-  {lat:13,lon:102,n:20},
-  {lat:-18,lon:25,n:18},
-  {lat:37,lon:-7,n:12},
-  {lat:-10,lon:-55,n:15},
-  {lat:58,lon:100,n:10},
-  {lat:18,lon:-72,n:8}
+ {lat:4,lon:22,n:28},{lat:-3,lon:115,n:30},{lat:13,lon:102,n:20},
+ {lat:-18,lon:25,n:18},{lat:37,lon:-7,n:12},{lat:-10,lon:-55,n:15},
+ {lat:58,lon:100,n:10},{lat:18,lon:-72,n:8}
  ];
-
  data=[];
  clusters.forEach(c=>{
   for(let i=0;i<c.n;i++){
-   let lat=c.lat+(Math.random()-.5)*13;
-   let lon=c.lon+(Math.random()-.5)*17;
-   let b=299+Math.random()*88;
-   data.push({
-    latitude:+lat.toFixed(3),
-    longitude:+lon.toFixed(3),
-    brightness:+b.toFixed(1),
-    risk:riskOf(b),
-    region:regionOf(lat,lon),
-    source:'SIMULATED',
-    date:new Date().toISOString().slice(0,10)
-   });
+   const lat=c.lat+(Math.random()-.5)*13;
+   const lon=c.lon+(Math.random()-.5)*17;
+   const b=299+Math.random()*88;
+   data.push({latitude:+lat.toFixed(3),longitude:+lon.toFixed(3),brightness:+b.toFixed(1),risk:riskOf(b),region:regionOf(lat,lon),source:'SIMULATED',date:new Date().toISOString().slice(0,10)});
   }
  });
-
  $('status').textContent='DEMO MODE';
  $('sourceInfo').textContent='Simulated records';
  $('trackingSource').textContent='Demo records';
@@ -645,95 +317,57 @@ function demoData(){
 }
 
 function renderMap(which){
- const map=maps[which];
- if(!map)return;
-
- mapMarkers[which].forEach(m=>map.removeLayer(m));
- mapMarkers[which]=[];
-
+ const map=maps[which];if(!map)return;
+ mapMarkers[which].forEach(m=>map.removeLayer(m));mapMarkers[which]=[];
  data.forEach(d=>{
   const color=colors[d.risk];
-  const marker=L.circleMarker([d.latitude,d.longitude],{
-   radius:d.risk==='Extreme'?7:5,
-   color,fillColor:color,fillOpacity:.85,weight:1
-  });
-
-  marker.bindPopup(`
-   <b>${d.region}</b><br>
-   Brightness: ${d.brightness} K<br>
-   Risk: ${d.risk}<br>
-   Latitude: ${d.latitude}<br>
-   Longitude: ${d.longitude}<br>
-   Source: ${d.source}
-  `);
-
-  marker.addTo(map);
-  mapMarkers[which].push(marker);
+  const marker=L.circleMarker([d.latitude,d.longitude],{radius:d.risk==='Extreme'?7:5,color,fillColor:color,fillOpacity:.85,weight:1});
+  marker.bindPopup(`<b>${d.region}</b><br>Brightness: ${d.brightness} K<br>Risk: ${d.risk}<br>Latitude: ${d.latitude}<br>Longitude: ${d.longitude}<br>Source: ${d.source}`);
+  marker.addTo(map);mapMarkers[which].push(marker);
  });
 }
 
 function parseCSV(csv){
  const lines=csv.trim().split(/\r?\n/);
  if(lines.length<2)throw Error('No records returned');
-
  const headers=lines.shift().split(',').map(x=>x.trim());
  const idx=n=>headers.indexOf(n);
- const latI=idx('latitude');
- const lonI=idx('longitude');
+ const latI=idx('latitude'),lonI=idx('longitude');
  const brightI=idx('bright_ti4')>=0?idx('bright_ti4'):idx('brightness');
-
- if(latI<0||lonI<0||brightI<0)throw Error('Unexpected CSV format');
-
- data=[];
+ if(latI<0||lonI<0||brightI<0)throw Error('Unexpected NASA CSV format');
+ const newData=[];
  lines.slice(0,1500).forEach(line=>{
   const c=line.split(',');
-  const lat=Number(c[latI]);
-  const lon=Number(c[lonI]);
-  const b=Number(c[brightI]);
-
+  const lat=Number(c[latI]),lon=Number(c[lonI]),b=Number(c[brightI]);
   if(Number.isFinite(lat)&&Number.isFinite(lon)&&Number.isFinite(b)){
-   data.push({
-    latitude:lat,longitude:lon,brightness:b,
-    risk:riskOf(b),region:regionOf(lat,lon),
-    source:'NASA FIRMS',date:c[idx('acq_date')]||''
-   });
+   newData.push({latitude:lat,longitude:lon,brightness:b,risk:riskOf(b),region:regionOf(lat,lon),source:'NASA FIRMS',date:c[idx('acq_date')]||''});
   }
  });
- if(!data.length)throw Error('No valid detections');
+ if(!newData.length)throw Error('No valid detections in NASA response');
+ data=newData;
 }
 
 async function syncNASA(){
- const key=$('apiKeyInput').value.trim();
- if(!key){
-  notify('Please enter your NASA FIRMS MAP key in Settings.');
-  showPage('settings');
-  return;
- }
-
- $('status').textContent='SYNCING...';
- $('syncBtn').disabled=true;
-
+ $('status').textContent='SYNCING NASA...';
+ $('syncBtn').disabled=true;$('saveSettings').disabled=true;
  try{
-  const dataset=$('dataset').value;
-  const days=$('days').value;
-  const url=`https://firms.modaps.eosdis.nasa.gov/api/area/csv/${encodeURIComponent(key)}/${dataset}/world/${days}`;
-  const response=await fetch(url);
-  if(!response.ok)throw Error('HTTP '+response.status);
-
-  const csv=await response.text();
-  if(csv.toLowerCase().includes('error'))throw Error(csv.slice(0,120));
-
-  parseCSV(csv);
-  $('status').innerHTML='<span class="live-dot"></span>NASA CONNECTED';
-  $('sourceInfo').textContent='NASA FIRMS';
-  $('trackingSource').textContent='NASA FIRMS';
-  updateDashboard();
-  notify('NASA FIRMS observations updated.');
+  const dataset=$('dataset').value,days=$('days').value;
+  const response=await fetch(`/api/firms?dataset=${encodeURIComponent(dataset)}&days=${encodeURIComponent(days)}`);
+  const body=await response.text();
+  if(!response.ok)throw Error(body.slice(0,180)||('HTTP '+response.status));
+  if(body.toLowerCase().includes('error'))throw Error(body.slice(0,180));
+  parseCSV(body);
+  $('status').innerHTML='<span class="live-dot"></span>LIVE NASA DATA';
+  $('sourceInfo').textContent='NASA FIRMS (live)';
+  $('trackingSource').textContent='NASA FIRMS (live)';
+  updateDashboard();notify('Live NASA FIRMS observations updated.');
  }catch(e){
-  $('status').textContent='SYNC FAILED';
-  notify('NASA request failed: '+e.message+'. Try a backend proxy or demo data.');
+  $('status').textContent='NASA CONNECTION ERROR';
+  $('sourceInfo').textContent='NASA connection unavailable';
+  $('trackingSource').textContent='NASA unavailable';
+  notify('NASA sync failed: '+e.message+'. Use demonstration data if needed.');
  }finally{
-  $('syncBtn').disabled=false;
+  $('syncBtn').disabled=false;$('saveSettings').disabled=false;
  }
 }
 
@@ -742,321 +376,114 @@ function counts(){
  data.forEach(d=>result[d.risk]++);
  return result;
 }
-
 function updateDashboard(){
  const n=data.length;
  const mean=n?data.reduce((a,x)=>a+x.brightness,0)/n:0;
  const peak=n?Math.max(...data.map(x=>x.brightness)):0;
  const threshold=+$('threshSlider').value;
-
  $('kpiNodes').textContent=n.toLocaleString();
  $('kpiMean').textContent=mean.toFixed(1)+' K';
  $('kpiPeak').textContent=peak.toFixed(1)+' K';
-
  const critical=data.filter(x=>x.brightness>=threshold).length;
- $('kpiCritical').textContent=critical;
- $('alertCritical').textContent=critical;
+ $('kpiCritical').textContent=critical;$('alertCritical').textContent=critical;
  $('alertThreshold').textContent=threshold+' K';
-
  const c=counts();
- $('extCount').textContent=c.Extreme;
- $('highCount').textContent=c.High;
- $('modCount').textContent=c.Moderate;
- $('lowCount').textContent=c.Low;
-
- $('mapCount').textContent=n+' HOTSPOTS';
- $('mapCount2').textContent=n+' HOTSPOTS';
- $('trackingCount').textContent=n;
- $('trackingTime').textContent=new Date().toLocaleString();
+ $('extCount').textContent=c.Extreme;$('highCount').textContent=c.High;
+ $('modCount').textContent=c.Moderate;$('lowCount').textContent=c.Low;
+ $('mapCount').textContent=n+' HOTSPOTS';$('mapCount2').textContent=n+' HOTSPOTS';
+ $('trackingCount').textContent=n;$('trackingTime').textContent=new Date().toLocaleString();
  $('coverageText').textContent=`${n} observations across ${new Set(data.map(x=>x.region)).size} broad geographic regions.`;
-
- renderMap('overview');
- renderMap('mapPage');
- renderTable();
- renderRecent();
- renderCharts();
- checkThreshold();
+ renderMap('overview');renderMap('mapPage');renderTable();renderRecent();renderCharts();checkThreshold();
 }
 
 function renderTable(){
- const q=$('searchInput').value.toLowerCase();
- const risk=$('riskFilter').value;
-
- const filtered=data.filter(d=>
-  (d.region.toLowerCase().includes(q)||d.risk.toLowerCase().includes(q))&&
-  (risk==='all'||d.risk===risk)
- );
-
+ const q=$('searchInput').value.toLowerCase(),risk=$('riskFilter').value;
+ const filtered=data.filter(d=>(d.region.toLowerCase().includes(q)||d.risk.toLowerCase().includes(q))&&(risk==='all'||d.risk===risk));
  $('recordCount').textContent=filtered.length+' records';
-
- $('dataTableBody').innerHTML=filtered.slice(0,1000).map(d=>`
-  <tr>
-   <td>${d.region}</td>
-   <td>${d.latitude.toFixed(3)}°</td>
-   <td>${d.longitude.toFixed(3)}°</td>
-   <td style="color:#4bd9ed">${d.brightness.toFixed(1)} K</td>
-   <td><span class="risk ${d.risk}">${d.risk}</span></td>
-   <td>${d.source}</td>
-  </tr>
- `).join('')||'<tr><td colspan="6">No matching records</td></tr>';
+ $('dataTableBody').innerHTML=filtered.slice(0,1000).map(d=>`<tr><td>${d.region}</td><td>${d.latitude.toFixed(3)}°</td><td>${d.longitude.toFixed(3)}°</td><td style="color:#4bd9ed">${d.brightness.toFixed(1)} K</td><td><span class="risk ${d.risk}">${d.risk}</span></td><td>${d.source}</td></tr>`).join('')||'<tr><td colspan="6">No matching records</td></tr>';
 }
-
 function renderRecent(){
  const recent=[...data].sort((a,b)=>b.brightness-a.brightness).slice(0,5);
- $('recentAlerts').innerHTML=recent.map(d=>`
-  <div class="alert-item">
-   <b style="color:${colors[d.risk]}">${d.risk} detection</b> · ${d.region}
-   <small>Thermal reading: ${d.brightness.toFixed(1)} K</small>
-  </div>
- `).join('')||'<div class="panel-sub">No recent records.</div>';
+ $('recentAlerts').innerHTML=recent.map(d=>`<div class="alert-item"><b style="color:${colors[d.risk]}">${d.risk} detection</b> · ${d.region}<small>Thermal reading: ${d.brightness.toFixed(1)} K</small></div>`).join('')||'<div class="panel-sub">No recent records.</div>';
 }
 
-function destroyCharts(){
- Object.values(charts).forEach(c=>c.destroy());
- charts={};
-}
-
+function destroyCharts(){Object.values(charts).forEach(c=>c.destroy());charts={}}
 function renderCharts(){
  destroyCharts();
-
- const risk=['Extreme','High','Moderate','Low'];
- const c=counts();
- const riskData=risk.map(r=>c[r]);
+ const risk=['Extreme','High','Moderate','Low'],c=counts(),riskData=risk.map(r=>c[r]);
  const regions=['North America','South America','Europe','Africa','Asia','Oceania'];
-
- const averages=regions.map(r=>{
-  const arr=data.filter(d=>d.region===r);
-  return arr.length?arr.reduce((a,x)=>a+x.brightness,0)/arr.length:0;
- });
-
+ const averages=regions.map(r=>{const arr=data.filter(d=>d.region===r);return arr.length?arr.reduce((a,x)=>a+x.brightness,0)/arr.length:0});
  const regionalCounts=regions.map(r=>data.filter(d=>d.region===r).length);
-
- const common={
-  responsive:true,
-  maintainAspectRatio:false,
-  plugins:{legend:{labels:{color:'#91acbd',font:{size:10}}}}
- };
-
- function donut(id){
-  return new Chart($(id),{
-   type:'doughnut',
-   data:{labels:risk,datasets:[{
-    data:riskData,
-    backgroundColor:risk.map(r=>colors[r]),
-    borderColor:'#0a1927',borderWidth:3
-   }]},
-   options:{...common,cutout:'65%'}
-  });
- }
-
- function bar(id){
-  return new Chart($(id),{
-   type:'bar',
-   data:{labels:regions,datasets:[{
-    data:regionalCounts,backgroundColor:'#159fba',borderRadius:5
-   }]},
-   options:{
-    ...common,
-    plugins:{legend:{display:false}},
-    scales:{
-     x:{ticks:{color:'#86a4b7'},grid:{display:false}},
-     y:{beginAtZero:true,ticks:{color:'#86a4b7'},grid:{color:'#17364a'}}
-    }
-   }
-  });
- }
-
- function radar(id){
-  return new Chart($(id),{
-   type:'radar',
-   data:{labels:regions,datasets:[{
-    data:averages,borderColor:'#25cde9',
-    backgroundColor:'rgba(37,205,233,.15)',
-    pointBackgroundColor:'#25cde9',borderWidth:2
-   }]},
-   options:{
-    ...common,
-    plugins:{legend:{display:false}},
-    scales:{r:{
-     min:0,max:400,ticks:{display:false},
-     grid:{color:'#17364a'},
-     angleLines:{color:'#17364a'},
-     pointLabels:{color:'#9bb6c7',font:{size:9}}
-    }}
-   }
-  });
- }
-
- function line(id){
-  return new Chart($(id),{
-   type:'line',
-   data:{
-    labels:data.slice(0,120).map((_,i)=>i+1),
-    datasets:[{
-     data:data.slice(0,120).map(d=>d.brightness),
-     borderColor:'#20cce9',
-     backgroundColor:'rgba(32,204,233,.12)',
-     fill:true,tension:.35,pointRadius:0,borderWidth:2
-    }]
-   },
-   options:{
-    ...common,
-    plugins:{legend:{display:false}},
-    scales:{
-     x:{display:false},
-     y:{ticks:{color:'#86a4b7'},grid:{color:'#17364a'}}
-    }
-   }
-  });
- }
-
- donut('donutRisk');
- radar('regionChart');
- donut('analyticsDonut');
- radar('analyticsRadar');
- line('analyticsLine');
- bar('analyticsBar');
+ const common={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#91acbd',font:{size:10}}}}};
+ function donut(id){return new Chart($(id),{type:'doughnut',data:{labels:risk,datasets:[{data:riskData,backgroundColor:risk.map(r=>colors[r]),borderColor:'#0a1927',borderWidth:3}]},options:{...common,cutout:'65%'}})}
+ function bar(id){return new Chart($(id),{type:'bar',data:{labels:regions,datasets:[{data:regionalCounts,backgroundColor:'#159fba',borderRadius:5}]},options:{...common,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#86a4b7'},grid:{display:false}},y:{beginAtZero:true,ticks:{color:'#86a4b7'},grid:{color:'#17364a'}}}}})}
+ function radar(id){return new Chart($(id),{type:'radar',data:{labels:regions,datasets:[{data:averages,borderColor:'#25cde9',backgroundColor:'rgba(37,205,233,.15)',pointBackgroundColor:'#25cde9',borderWidth:2}]},options:{...common,plugins:{legend:{display:false}},scales:{r:{min:0,max:400,ticks:{display:false},grid:{color:'#17364a'},angleLines:{color:'#17364a'},pointLabels:{color:'#9bb6c7',font:{size:9}}}}}})}
+ function line(id){return new Chart($(id),{type:'line',data:{labels:data.slice(0,120).map((_,i)=>i+1),datasets:[{data:data.slice(0,120).map(d=>d.brightness),borderColor:'#20cce9',backgroundColor:'rgba(32,204,233,.12)',fill:true,tension:.35,pointRadius:0,borderWidth:2}]},options:{...common,plugins:{legend:{display:false}},scales:{x:{display:false},y:{ticks:{color:'#86a4b7'},grid:{color:'#17364a'}}}}})}
+ donut('donutRisk');radar('regionChart');donut('analyticsDonut');radar('analyticsRadar');line('analyticsLine');bar('analyticsBar');
 }
 
 function checkThreshold(){
- const threshold=+$('threshSlider').value;
- const hot=data.filter(d=>d.brightness>=threshold);
-
- $('threshVal').textContent=threshold+' K';
- $('alertThreshold').textContent=threshold+' K';
- $('alertCritical').textContent=hot.length;
-
- $('sirenStatus').textContent=hot.length?
-  `⚠ ${hot.length} observations at or above ${threshold} K`:
-  'Monitoring: no observations above the configured threshold.';
-
+ const threshold=+$('threshSlider').value,hot=data.filter(d=>d.brightness>=threshold);
+ $('threshVal').textContent=threshold+' K';$('alertThreshold').textContent=threshold+' K';$('alertCritical').textContent=hot.length;
+ $('sirenStatus').textContent=hot.length?`⚠ ${hot.length} observations at or above ${threshold} K`:'Monitoring: no observations above the configured threshold.';
  $('sirenStatus').style.color=hot.length?'#ff8994':'#67d8ae';
 }
-
 function logAlert(message){
- alertLog.unshift({message,time:new Date().toLocaleString()});
- alertLog=alertLog.slice(0,25);
- $('alertHistory').innerHTML=alertLog.map(a=>`
-  <div class="alert-item">${a.message}<small>${a.time}</small></div>
- `).join('');
+ alertLog.unshift({message,time:new Date().toLocaleString()});alertLog=alertLog.slice(0,25);
+ $('alertHistory').innerHTML=alertLog.map(a=>`<div class="alert-item">${a.message}<small>${a.time}</small></div>`).join('');
 }
-
 function startSiren(){
  try{
-  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-  osc=audioCtx.createOscillator();
-  const gain=audioCtx.createGain();
-  osc.type='sine';
-  osc.frequency.value=600;
-  gain.gain.value=.035;
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
-  osc.start();
-
+  audioCtx=new(window.AudioContext||window.webkitAudioContext)();osc=audioCtx.createOscillator();
+  const gain=audioCtx.createGain();osc.type='sine';osc.frequency.value=600;gain.gain.value=.035;
+  osc.connect(gain);gain.connect(audioCtx.destination);osc.start();
   let high=false;
-  window.sirenTimer=setInterval(()=>{
-   if(!osc)return;
-   osc.frequency.setTargetAtTime(high?900:550,audioCtx.currentTime,.2);
-   high=!high;
-  },600);
-
-  sirenEnabled=true;
-  $('sirenBtn').textContent='Siren Enabled';
-  logAlert('Browser siren manually activated.');
+  window.sirenTimer=setInterval(()=>{if(!osc)return;osc.frequency.setTargetAtTime(high?900:550,audioCtx.currentTime,.2);high=!high},600);
+  sirenEnabled=true;$('sirenBtn').textContent='Siren Enabled';logAlert('Browser siren manually activated.');
  }catch(e){notify('Audio not available in this browser.')}
 }
-
 function stopSiren(){
  if(window.sirenTimer)clearInterval(window.sirenTimer);
  if(osc){try{osc.stop()}catch(e){}osc=null}
  if(audioCtx){audioCtx.close();audioCtx=null}
- sirenEnabled=false;
- $('sirenBtn').textContent='♫ Enable Siren';
+ sirenEnabled=false;$('sirenBtn').textContent='♫ Enable Siren';
 }
-
 async function dispatchAlert(){
  const url=$('webhookInput').value.trim();
- if(!url.startsWith('https://discord.com/api/webhooks/')){
-  notify('Please enter a valid Discord webhook URL.');
-  return;
- }
-
- const threshold=+$('threshSlider').value;
- const hot=data.filter(d=>d.brightness>=threshold);
-
+ if(!url.startsWith('https://discord.com/api/webhooks/')){notify('Please enter a valid Discord webhook URL.');return}
+ const threshold=+$('threshSlider').value,hot=data.filter(d=>d.brightness>=threshold);
  try{
-  const r=await fetch(url,{
-   method:'POST',
-   headers:{'Content-Type':'application/json'},
-   body:JSON.stringify({
-    content:`🔥 SATELLITE LIVE ALERT\n${hot.length} detections at or above ${threshold} K.\nPeak brightness: ${data.length?Math.max(...data.map(d=>d.brightness)).toFixed(1):0} K.`
-   })
-  });
+  const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:`🔥 SATELLITE LIVE ALERT\n${hot.length} detections at or above ${threshold} K.\nPeak brightness: ${data.length?Math.max(...data.map(d=>d.brightness)).toFixed(1):0} K.`})});
   if(!r.ok)throw Error('HTTP '+r.status);
-  logAlert(`Discord notification sent for ${hot.length} detections.`);
-  notify('Discord notification sent.');
- }catch(e){
-  logAlert('Discord dispatch failed: '+e.message);
-  notify('Discord request failed. A secure backend may be required.');
- }
+  logAlert(`Discord notification sent for ${hot.length} detections.`);notify('Discord notification sent.');
+ }catch(e){logAlert('Discord dispatch failed: '+e.message);notify('Discord request failed. A secure backend may be required.')}
 }
-
 function exportCSV(){
- const csv='Region,Latitude,Longitude,Brightness,Risk,Source\n'+
- data.map(d=>[
-  d.region,d.latitude,d.longitude,d.brightness,d.risk,d.source
- ].map(x=>'"'+String(x).replaceAll('"','""')+'"').join(',')).join('\n');
-
- const blob=new Blob([csv],{type:'text/csv'});
- const link=document.createElement('a');
- const url=URL.createObjectURL(blob);
- link.href=url;
- link.download='satellite-live-detections.csv';
- link.click();
- URL.revokeObjectURL(url);
- notify('CSV file exported.');
+ const csv='Region,Latitude,Longitude,Brightness,Risk,Source\n'+data.map(d=>[d.region,d.latitude,d.longitude,d.brightness,d.risk,d.source].map(x=>'"'+String(x).replaceAll('"','""')+'"').join(',')).join('\n');
+ const blob=new Blob([csv],{type:'text/csv'}),link=document.createElement('a'),url=URL.createObjectURL(blob);
+ link.href=url;link.download='satellite-live-detections.csv';link.click();URL.revokeObjectURL(url);notify('CSV file exported.');
 }
 
 $('syncBtn').onclick=syncNASA;
 $('saveSettings').onclick=syncNASA;
-
-$('demoBtn').onclick=()=>{
- demoData();
- notify('Demonstration records loaded.');
-};
-
+$('demoBtn').onclick=()=>{demoData();notify('Demonstration records loaded.')};
 $('searchInput').oninput=renderTable;
 $('riskFilter').onchange=renderTable;
 $('exportBtn').onclick=exportCSV;
-
-$('threshSlider').oninput=()=>{
- checkThreshold();
- $('kpiCritical').textContent=data.filter(d=>d.brightness>=+$('threshSlider').value).length;
-};
-
+$('threshSlider').oninput=()=>{checkThreshold();$('kpiCritical').textContent=data.filter(d=>d.brightness>=+$('threshSlider').value).length};
 $('sirenBtn').onclick=()=>sirenEnabled?stopSiren():startSiren();
 $('stopSiren').onclick=stopSiren;
 $('dispatchBtn').onclick=dispatchAlert;
+$('clearAlerts').onclick=()=>{alertLog=[];$('alertHistory').innerHTML='<div class="panel-sub">No alerts recorded.</div>'};
 
-$('clearAlerts').onclick=()=>{
- alertLog=[];
- $('alertHistory').innerHTML='<div class="panel-sub">No alerts recorded.</div>';
-};
-
-// Start dashboard with demonstration data
+// Start with labelled sample data, then automatically request real NASA observations.
 demoData();
-
-// Correct map dimensions after the browser finishes rendering
+window.addEventListener('load',()=>syncNASA(),{once:true});
 window.addEventListener('load',()=>{
- setTimeout(()=>{
-  if(maps.overview)maps.overview.invalidateSize(true);
-  if(maps.mapPage)maps.mapPage.invalidateSize(true);
- },500);
+ setTimeout(()=>{maps.overview.invalidateSize(true);maps.mapPage.invalidateSize(true)},500);
 });
-
 window.addEventListener('resize',()=>{
- if(maps.overview)maps.overview.invalidateSize();
- if(maps.mapPage)maps.mapPage.invalidateSize();
+ maps.overview.invalidateSize();maps.mapPage.invalidateSize();
 });
 </script>
 </body>
