@@ -275,10 +275,10 @@ tr:hover{background:rgba(0,245,212,0.03)}
 <section class="page" id="mapPage">
  <div class="page-heading">
   <div>
-   <h2>Orbital Satellite Map Projection</h2>
-   <p>High-density global plotting of active wildfire thermal nodes.</p>
+   <h2>Infinite Orbital Satellite Map</h2>
+   <p>Rendering infinite worldwide thermal anomaly nodes simultaneously on canvas.</p>
   </div>
-  <span class="tag">ESRI DARK CANVAS</span>
+  <span class="tag">UNLIMITED CANVAS MAPPING</span>
  </div>
 
  <div class="card">
@@ -430,7 +430,7 @@ const bootLogsText = [
   "ESTABLISHING SECURE SATELLITE HANDSHAKE...",
   "CONNECTING TO VIIRS NOAA-20 NRT STREAM...",
   "PARKING ORBIT: 824 KM // INCLINATION: 98.7°",
-  "TRACKING GLOBAL THERMAL ANOMALIES...",
+  "TRACKING INFINITE GLOBAL THERMAL NODES...",
   "CALIBRATING KELVIN BRIGHTNESS MATRICES...",
   "SYSTEM ONLINE. LAUNCHING INTERFACE..."
 ];
@@ -514,11 +514,12 @@ function renderMarkers(map, layerArray, data) {
   layerArray.forEach(m => map.removeLayer(m));
   layerArray.length = 0;
 
-  data.slice(0, 2000).forEach(fire => {
+  // INFINITY MAP RENDERING: loops through ALL fetched global records without truncation
+  data.forEach(fire => {
     const color = riskColors[fire.risk] || riskColors.Low;
     const marker = L.circleMarker([fire.latitude, fire.longitude], {
-      radius: fire.risk === "Extreme" ? 4 : 2.5,
-      color: color, fillColor: color, fillOpacity: 0.85, weight: 0.5
+      radius: fire.risk === "Extreme" ? 3.5 : 2,
+      color: color, fillColor: color, fillOpacity: 0.8, weight: 0.4
     });
     marker.bindPopup(`<div style="color:#030712"><b>${fire.region}</b><br>Temp: ${fire.brightness} K<br>Risk: ${fire.risk}</div>`);
     marker.addTo(map);
@@ -542,7 +543,6 @@ async function loadData(showMessage=false) {
   $("status").textContent = "SYNCING ORBITAL FEED";
   try {
     const embeddedApiKey = "11be2b95414f1e231600092cc3ff7148";
-    // Added unique timestamp cache-buster to prevent browser caching stale data
     const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${embeddedApiKey}/VIIRS_NOAA20_NRT/world/1?_t=${new Date().getTime()}`;
 
     const response = await fetch(url, { cache: "no-store" });
@@ -606,7 +606,7 @@ function loadMockData() {
   fires = [];
   pendingAlerts = [];
   const regions = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania"];
-  for (let i = 0; i < 2500; i++) {
+  for (let i = 0; i < 5000; i++) {
     const brightness = 295 + Math.random() * 90;
     const fireObj = {
       latitude: Math.random() * 120 - 60,
