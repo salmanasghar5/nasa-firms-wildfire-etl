@@ -1,64 +1,64 @@
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SATELLITE LIVE — Wildfire Intelligence</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SATELLITE LIVE - Wildfire Intelligence</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <style>
-:root{--bg:#050d16;--panel:#0a1724;--panel2:#0c1d2c;--line:#153247;--muted:#7892a6;--text:#e5f4fc;--cyan:#19c8e8;--green:#26d6a0;--amber:#f5b942;--red:#ff5b68}
+:root{--bg:#050d16;--panel:#0a1724;--line:#153247;--text:#e5f4fc;--cyan:#19c8e8}
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(ellipse at 55% 20%,#09263a 0,#050d16 52%,#030910 100%);color:var(--text);font-family:Inter,system-ui,sans-serif}
+body{margin:0;background:radial-gradient(ellipse at 55% 20%,#09263a 0,#050d16 52%,#030910 100%);color:var(--text);font-family:Inter,Arial,sans-serif}
 .app{min-height:100vh;display:grid;grid-template-columns:76px 1fr}
 .rail{background:#06111c;border-right:1px solid var(--line);display:flex;align-items:center;flex-direction:column;padding:18px 10px;gap:12px;position:sticky;top:0;height:100vh}
-.rail .brandmark{width:42px;height:42px;border:1px solid #11617a;border-radius:13px;color:var(--cyan);display:grid;place-items:center;font-size:21px;margin-bottom:20px;background:#082437;box-shadow:0 0 24px #0a9fbd22}
-.rail a{width:44px;height:44px;display:grid;place-items:center;color:#6f91a7;border-radius:12px;text-decoration:none;font-size:19px;cursor:pointer}
-.rail a:hover,.rail a.active{background:#0b3b50;color:#3de1f6;box-shadow:inset 0 0 0 1px #17617a}
+.rail .brandmark{width:42px;height:42px;border:1px solid #11617a;border-radius:13px;color:var(--cyan);display:grid;place-items:center;font-size:21px;margin-bottom:20px;background:#082437}
+.rail a{width:44px;height:44px;display:grid;place-items:center;color:#6f91a7;border-radius:12px;text-decoration:none;font-size:19px}
+.rail a:hover,.rail a.active{background:#0b3b50;color:#3de1f6}
 .rail .bottom{margin-top:auto}
 .main{padding:22px 26px 34px;max-width:1800px;width:100%;margin:auto}
 .topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:20px}
 .brand{display:flex;align-items:center;gap:13px}
-.sat-icon{height:48px;width:48px;border-radius:14px;background:linear-gradient(145deg,#0b4055,#092032);border:1px solid #17617a;display:grid;place-items:center;font-size:25px;color:#35d8f1;box-shadow:0 0 25px #08b6d433}
+.sat-icon{height:48px;width:48px;border-radius:14px;background:#0b4055;border:1px solid #17617a;display:grid;place-items:center;font-size:25px;box-shadow:0 0 25px #08b6d433}
 .brand h1{font-size:20px;letter-spacing:.12em;font-weight:800;color:#3bdcf3;margin:0}
 .brand p{font-size:10px;color:#7897aa;letter-spacing:.16em;margin:4px 0 0}
 .actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
 .pill{border:1px solid var(--line);background:#091a28;color:#9db7c8;padding:9px 12px;border-radius:10px;font-size:11px}
 .live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#2ce2a4;box-shadow:0 0 10px #2ce2a4;margin-right:7px}
-.btn{border:1px solid #17627a;background:#0b3a50;color:#bff6ff;padding:10px 13px;border-radius:9px;font-size:11px;font-weight:700;cursor:pointer;transition:.2s}
-.btn:hover{background:#10536b;transform:translateY(-1px)}
-.btn.primary{background:#087c9b;border-color:#12a5c6;color:white}
+.btn{border:1px solid #17627a;background:#0b3a50;color:#bff6ff;padding:10px 13px;border-radius:9px;font-size:11px;font-weight:700;cursor:pointer}
+.btn:hover{background:#10536b}
+.btn.primary{background:#087c9b;color:white}
 .btn.ghost{background:#0a1926;border-color:var(--line);color:#a9c1d1}
 .btn.warn{background:#563b14;border-color:#9d701e;color:#ffe0a0}
 .grid-kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:14px}
 .panel,.kpi{background:linear-gradient(145deg,#0b1b29ed,#081521f2);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px #0003}
-.kpi{padding:16px 17px;position:relative;overflow:hidden}
-.kpi:after{content:"";position:absolute;width:90px;height:90px;border-radius:50%;right:-38px;top:-45px;background:#13b9d20b}
+.kpi{padding:16px 17px;position:relative}
 .kpi-label{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#7894a8}
-.kpi-value{font-size:29px;font-weight:700;letter-spacing:-.04em;margin:9px 0 3px}
+.kpi-value{font-size:29px;font-weight:700;margin:9px 0 3px}
 .kpi-foot{font-size:10px;color:#6d899d}
-.kpi-icon{float:right;color:#20bdd7;font-size:17px}
+.kpi-icon{float:right;color:#20bdd7}
 .layout{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(310px,.95fr);gap:14px}
 .leftcol,.rightcol{display:flex;flex-direction:column;gap:14px}
 .panel{padding:16px}
 .panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
-.panel-title{font-size:12px;font-weight:700;color:#d8edf7;letter-spacing:.02em}
+.panel-title{font-size:12px;font-weight:700;color:#d8edf7}
 .panel-sub{font-size:10px;color:#6f8ba0;margin-top:4px}
-.tag{font-size:9px;color:#66cfe0;border:1px solid #15546a;background:#082333;padding:5px 8px;border-radius:20px;white-space:nowrap}
+.tag{font-size:9px;color:#66cfe0;border:1px solid #15546a;background:#082333;padding:5px 8px;border-radius:20px}
 .map-wrap{position:relative}
-.map-panel{padding:0;overflow:hidden;position:relative;min-height:480px}
+.map-panel{padding:0;overflow:hidden;min-height:480px;position:relative}
 .map-head{position:absolute;z-index:500;top:14px;left:16px;right:16px;display:flex;justify-content:space-between;pointer-events:none}
 .map-head>*{pointer-events:auto}
-.map-title{background:#061521dd;border:1px solid #16445b;border-radius:9px;padding:9px 12px;font-size:11px;backdrop-filter:blur(8px)}
+.map-title{background:#061521dd;border:1px solid #16445b;border-radius:9px;padding:9px 12px;font-size:11px}
 #map{height:480px;background:#061522}
 .map-tools{position:absolute;z-index:500;right:15px;top:68px;display:flex;flex-direction:column;gap:6px}
-.map-tools button{width:35px;height:35px;border-radius:9px;background:#071b29eF;border:1px solid #16455c;color:#4bd4eb;cursor:pointer}
-.map-legend{position:absolute;z-index:500;bottom:14px;left:15px;background:#061521eF;border:1px solid #16445b;border-radius:9px;padding:9px 11px;font-size:9px;color:#a4bac8}
+.map-tools button{width:35px;height:35px;border-radius:9px;background:#071b29;border:1px solid #16455c;color:#4bd4eb;cursor:pointer}
+.map-legend{position:absolute;z-index:500;bottom:14px;left:15px;background:#061521ed;border:1px solid #16445b;border-radius:9px;padding:9px 11px;font-size:9px;color:#a4bac8}
 .legend-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin:0 5px 0 9px}
 .charts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .chartbox{height:210px;position:relative}
@@ -71,7 +71,7 @@ input:focus,select:focus{border-color:#16a9c8}
 input::placeholder{color:#557286}
 .table-scroll{overflow:auto;max-height:340px}
 table{width:100%;border-collapse:collapse;font-size:10px;white-space:nowrap}
-th{text-align:left;background:#081724;color:#7895a9;font-size:9px;text-transform:uppercase;letter-spacing:.08em;position:sticky;top:0;padding:11px 13px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+th{text-align:left;background:#081724;color:#7895a9;font-size:9px;text-transform:uppercase;position:sticky;top:0;padding:11px 13px;border-bottom:1px solid var(--line)}
 td{padding:10px 13px;border-bottom:1px solid #102638;color:#a9c0ce}
 tbody tr:hover{background:#0d2637}
 .risk{display:inline-block;padding:4px 7px;border-radius:20px;font-size:9px}
@@ -91,7 +91,7 @@ tbody tr:hover{background:#0d2637}
 .field input{width:100%}
 .field.full{grid-column:1/-1}
 .footer-note{font-size:9px;color:#58768b;text-align:center;margin:17px 0 0}
-.toast{position:fixed;bottom:20px;right:20px;z-index:2000;background:#0b2637;border:1px solid #1a6b83;color:#d5f8ff;padding:12px 16px;border-radius:10px;font-size:11px;box-shadow:0 10px 30px #0008;display:none}
+.toast{position:fixed;bottom:20px;right:20px;z-index:2000;background:#0b2637;border:1px solid #1a6b83;color:#d5f8ff;padding:12px 16px;border-radius:10px;font-size:11px;display:none}
 .leaflet-container{font:11px Inter,sans-serif}
 .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#0a1c2a;color:#d8edf7;border:1px solid #1c536a}
 .leaflet-control-zoom a{background:#0a1c2a!important;color:#8feeff!important;border-color:#16445b!important}
@@ -102,6 +102,7 @@ tbody tr:hover{background:#0d2637}
 </head>
 <body>
 <div class="app">
+
 <aside class="rail">
 <div class="brandmark">⌁</div>
 <a class="active" title="Overview" href="#overview">▦</a>
@@ -112,9 +113,17 @@ tbody tr:hover{background:#0d2637}
 <a title="Settings" href="#settings">⚙</a>
 <a class="bottom" title="About" href="#about">ⓘ</a>
 </aside>
+
 <main class="main" id="overview">
+
 <header class="topbar">
-<div class="brand"><div class="sat-icon">🛰</div><div><h1>SATELLITE LIVE</h1><p>NASA FIRMS · WILDFIRE INTELLIGENCE SYSTEM</p></div></div>
+<div class="brand">
+<div class="sat-icon">🛰</div>
+<div>
+<h1>SATELLITE LIVE</h1>
+<p>NASA FIRMS · WILDFIRE INTELLIGENCE SYSTEM</p>
+</div>
+</div>
 <div class="actions">
 <span class="pill"><span class="live-dot"></span><span id="systemStatus">DEMO FEED ACTIVE</span></span>
 <button class="btn ghost" id="demoBtn">Load demo data</button>
@@ -192,6 +201,7 @@ tbody tr:hover{background:#0d2637}
 </div>
 
 <div class="rightcol">
+
 <section class="panel">
 <div class="panel-head"><div><div class="panel-title">Satellite telemetry</div><div class="panel-sub">Current observation summary</div></div><span class="tag">NOAA-20 / VIIRS</span></div>
 <div class="right-stats">
@@ -221,7 +231,7 @@ tbody tr:hover{background:#0d2637}
 <input id="webhookInput" type="password" placeholder="Paste your Discord webhook URL" autocomplete="off" style="width:100%">
 </div>
 <button class="btn primary" id="dispatchBtn" style="width:100%;margin-top:9px">Send Discord alert</button>
-<div class="panel-sub" style="margin-top:7px">Webhook is kept only in this browser session. For production, send alerts through a secure backend.</div>
+<div class="panel-sub" style="margin-top:7px">For production, send alerts through a secure backend.</div>
 </section>
 
 <section class="panel">
@@ -244,8 +254,9 @@ tbody tr:hover{background:#0d2637}
 </select></div>
 </div>
 <button class="btn ghost" id="saveSettings" style="width:100%;margin-top:10px">Use settings and sync</button>
-<div class="panel-sub" style="margin-top:8px">Some browsers block direct NASA API requests (CORS). If sync fails, use a small backend proxy or load demo data.</div>
+<div class="panel-sub" style="margin-top:8px">Some browsers block direct NASA API requests (CORS). If sync fails, use a backend proxy or load demo data.</div>
 </section>
+
 </div>
 </div>
 
@@ -256,14 +267,8 @@ tbody tr:hover{background:#0d2637}
 
 <script>
 let data=[],map,markers=[],charts={},audioCtx=null,osc=null,sirenEnabled=false,alertLog=[];
-
 const $=id=>document.getElementById(id);
-const palette={
-Extreme:'#ff5367',
-High:'#ffb547',
-Moderate:'#27d69a',
-Low:'#35c6ec'
-};
+const palette={Extreme:'#ff5367',High:'#ffb547',Moderate:'#27d69a',Low:'#35c6ec'};
 
 function regionOf(lat,lon){
 if(lat>=15&&lat<=75&&lon>=-170&&lon<=-50)return'North America';
@@ -286,10 +291,15 @@ setTimeout(()=>$('toast').style.display='none',3300);
 
 function initMap(){
 map=L.map('map',{zoomControl:false,worldCopyJump:true}).setView([8,15],2);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
-attribution:'© OpenStreetMap © CARTO',
+
+// UPDATED MAP PROVIDER: ESRI DARK GRAY
+L.tileLayer(
+'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+{
+attribution:'Tiles © Esri',
 maxZoom:18
-}).addTo(map);
+}
+).addTo(map);
 }
 
 function mockData(){
@@ -305,13 +315,11 @@ const clusters=[
 ];
 
 data=[];
-
 clusters.forEach(c=>{
 for(let i=0;i<c.n;i++){
 let lat=c.lat+(Math.random()-.5)*13;
 let lon=c.lon+(Math.random()-.5)*17;
 let b=299+Math.random()*88;
-
 data.push({
 latitude:+lat.toFixed(3),
 longitude:+lon.toFixed(3),
@@ -332,27 +340,19 @@ updateDashboard();
 
 function parseCSV(txt){
 let rows=txt.trim().split(/\r?\n/);
-
 if(rows.length<2)throw Error('No detection rows returned');
-
 let h=rows.shift().split(',').map(x=>x.trim());
 let idx=n=>h.indexOf(n);
-
 let ilat=idx('latitude');
 let ilon=idx('longitude');
 let ib=idx('bright_ti4')>=0?idx('bright_ti4'):idx('brightness');
 
-if(ilat<0||ilon<0||ib<0)
-throw Error('Unexpected NASA CSV format');
+if(ilat<0||ilon<0||ib<0)throw Error('Unexpected NASA CSV format');
 
 data=[];
-
 rows.slice(0,1000).forEach(line=>{
 let c=line.split(',');
-let lat=+c[ilat];
-let lon=+c[ilon];
-let b=+c[ib];
-
+let lat=+c[ilat],lon=+c[ilon],b=+c[ib];
 if(Number.isFinite(lat)&&Number.isFinite(lon)&&Number.isFinite(b)){
 data.push({
 latitude:lat,
@@ -365,13 +365,11 @@ source:'NASA FIRMS'
 });
 }
 });
-
 if(!data.length)throw Error('No valid detections in feed');
 }
 
 async function syncFeed(){
 let key=$('apiKeyInput').value.trim();
-
 if(!key){
 toast('Enter your NASA FIRMS MAP key in Feed configuration, or load demo data.');
 $('settings').scrollIntoView({behavior:'smooth'});
@@ -384,24 +382,16 @@ $('syncBtn').disabled=true;
 try{
 let ds=$('dataset').value;
 let days=$('days').value;
-
 let url=`https://firms.modaps.eosdis.nasa.gov/api/area/csv/${encodeURIComponent(key)}/${ds}/world/${days}`;
-
 let r=await fetch(url);
-
 if(!r.ok)throw Error('NASA service returned HTTP '+r.status);
-
 let t=await r.text();
-
-if(t.toLowerCase().includes('error'))
-throw Error(t.slice(0,150));
-
+if(t.toLowerCase().includes('error'))throw Error(t.slice(0,150));
 parseCSV(t);
 
 $('systemStatus').innerHTML='<span class="live-dot"></span>NASA FEED CONNECTED';
 $('feedMode').textContent='Live NASA FIRMS';
 $('feedMode').style.color='#55ddb0';
-
 updateDashboard();
 toast('NASA FIRMS feed synchronized.');
 
@@ -426,14 +416,12 @@ $('kpiPeak').textContent=peak.toFixed(1)+' K';
 $('kpiCritical').textContent=critical.toLocaleString();
 
 let counts={Extreme:0,High:0,Moderate:0,Low:0};
-
 data.forEach(x=>counts[x.risk]++);
 
 $('extCount').textContent=counts.Extreme;
 $('highCount').textContent=counts.High;
 $('modCount').textContent=counts.Moderate;
 $('lowCount').textContent=counts.Low;
-
 $('mapCount').textContent=n+' HOTSPOTS';
 $('lastUpdated').textContent=new Date().toLocaleString();
 
@@ -446,16 +434,11 @@ checkThreshold();
 function renderMap(){
 markers.forEach(m=>map.removeLayer(m));
 markers=[];
-
 data.forEach(d=>{
 let color=palette[d.risk];
-
 let m=L.circleMarker([d.latitude,d.longitude],{
 radius:d.risk==='Extreme'?6:4,
-color,
-fillColor:color,
-fillOpacity:.8,
-weight:1
+color:color,fillColor:color,fillOpacity:.8,weight:1
 }).bindPopup(
 `<b>${d.region}</b><br>
 Brightness: ${d.brightness} K<br>
@@ -463,7 +446,6 @@ Risk: ${d.risk}<br>
 Coordinates: ${d.latitude}, ${d.longitude}<br>
 ${d.source||''}`
 );
-
 m.addTo(map);
 markers.push(m);
 });
@@ -472,14 +454,12 @@ markers.push(m);
 function renderTable(){
 let q=$('searchInput').value.toLowerCase();
 let risk=$('riskFilter').value;
-
 let filtered=data.filter(x=>
 (x.region.toLowerCase().includes(q)||x.risk.toLowerCase().includes(q))&&
 (risk==='all'||x.risk===risk)
 );
 
-$('dataTableBody').innerHTML=
-filtered.slice(0,500).map(x=>`
+$('dataTableBody').innerHTML=filtered.slice(0,500).map(x=>`
 <tr>
 <td>${x.region}</td>
 <td>${x.latitude.toFixed(3)}°</td>
@@ -487,8 +467,7 @@ filtered.slice(0,500).map(x=>`
 <td style="color:#5bd5eb;font-weight:700">${x.brightness.toFixed(1)} K</td>
 <td><span class="risk ${x.risk}">${x.risk}</span></td>
 </tr>
-`).join('')||
-'<tr><td colspan="5" style="text-align:center;padding:25px">No matching records</td></tr>';
+`).join('')||'<tr><td colspan="5" style="text-align:center;padding:25px">No matching records</td></tr>';
 }
 
 const chartText={color:'#8ba6b8',font:{size:9,family:'Inter'}};
@@ -505,15 +484,7 @@ destroyCharts();
 let risk=['Extreme','High','Moderate','Low'];
 let rc=risk.map(r=>data.filter(x=>x.risk===r).length);
 
-let regions=[
-'North America',
-'South America',
-'Europe',
-'Africa',
-'Asia',
-'Oceania'
-];
-
+let regions=['North America','South America','Europe','Africa','Asia','Oceania'];
 let avg=regions.map(r=>{
 let a=data.filter(x=>x.region===r);
 return a.length?a.reduce((s,x)=>s+x.brightness,0)/a.length:0;
@@ -522,53 +493,40 @@ return a.length?a.reduce((s,x)=>s+x.brightness,0)/a.length:0;
 let opts={
 responsive:true,
 maintainAspectRatio:false,
-plugins:{
-legend:{
-labels:{color:'#91aabc',boxWidth:9,font:{size:9}}
-}
-}
+plugins:{legend:{labels:{color:'#91aabc',boxWidth:9,font:{size:9}}}}
 };
 
 charts.donut=new Chart($('donutRisk'),{
 type:'doughnut',
-data:{
-labels:risk,
-datasets:[{
+data:{labels:risk,datasets:[{
 data:rc,
 backgroundColor:risk.map(r=>palette[r]),
 borderColor:'#0a1724',
 borderWidth:3,
 hoverOffset:5
-}]
-},
+}]},
 options:{...opts,cutout:'67%'}
 });
 
 charts.radar=new Chart($('radarChart'),{
 type:'radar',
-data:{
-labels:regions,
-datasets:[{
+data:{labels:regions,datasets:[{
 data:avg,
 borderColor:'#24c6e3',
 backgroundColor:'rgba(36,198,227,.15)',
 pointBackgroundColor:'#41d9ee',
 borderWidth:2
-}]
-},
+}]},
 options:{
 ...opts,
 plugins:{legend:{display:false}},
-scales:{
-r:{
-min:0,
-max:400,
+scales:{r:{
+min:0,max:400,
 ticks:{display:false},
 grid,
 angleLines:{color:grid.color},
 pointLabels:{color:'#8ba6b8',font:{size:8}}
-}
-}
+}}
 }
 });
 
@@ -580,19 +538,13 @@ datasets:[{
 data:data.slice(0,100).map(x=>x.brightness),
 borderColor:'#20c9e4',
 backgroundColor:'rgba(32,201,228,.12)',
-fill:true,
-tension:.35,
-pointRadius:0,
-borderWidth:2
+fill:true,tension:.35,pointRadius:0,borderWidth:2
 }]
 },
 options:{
 ...opts,
 plugins:{legend:{display:false}},
-scales:{
-x:{display:false,grid},
-y:{grid,ticks:chartText}
-}
+scales:{x:{display:false,grid},y:{grid,ticks:chartText}}
 }
 });
 
@@ -600,15 +552,12 @@ let regCounts=regions.map(r=>data.filter(x=>x.region===r).length);
 
 charts.country=new Chart($('countryChart'),{
 type:'bar',
-data:{
-labels:regions,
-datasets:[{
+data:{labels:regions,datasets:[{
 data:regCounts,
 backgroundColor:'#159dbb',
 borderRadius:5,
 maxBarThickness:38
-}]
-},
+}]},
 options:{
 ...opts,
 plugins:{legend:{display:false}},
@@ -623,7 +572,6 @@ y:{beginAtZero:true,grid,ticks:chartText}
 function logAlert(msg){
 alertLog.unshift({msg,time:new Date().toLocaleString()});
 alertLog=alertLog.slice(0,20);
-
 $('alertHistory').innerHTML=alertLog.map(a=>
 `<div class="alert-item">${a.msg}<small>${a.time}</small></div>`
 ).join('');
@@ -632,7 +580,6 @@ $('alertHistory').innerHTML=alertLog.map(a=>
 function checkThreshold(){
 let th=+$('threshSlider').value;
 let num=data.filter(x=>x.brightness>=th).length;
-
 $('threshVal').textContent=th+' K';
 
 if(num){
@@ -649,33 +596,24 @@ function startSiren(){
 try{
 audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();
 audioCtx.resume();
-
 osc=audioCtx.createOscillator();
 let gain=audioCtx.createGain();
-
 osc.type='sine';
 osc.frequency.value=520;
 gain.gain.value=.035;
-
 osc.connect(gain);
 gain.connect(audioCtx.destination);
 osc.start();
-
 let up=true;
 
 window.sirenTimer=setInterval(()=>{
 if(!osc)return;
-osc.frequency.setTargetAtTime(
-up?880:520,
-audioCtx.currentTime,
-.18
-);
+osc.frequency.setTargetAtTime(up?880:520,audioCtx.currentTime,.18);
 up=!up;
 },650);
 
 sirenEnabled=true;
 $('sirenBtn').textContent='♬ Siren enabled';
-
 toast('Siren enabled. It sounds only while threshold is exceeded.');
 checkThreshold();
 
@@ -686,24 +624,14 @@ toast('Audio is not available in this browser.');
 
 function stopSiren(){
 if(window.sirenTimer)clearInterval(window.sirenTimer);
-
-if(osc){
-try{osc.stop()}catch(e){}
-osc=null;
-}
-
-if(audioCtx){
-audioCtx.close();
-audioCtx=null;
-}
-
+if(osc){try{osc.stop()}catch(e){}osc=null}
+if(audioCtx){audioCtx.close();audioCtx=null}
 sirenEnabled=false;
 $('sirenBtn').textContent='♬ Enable siren';
 }
 
 async function dispatchAlert(){
 let url=$('webhookInput').value.trim();
-
 if(!url.startsWith('https://discord.com/api/webhooks/')){
 toast('Enter a valid Discord webhook URL first.');
 return;
@@ -724,7 +652,6 @@ Peak brightness: **${data.length?Math.max(...data.map(x=>x.brightness)).toFixed(
 });
 
 if(!res.ok)throw Error('HTTP '+res.status);
-
 logAlert(`Discord alert dispatched: ${hot.length} hotspots ≥ ${th} K`);
 toast('Discord alert dispatched.');
 
@@ -737,40 +664,26 @@ toast('Dispatch failed. Browser CORS may block direct webhooks; use a backend pr
 function exportCSV(){
 let csv='Region,Latitude,Longitude,Brightness_K,Risk,Source\n'+
 data.map(x=>[
-x.region,
-x.latitude,
-x.longitude,
-x.brightness,
-x.risk,
-x.source||''
+x.region,x.latitude,x.longitude,x.brightness,x.risk,x.source||''
 ].map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\n');
 
 let blob=new Blob([csv],{type:'text/csv'});
 let u=URL.createObjectURL(blob);
 let a=document.createElement('a');
-
 a.href=u;
 a.download='satellite-live-wildfire-detections.csv';
 a.click();
-
 URL.revokeObjectURL(u);
 toast('CSV export prepared.');
 }
 
 $('syncBtn').onclick=syncFeed;
-$('demoBtn').onclick=()=>{
-mockData();
-toast('Loaded simulated sample detections.');
-};
+$('demoBtn').onclick=()=>{mockData();toast('Loaded simulated sample detections.')};
 $('saveSettings').onclick=syncFeed;
 $('searchInput').oninput=renderTable;
 $('riskFilter').onchange=renderTable;
 $('exportBtn').onclick=exportCSV;
-
-$('threshSlider').oninput=()=>{
-updateDashboard();
-};
-
+$('threshSlider').oninput=updateDashboard;
 $('sirenBtn').onclick=()=>sirenEnabled?stopSiren():startSiren();
 $('stopSiren').onclick=stopSiren;
 $('dispatchBtn').onclick=dispatchAlert;
