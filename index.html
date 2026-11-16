@@ -239,10 +239,10 @@ textarea{min-height:110px;resize:vertical}
 <section class="page" id="mapPage">
  <div class="page-heading">
   <div>
-   <h2>Worldwide Live Satellite Map</h2>
-   <p>Inspect global wildfire hotspots across North America, South America, Europe, Africa, Asia, and Oceania[cite: 1].</p>
+   <h2>Worldwide Live Satellite Map (2,000+ Dots)</h2>
+   <p>Inspect up to 2,000 global wildfire hotspots across North America, South America, Europe, Africa, Asia, and Oceania[cite: 1].</p>
   </div>
-  <span class="tag">GLOBAL PROJECTION</span>
+  <span class="tag">HIGH-DENSITY PROJECTION</span>
  </div>
 
  <div class="card">
@@ -305,7 +305,7 @@ textarea{min-height:110px;resize:vertical}
   <div class="card">
    <div class="card-head"><h3>Automated Worldwide Monitoring</h3><span class="tag">ACTIVE TRIGGER</span></div>
    <div class="notice">
-     The system continuously monitors worldwide satellite feeds[cite: 1]. Any global anomaly exceeding <b>300 K</b> automatically triggers an instant notification to your Discord webhook.
+     The system continuously monitors worldwide satellite feeds[cite: 1]. Any global anomaly exceeding <b>300 K</b> automatically triggers a batched notification to your Discord webhook without rate-limit errors.
    </div>
    <div class="form-grid" style="margin-top:15px">
      <label>
@@ -387,7 +387,7 @@ let mapMain = null;
 let mapOverview = null;
 let mainMarkers = [];
 let overviewMarkers = [];
-let alertedIds = new Set();
+let pendingAlerts = [];
 
 const riskColors = {
   Low:"#18d7f5", Moderate:"#19d5a0", High:"#ffba45", Extreme:"#ff526b"
@@ -454,11 +454,12 @@ function renderMarkers(map, layerArray, data) {
   layerArray.forEach(m => map.removeLayer(m));
   layerArray.length = 0;
 
-  data.slice(0, 400).forEach(fire => {
+  // Increased limit to 2,000 dots on the map using optimized Leaflet Canvas rendering
+  data.slice(0, 2000).forEach(fire => {
     const color = riskColors[fire.risk] || riskColors.Low;
     const marker = L.circleMarker([fire.latitude, fire.longitude], {
-      radius: fire.risk === "Extreme" ? 6 : 4,
-      color: color, fillColor: color, fillOpacity: 0.85, weight: 1
+      radius: fire.risk === "Extreme" ? 4 : 2.5,
+      color: color, fillColor: color, fillOpacity: 0.8, weight: 0.5
     });
     marker.bindPopup(`<b>${fire.region}</b><br>Temp: ${fire.brightness} K<br>Risk: ${fire.risk}`);
     marker.addTo(map);
@@ -483,7 +484,6 @@ async function loadData(showMessage=false) {
   $("statusDot").style.background = "#ffba45";
 
   try {
-    // Embedded API key targeting worldwide ('world') feed[cite: 1]
     const embeddedApiKey = "11be2b95414f1e231600092cc3ff7148";
     const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${embeddedApiKey}/VIIRS_NOAA20_NRT/world/1`;
 
@@ -520,6 +520,8 @@ function parseCSV(text) {
   const brightIdx = headers.indexOf("bright_ti4") !== -1 ? headers.indexOf("bright_ti4") : headers.indexOf("brightness");
 
   fires = [];
+  pendingAlerts = [];
+
   for (let i = 1; i < lines.length; i++) {
     const cols = lines[i].split(",");
     if (cols.length > Math.max(latIdx, lonIdx, brightIdx)) {
@@ -536,19 +538,26 @@ function parseCSV(text) {
         };
         fires.push(fireObj);
 
-        // Automated background rule for worldwide detections > 300K
-        checkForAutoDiscordAlert(fireObj);
+        if (fireObj.brightness > 300) {
+          pendingAlerts.push(fireObj);
+        }
       }
     }
   }
   if (!fires.length) loadMockData();
+  
   updateDashboard();
+  
+  if (pendingAlerts.length > 0) {
+    sendBatchedDiscordAlert(pendingAlerts.length);
+  }
 }
 
 function loadMockData() {
   fires = [];
+  pendingAlerts = [];
   const regions = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania"];
-  for (let i = 0; i < 300; i++) {
+  for (let i = 0; i < 2500; i++) {
     const brightness = 295 + Math.random() * 90;
     const fireObj = {
       latitude: Math.random() * 120 - 60,
@@ -558,32 +567,26 @@ function loadMockData() {
       region: regions[Math.floor(Math.random() * regions.length)]
     };
     fires.push(fireObj);
-    checkForAutoDiscordAlert(fireObj);
+    if (fireObj.brightness > 300) pendingAlerts.push(fireObj);
   }
   updateDashboard();
+  if (pendingAlerts.length > 0) sendBatchedDiscordAlert(pendingAlerts.length);
 }
 
-// Automatically check condition (> 300K) and push to Discord webhook worldwide
-async function checkForAutoDiscordAlert(fire) {
-  if (fire.brightness > 300) {
-    const uniqueKey = `${fire.latitude.toFixed(2)}_${fire.longitude.toFixed(2)}_${fire.brightness}`;
-    if (!alertedIds.has(uniqueKey)) {
-      alertedIds.add(uniqueKey);
-      const url = $("webhookUrl").value.trim();
-      if (url.startsWith("https://")) {
-        try {
-          await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              content: `🚨 **WORLDWIDE WILDFIRE ALERT (>300K)**\n• **Region:** ${fire.region}\n• **Brightness:** ${fire.brightness} K\n• **Risk Level:** ${fire.risk}\n• **Coordinates:** (${fire.latitude.toFixed(2)}, ${fire.longitude.toFixed(2)})` 
-            })
-          });
-        } catch(e) {
-          console.error("Automatic webhook dispatch error:", e);
-        }
-      }
-    }
+async function sendBatchedDiscordAlert(count) {
+  const url = $("webhookUrl").value.trim();
+  if (!url.startsWith("https://")) return;
+
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        content: `🚨 **WORLDWIDE WILDFIRE INTELLIGENCE SYNC**\n• **Detected Anomalies >300K:** ${count} active thermal nodes synchronized across global sectors.` 
+      })
+    });
+  } catch(e) {
+    console.error("Batched webhook dispatch error:", e);
   }
 }
 
@@ -714,7 +717,6 @@ function exportCSV() {
   a.click();
 }
 
-// Automatically load worldwide data on startup without manual API input
 loadData(false);
 </script>
 </body>
