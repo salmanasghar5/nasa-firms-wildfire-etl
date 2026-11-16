@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SATELLITE LIVE | Orbital Thermal Intelligence</title>
+<title>SATELLITE LIVE | Live Orbital Intelligence</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -11,32 +11,32 @@
 
 <style>
 :root {
-  --bg:#030712; --panel:#071124; --line:#1E293B;
-  --cyan:#00F5D4; --amber:#FF9F1C; --red:#FF2B2B; --text:#F8FAFC; --muted:#94A3B8;
+  --bg:#f1f5f9; --panel:#ffffff; --line:#cbd5e1;
+  --cyan:#0284c7; --amber:#d97706; --red:#dc2626; --text:#0f172a; --muted:#64748b;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:'Courier New', Courier, monospace;overflow-x:hidden;}
 
 /* CINEMATIC BOOT SCREEN */
 #bootScreen {
-  position:fixed;inset:0;background:#030712;z-index:9999;
+  position:fixed;inset:0;background:#0f172a;z-index:9999;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   transition:opacity 0.8s ease-in-out, visibility 0.8s;
 }
 .orbit-container {
-  width:140px;height:140px;border:2px dashed rgba(0, 245, 212, 0.3);border-radius:50%;
+  width:140px;height:140px;border:2px dashed rgba(2, 132, 199, 0.4);border-radius:50%;
   position:relative;display:grid;place-items:center;animation:spin 6s linear infinite;
 }
 .satellite-icon { font-size:32px;position:absolute;top:-16px;animation:counterSpin 6s linear infinite; }
 .radar-core {
-  width:60px;height:60px;background:rgba(0, 245, 212, 0.15);border-radius:50%;
+  width:60px;height:60px;background:rgba(2, 132, 199, 0.2);border-radius:50%;
   box-shadow:0 0 25px var(--cyan);animation:pulseGlow 1.5s infinite alternate;
 }
 @keyframes spin { 100% { transform:rotate(360deg); } }
 @keyframes counterSpin { 100% { transform:rotate(-360deg); } }
 @keyframes pulseGlow { 0% { transform:scale(0.9); opacity:0.5; } 100% { transform:scale(1.1); opacity:1; } }
 
-.boot-logs { margin-top:25px;text-align:center;width:320px;font-size:11px;color:var(--cyan);letter-spacing:1px; }
+.boot-logs { margin-top:25px;text-align:center;width:320px;font-size:11px;color:#38bdf8;letter-spacing:1px; }
 
 /* MAIN APP DASHBOARD */
 .layout{display:flex;min-height:100vh;opacity:0;transition:opacity 1s ease-in-out;}
@@ -44,23 +44,23 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Courier New', 
 
 .sidebar{
   width:74px;position:fixed;inset:0 auto 0 0;
-  background:#071124;border-right:1px solid var(--line);
+  background:#ffffff;border-right:1px solid var(--line);
   display:flex;align-items:center;flex-direction:column;
   padding:16px 0;gap:12px;z-index:1000;
+  box-shadow:2px 0 10px rgba(0,0,0,0.05);
 }
 .logo{
   width:44px;height:44px;border-radius:12px;
-  display:grid;place-items:center;background:rgba(0, 245, 212, 0.1);
-  color:var(--cyan);font-size:20px;margin-bottom:18px;border:1px solid rgba(0, 245, 212, 0.3);
-  box-shadow:0 0 15px rgba(0, 245, 212, 0.2);
+  display:grid;place-items:center;background:rgba(2, 132, 199, 0.1);
+  color:var(--cyan);font-size:20px;margin-bottom:18px;border:1px solid rgba(2, 132, 199, 0.3);
 }
 .navbtn{
   width:46px;height:46px;border:0;border-radius:10px;
   background:transparent;color:var(--muted);font-size:18px;transition:.2s;
 }
 .navbtn:hover,.navbtn.active{
-  background:rgba(0, 245, 212, 0.15);color:var(--cyan);
-  box-shadow:inset 3px 0 var(--cyan), 0 0 10px rgba(0, 245, 212, 0.2);
+  background:rgba(2, 132, 199, 0.1);color:var(--cyan);
+  box-shadow:inset 3px 0 var(--cyan);
 }
 .sidebar-bottom{margin-top:auto}
 .main{margin-left:74px;width:calc(100% - 74px);padding:22px 26px}
@@ -72,27 +72,28 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Courier New', 
 .brand{display:flex;align-items:center;gap:13px}
 .brand-icon{
   width:46px;height:46px;border-radius:12px;
-  display:grid;place-items:center;background:rgba(0, 245, 212, 0.1);
-  border:1px solid rgba(0, 245, 212, 0.3);font-size:20px;box-shadow:0 0 15px rgba(0, 245, 212, 0.2);
+  display:grid;place-items:center;background:rgba(2, 132, 199, 0.1);
+  border:1px solid rgba(2, 132, 199, 0.3);font-size:20px;
 }
-.brand h1{margin:0;color:var(--cyan);font-size:20px;letter-spacing:3px;text-shadow:0 0 10px rgba(0, 245, 212, 0.4);}
+.brand h1{margin:0;color:var(--text);font-size:20px;letter-spacing:3px;}
 .brand small{display:block;color:var(--muted);font-size:9px;letter-spacing:2px;margin-top:4px;}
 
 .status-area{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
 .pill{
   border:1px solid var(--line);background:var(--panel);
   border-radius:20px;padding:8px 14px;color:var(--muted);font-size:10px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.05);
 }
 .dot{
   display:inline-block;width:7px;height:7px;
-  border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);margin-right:6px;
+  border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;margin-right:6px;
 }
 .primary{
-  border:0;background:rgba(0, 245, 212, 0.15);color:var(--cyan);
+  border:0;background:var(--cyan);color:white;
   border-radius:8px;padding:10px 16px;font-weight:bold;font-size:11px;
-  border:1px solid rgba(0, 245, 212, 0.4);box-shadow:0 0 12px rgba(0, 245, 212, 0.2);cursor:pointer;transition:0.2s;
+  box-shadow:0 2px 5px rgba(2,132,199,0.3);cursor:pointer;transition:0.2s;
 }
-.primary:hover{background:rgba(0, 245, 212, 0.3);box-shadow:0 0 18px rgba(0, 245, 212, 0.4);}
+.primary:hover{background:#0369a1;}
 
 .page{display:none;animation:fade .3s ease}
 .page.active{display:block}
@@ -106,18 +107,14 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Courier New', 
 .stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:16px}
 .card{
   background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0;
-  box-shadow:0 8px 30px rgba(0,0,0,0.5);position:relative;overflow:hidden;
-}
-.card::after {
-  content:'';position:absolute;top:0;left:0;width:100%;height:2px;
-  background:linear-gradient(90deg, transparent, var(--cyan), transparent);opacity:0.3;
+  box-shadow:0 4px 6px -1px rgba(0,0,0,0.05);position:relative;overflow:hidden;
 }
 .card-title{color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:1px;}
-.stat-value{font-size:25px;font-weight:bold;margin-top:10px;text-shadow:0 0 10px rgba(0,245,212,0.2);}
+.stat-value{font-size:25px;font-weight:bold;margin-top:10px;color:var(--text);}
 .stat-sub{font-size:9px;color:var(--muted);margin-top:5px}
 
 .cyan{color:var(--cyan)}
-.green{color:#10B981}
+.green{color:#10b981}
 .yellow{color:var(--amber)}
 .red{color:var(--red)}
 
@@ -125,34 +122,34 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Courier New', 
 .two-col{grid-template-columns:repeat(2,minmax(0,1fr))}
 .card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;}
 .card-head h3{font-size:13px;margin:0;letter-spacing:1px;}
-.tag{border:1px solid rgba(0,245,212,0.3);color:var(--cyan);background:rgba(0,245,212,0.05);font-size:9px;padding:5px 10px;border-radius:12px;box-shadow:0 0 8px rgba(0,245,212,0.1);}
+.tag{border:1px solid rgba(2,132,199,0.3);color:var(--cyan);background:rgba(2,132,199,0.05);font-size:9px;padding:5px 10px;border-radius:12px;}
 
-#map{height:460px;width:100%;border-radius:8px;background:#050d17;z-index:1;}
+#map{height:460px;width:100%;border-radius:8px;background:#e2e8f0;z-index:1;}
 .map-wrap{position:relative}
 .legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
 .legend span{font-size:10px;color:var(--muted)}
 .legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
-.low{background:#00F5D4;box-shadow:0 0 6px #00F5D4}
-.moderate{background:#10B981;box-shadow:0 0 6px #10B981}
-.high{background:#FF9F1C;box-shadow:0 0 6px #FF9F1C}
-.extreme{background:#FF2B2B;box-shadow:0 0 8px #FF2B2B}
+.low{background:#0284c7}
+.moderate{background:#10b981}
+.high{background:#d97706}
+.extreme{background:#dc2626}
 
 input,select,textarea{
-  background:#030712;color:var(--text);border:1px solid var(--line);border-radius:7px;padding:10px;font-size:11px;outline:none;font-family:inherit;
+  background:#f8fafc;color:var(--text);border:1px solid var(--line);border-radius:7px;padding:10px;font-size:11px;outline:none;font-family:inherit;
 }
-input:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 8px rgba(0,245,212,0.3);}
+input:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 5px rgba(2,132,199,0.3);}
 canvas{max-height:280px}
 .chart-box{height:270px;position:relative}
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;white-space:nowrap;font-size:11px}
 th{text-align:left;color:var(--muted);padding:12px 10px;border-bottom:1px solid var(--line);}
-td{padding:11px 10px;border-bottom:1px solid rgba(30,41,59,0.5)}
-tr:hover{background:rgba(0,245,212,0.03)}
+td{padding:11px 10px;border-bottom:1px solid var(--line)}
+tr:hover{background:rgba(2,132,199,0.03)}
 .footer{text-align:center;color:var(--muted);font-size:9px;padding:25px 0 10px;letter-spacing:1px;}
 .toast{
   position:fixed;right:20px;bottom:20px;z-index:3000;
-  background:var(--panel);border:1px solid rgba(0,245,212,0.4);color:var(--text);
-  padding:12px 16px;border-radius:8px;font-size:11px;display:none;box-shadow:0 0 15px rgba(0,245,212,0.2);
+  background:#ffffff;border:1px solid var(--line);color:var(--text);
+  padding:12px 16px;border-radius:8px;font-size:11px;display:none;box-shadow:0 4px 12px rgba(0,0,0,0.1);
 }
 @media(max-width:950px){
   .stats{grid-template-columns:repeat(2,1fr)}
@@ -170,7 +167,7 @@ tr:hover{background:rgba(0,245,212,0.03)}
     <div class="satellite-icon">🛰️</div>
     <div class="radar-core"></div>
   </div>
-  <div class="boot-logs" id="bootLogs">INITIALIZING ORBITAL LINK...</div>
+  <div class="boot-logs" id="bootLogs">ESTABLISHING LIVE MAP LINK...</div>
 </div>
 
 <div class="layout" id="mainLayout">
@@ -191,15 +188,15 @@ tr:hover{background:rgba(0,245,212,0.03)}
  <div class="brand">
   <div class="brand-icon">🛰</div>
   <div>
-   <h1>ORBITAL INTELLIGENCE</h1>
-   <small>GLOBAL THERMAL ANOMALY MONITORING SYSTEM</small>
+   <h1>LIVE MAP INTELLIGENCE</h1>
+   <small>WORLDWIDE THERMAL ANOMALY MONITORING</small>
   </div>
  </div>
 
  <div class="status-area">
-  <span class="pill"><span class="dot"></span><span id="status">ORBITAL LOCK ACTIVE</span></span>
+  <span class="pill"><span class="dot"></span><span id="status">LIVE MAP ACTIVE</span></span>
   <span class="pill" id="clock">--:--:--</span>
-  <button class="primary" onclick="loadData(true)">↻ SYNC TELEMETRY</button>
+  <button class="primary" onclick="loadData(true)">↻ SYNC LIVE FEED</button>
  </div>
 </header>
 
@@ -207,10 +204,10 @@ tr:hover{background:rgba(0,245,212,0.03)}
 <section class="page active" id="overview">
  <div class="page-heading">
   <div>
-   <h2>Global Telemetry Overview</h2>
+   <h2>Global Live Overview</h2>
    <p>Real-time satellite thermal anomaly tracking across global sectors[cite: 1].</p>
   </div>
-  <span class="tag">NASA FIRMS · LIVE STREAM</span>
+  <span class="tag">REAL-COLOR LIVE MAP</span>
  </div>
 
  <div class="grid stats">
@@ -239,11 +236,11 @@ tr:hover{background:rgba(0,245,212,0.03)}
  <div class="grid content-grid">
   <div class="card">
    <div class="card-head">
-    <h3>Worldwide Thermal Map</h3>
+    <h3>Live Map Overview</h3>
     <button class="primary" onclick="showPage('mapPage')">EXPAND MAP ↗</button>
    </div>
    <div class="map-wrap">
-    <div id="mapOverview" style="height:370px;border-radius:8px;background:#050d17"></div>
+    <div id="mapOverview" style="height:370px;border-radius:8px;"></div>
    </div>
    <div class="legend">
     <span><i class="low"></i>Low</span>
@@ -261,7 +258,7 @@ tr:hover{background:rgba(0,245,212,0.03)}
    <div class="card">
     <div class="card-head"><h3>Pipeline Status</h3><span class="tag">SECURE</span></div>
     <div class="grid two-col">
-     <div><div class="card-title">Link</div><b>Encrypted Feed</b></div>
+     <div><div class="card-title">Map Type</div><b>Carto Voyager Live</b></div>
      <div><div class="card-title">Auto Alert</div><b>> 300 K Active</b></div>
      <div><div class="card-title">Synced</div><b id="lastUpdate">—</b></div>
      <div><div class="card-title">Nodes</div><b id="displayed">—</b></div>
@@ -275,10 +272,10 @@ tr:hover{background:rgba(0,245,212,0.03)}
 <section class="page" id="mapPage">
  <div class="page-heading">
   <div>
-   <h2>Infinite Orbital Satellite Map</h2>
-   <p>Rendering infinite worldwide thermal anomaly nodes simultaneously on canvas.</p>
+   <h2>Real-Color Live Map Projection</h2>
+   <p>High-density global plotting of active wildfire thermal nodes with true-color map rendering.</p>
   </div>
-  <span class="tag">UNLIMITED CANVAS MAPPING</span>
+  <span class="tag">LIVE MAPPING ENGINE</span>
  </div>
 
  <div class="card">
@@ -353,7 +350,7 @@ tr:hover{background:rgba(0,245,212,0.03)}
    <div class="card-head"><h3>Manual Emergency Dispatch</h3><span class="tag">MANUAL TEST</span></div>
    <div class="form-grid" style="display:grid;gap:10px;">
     <label style="font-size:10px;color:var(--muted)">CUSTOM DISPATCH MESSAGE</label>
-    <input id="manualMsg" value="Manual global test alert: Orbital monitoring active (>300K threshold).">
+    <input id="manualMsg" value="Manual global test alert: Live map monitoring active (>300K threshold).">
     <button class="primary" onclick="sendManualAlert()" style="margin-top:5px">📡 DISPATCH WEBHOOK ALERT</button>
    </div>
   </div>
@@ -394,7 +391,7 @@ tr:hover{background:rgba(0,245,212,0.03)}
      </tr>
     </thead>
     <tbody id="tableBody">
-     <tr><td colspan="5" class="empty">Acquiring orbital telemetry...</td></tr>
+     <tr><td colspan="5" class="empty">Acquiring live telemetry...</td></tr>
     </tbody>
    </table>
   </div>
@@ -402,7 +399,7 @@ tr:hover{background:rgba(0,245,212,0.03)}
 </section>
 
 <footer class="footer">
- ORBITAL INTELLIGENCE · GLOBAL WILDFIRE MONITORING · NASA FIRMS NEAR-REAL-TIME DATA
+ LIVE MAP INTELLIGENCE · GLOBAL WILDFIRE MONITORING · NASA FIRMS NEAR-REAL-TIME DATA
 </footer>
 
 </main>
@@ -422,12 +419,12 @@ let overviewMarkers = [];
 let pendingAlerts = [];
 
 const riskColors = {
-  Low:"#00F5D4", Moderate:"#10B981", High:"#FF9F1C", Extreme:"#FF2B2B"
+  Low:"#0284c7", Moderate:"#10b981", High:"#d97706", Extreme:"#dc2626"
 };
 
 // CINEMATIC BOOT SEQUENCE SCRIPT
 const bootLogsText = [
-  "ESTABLISHING SECURE SATELLITE HANDSHAKE...",
+  "INITIALIZING REAL-COLOR LIVE MAP TILES...",
   "CONNECTING TO VIIRS NOAA-20 NRT STREAM...",
   "PARKING ORBIT: 824 KM // INCLINATION: 98.7°",
   "TRACKING INFINITE GLOBAL THERMAL NODES...",
@@ -488,8 +485,11 @@ setInterval(() => { $("clock") && ($("clock").textContent = new Date().toLocaleT
 
 function makeMap(element, zoom) {
   const map = L.map(element, { worldCopyJump:true, preferCanvas:true }).setView([20,0], zoom);
-  L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
-    attribution:'Esri', maxZoom:18
+  // Real-color modern live map tiles (Carto Voyager)
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains:'abcd',
+    maxZoom:19
   }).addTo(map);
   return map;
 }
@@ -514,14 +514,14 @@ function renderMarkers(map, layerArray, data) {
   layerArray.forEach(m => map.removeLayer(m));
   layerArray.length = 0;
 
-  // INFINITY MAP RENDERING: loops through ALL fetched global records without truncation
+  // INFINITY MAP RENDERING with vibrant real-color dots
   data.forEach(fire => {
     const color = riskColors[fire.risk] || riskColors.Low;
     const marker = L.circleMarker([fire.latitude, fire.longitude], {
-      radius: fire.risk === "Extreme" ? 3.5 : 2,
-      color: color, fillColor: color, fillOpacity: 0.8, weight: 0.4
+      radius: fire.risk === "Extreme" ? 4 : 2.5,
+      color: "#ffffff", fillColor: color, fillOpacity: 0.9, weight: 1
     });
-    marker.bindPopup(`<div style="color:#030712"><b>${fire.region}</b><br>Temp: ${fire.brightness} K<br>Risk: ${fire.risk}</div>`);
+    marker.bindPopup(`<div style="color:#0f172a"><b>${fire.region}</b><br>Temp: ${fire.brightness} K<br>Risk: ${fire.risk}</div>`);
     marker.addTo(map);
     layerArray.push(marker);
   });
@@ -540,7 +540,7 @@ function renderOverviewMap() {
 }
 
 async function loadData(showMessage=false) {
-  $("status").textContent = "SYNCING ORBITAL FEED";
+  $("status").textContent = "SYNCING LIVE FEED";
   try {
     const embeddedApiKey = "11be2b95414f1e231600092cc3ff7148";
     const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${embeddedApiKey}/VIIRS_NOAA20_NRT/world/1?_t=${new Date().getTime()}`;
@@ -549,8 +549,8 @@ async function loadData(showMessage=false) {
     const text = await response.text();
     parseCSV(text);
 
-    $("status").textContent = "ORBITAL LOCK ACTIVE";
-    if (showMessage) toast("Telemetry synchronized successfully.");
+    $("status").textContent = "LIVE MAP ACTIVE";
+    if (showMessage) toast("Live telemetry synchronized successfully.");
   } catch (err) {
     loadMockData();
     $("status").textContent = "SIMULATED TELEMETRY";
@@ -629,7 +629,7 @@ async function sendBatchedDiscordAlert(count) {
     await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: `🛰️ **ORBITAL INTELLIGENCE SYNC**\n• **Thermal Nodes >300K:** ${count} active wildfire anomalies synchronized globally.` })
+      body: JSON.stringify({ content: `🛰️ **LIVE MAP INTELLIGENCE SYNC**\n• **Thermal Nodes >300K:** ${count} active wildfire anomalies synchronized globally.` })
     });
   } catch(e) {}
 }
@@ -680,7 +680,7 @@ function drawCharts() {
   charts["overviewRiskChart"] = new Chart($("overviewRiskChart").getContext("2d"), {
     type: 'doughnut',
     data: { labels: risks, datasets: [{ data: riskCounts, backgroundColor: Object.values(riskColors) }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94A3B8', boxWidth: 10, font: { size: 10 } } } } }
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#64748b', boxWidth: 10, font: { size: 10 } } } } }
   });
 
   const regMap = {};
@@ -698,12 +698,12 @@ function drawCharts() {
           const sub = fires.filter(x => x.region === r);
           return sub.length ? (sub.reduce((a,b)=>a+b.brightness,0)/sub.length).toFixed(1) : 300;
         }),
-        backgroundColor: 'rgba(0, 245, 212, 0.15)',
-        borderColor: '#00F5D4',
-        pointBackgroundColor: '#FF9F1C'
+        backgroundColor: 'rgba(2, 132, 199, 0.15)',
+        borderColor: '#0284c7',
+        pointBackgroundColor: '#d97706'
       }]
     },
-    options: { responsive: true, maintainAspectRatio: false, scales: { r: { grid: { color: '#1E293B' }, ticks: { display: false }, pointLabels: { color: '#94A3B8', font: { size: 10 } } } }, plugins: { legend: { display: false } } }
+    options: { responsive: true, maintainAspectRatio: false, scales: { r: { grid: { color: '#cbd5e1' }, ticks: { display: false }, pointLabels: { color: '#64748b', font: { size: 10 } } } }, plugins: { legend: { display: false } } }
   });
 
   destroyChart("timeSeriesChart");
@@ -711,9 +711,9 @@ function drawCharts() {
     type: 'line',
     data: {
       labels: fires.map((_, i) => i + 1),
-      datasets: [{ label: 'Kelvin', data: fires.map(x => x.brightness), borderColor: '#10B981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.3, pointRadius: 0 }]
+      datasets: [{ label: 'Kelvin', data: fires.map(x => x.brightness), borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.3, pointRadius: 0 }]
     },
-    options: { responsive: true, maintainAspectRatio: false, scales: { x: { display: false }, y: { ticks: { color: '#94A3B8', font: { size: 9 } }, grid: { color: '#1E293B' } } }, plugins: { legend: { display: false } } }
+    options: { responsive: true, maintainAspectRatio: false, scales: { x: { display: false }, y: { ticks: { color: '#64748b', font: { size: 9 } }, grid: { color: '#cbd5e1' } } }, plugins: { legend: { display: false } } }
   });
 }
 
@@ -737,7 +737,7 @@ function renderTable() {
       <td>${row.latitude.toFixed(2)}°</td>
       <td>${row.longitude.toFixed(2)}°</td>
       <td style="color:var(--cyan);font-weight:bold">${row.brightness} K</td>
-      <td><span style="padding:3px 8px;border-radius:10px;font-size:9px;font-weight:bold;background:rgba(0,245,212,0.1);color:${riskColors[row.risk]}">${row.risk}</span></td>
+      <td><span style="padding:3px 8px;border-radius:10px;font-size:9px;font-weight:bold;background:rgba(2,132,199,0.1);color:${riskColors[row.risk]}">${row.risk}</span></td>
     </tr>`;
   });
   $("tableBody").innerHTML = html || '<tr><td colspan="5" class="empty">No matching telemetry records found.</td></tr>';
@@ -752,7 +752,7 @@ function exportCSV() {
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'orbital_wildfire_telemetry.csv';
+  a.download = 'live_map_wildfire_telemetry.csv';
   a.click();
 }
 
