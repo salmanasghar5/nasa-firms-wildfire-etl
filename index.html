@@ -1,123 +1,88 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SATELLITE LIVE | Wildfire Intelligence</title>
+<title>SATELLITE LIVE | Global Wildfire Intelligence</title>
 
-<link rel="stylesheet"
- href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <style>
 :root {
- --bg:#050d17;
- --panel:#091a28;
- --panel2:#0c2030;
- --line:#15384b;
- --cyan:#18d7f5;
- --blue:#0788ac;
- --text:#e7f5ff;
- --muted:#779bb4;
- --green:#19d5a0;
- --yellow:#ffba45;
- --red:#ff526b;
+  --bg:#050d17; --panel:#091a28; --panel2:#0c2030; --line:#15384b;
+  --cyan:#18d7f5; --blue:#0788ac; --text:#e7f5ff; --muted:#779bb4;
+  --green:#19d5a0; --yellow:#ffba45; --red:#ff526b;
 }
 *{box-sizing:border-box}
-body{
- margin:0;background:var(--bg);color:var(--text);
- font-family:Arial,Helvetica,sans-serif;
-}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;}
 button,input,select,textarea{font:inherit}
 button{cursor:pointer}
 .layout{display:flex;min-height:100vh}
 .sidebar{
- width:74px;position:fixed;inset:0 auto 0 0;
- background:#071522;border-right:1px solid var(--line);
- display:flex;align-items:center;flex-direction:column;
- padding:16px 0;gap:12px;z-index:1000;
+  width:74px;position:fixed;inset:0 auto 0 0;
+  background:#071522;border-right:1px solid var(--line);
+  display:flex;align-items:center;flex-direction:column;
+  padding:16px 0;gap:12px;z-index:1000;
 }
 .logo{
- width:44px;height:44px;border-radius:13px;
- display:grid;place-items:center;background:#0b3449;
- color:var(--cyan);font-size:22px;margin-bottom:18px;
- border:1px solid #126b88;
+  width:44px;height:44px;border-radius:13px;
+  display:grid;place-items:center;background:#0b3449;
+  color:var(--cyan);font-size:22px;margin-bottom:18px;border:1px solid #126b88;
 }
 .navbtn{
- width:46px;height:46px;border:0;border-radius:12px;
- background:transparent;color:#79a4bd;font-size:20px;
- transition:.2s;
+  width:46px;height:46px;border:0;border-radius:12px;
+  background:transparent;color:#79a4bd;font-size:20px;transition:.2s;
 }
 .navbtn:hover,.navbtn.active{
- background:#0c4055;color:var(--cyan);
- box-shadow:inset 3px 0 var(--cyan);
+  background:#0c4055;color:var(--cyan);box-shadow:inset 3px 0 var(--cyan);
 }
 .sidebar-bottom{margin-top:auto}
 .main{margin-left:74px;width:calc(100% - 74px);padding:22px 26px}
 .topbar{
- display:flex;justify-content:space-between;align-items:center;
- flex-wrap:wrap;gap:15px;margin-bottom:26px;
+  display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:15px;margin-bottom:26px;
 }
 .brand{display:flex;align-items:center;gap:13px}
 .brand-icon{
- width:46px;height:46px;border-radius:13px;
- display:grid;place-items:center;background:#0d3b50;
- border:1px solid #147b9a;font-size:22px;
+  width:46px;height:46px;border-radius:13px;
+  display:grid;place-items:center;background:#0d3b50;
+  border:1px solid #147b9a;font-size:22px;
 }
-.brand h1{
- margin:0;color:var(--cyan);font-size:21px;
- letter-spacing:4px;
-}
-.brand small{
- display:block;color:var(--muted);font-size:9px;
- letter-spacing:2px;margin-top:6px;
-}
+.brand h1{margin:0;color:var(--cyan);font-size:21px;letter-spacing:4px;}
+.brand small{display:block;color:var(--muted);font-size:9px;letter-spacing:2px;margin-top:6px;}
 .status-area{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
 .pill{
- border:1px solid var(--line);background:var(--panel);
- border-radius:20px;padding:9px 12px;
- color:var(--muted);font-size:10px;
+  border:1px solid var(--line);background:var(--panel);
+  border-radius:20px;padding:9px 12px;color:var(--muted);font-size:10px;
 }
 .dot{
- display:inline-block;width:7px;height:7px;
- border-radius:50%;background:var(--green);margin-right:6px;
+  display:inline-block;width:7px;height:7px;
+  border-radius:50%;background:var(--green);margin-right:6px;
 }
 .primary{
- border:0;background:#0789a8;color:white;
- border-radius:8px;padding:11px 15px;font-weight:bold;
+  border:0;background:#0789a8;color:white;border-radius:8px;padding:11px 15px;font-weight:bold;
 }
 .primary:hover{background:#10a8c9}
 .secondary{
- background:#10283a;border:1px solid var(--line);
- color:var(--cyan);border-radius:8px;padding:10px 13px;
-}
-.danger{
- background:#351c2b;border:1px solid #71334c;
- color:#ff8293;border-radius:8px;padding:10px 13px;
+  background:#10283a;border:1px solid var(--line);color:var(--cyan);border-radius:8px;padding:10px 13px;
 }
 .page{display:none;animation:fade .25s ease}
 .page.active{display:block}
 @keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 .page-heading{
- display:flex;justify-content:space-between;align-items:center;
- flex-wrap:wrap;gap:10px;margin-bottom:20px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:20px;
 }
 .page-heading h2{font-size:22px;margin:0}
 .page-heading p{font-size:12px;color:var(--muted);margin:7px 0 0}
 .grid{display:grid;gap:15px}
 .stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:16px}
 .card{
- background:linear-gradient(145deg,#0a1c2b,#071522);
- border:1px solid var(--line);border-radius:13px;padding:17px;
- min-width:0;
+  background:linear-gradient(145deg,#0a1c2b,#071522);
+  border:1px solid var(--line);border-radius:13px;padding:17px;min-width:0;
 }
-.card-title{
- color:var(--muted);font-size:10px;
- text-transform:uppercase;letter-spacing:1px;
-}
+.card-title{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;}
 .stat-value{font-size:27px;font-weight:bold;margin-top:12px}
 .stat-sub{font-size:10px;color:var(--muted);margin-top:7px}
 .cyan{color:var(--cyan)}
@@ -126,26 +91,11 @@ button{cursor:pointer}
 .red{color:var(--red)}
 .content-grid{grid-template-columns:minmax(0,1.65fr) minmax(280px,1fr)}
 .two-col{grid-template-columns:repeat(2,minmax(0,1fr))}
-.card-head{
- display:flex;justify-content:space-between;
- align-items:center;gap:10px;margin-bottom:14px;
-}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;}
 .card-head h3{font-size:14px;margin:0}
-.tag{
- border:1px solid #14536a;color:var(--cyan);
- font-size:9px;padding:6px 9px;border-radius:15px;
- white-space:nowrap;
-}
-#map{
- height:480px;width:100%;border-radius:9px;
- background:#101c28;z-index:1;
-}
+.tag{border:1px solid #14536a;color:var(--cyan);font-size:9px;padding:6px 9px;border-radius:15px;white-space:nowrap;}
+#map{height:480px;width:100%;border-radius:9px;background:#101c28;z-index:1;}
 .map-wrap{position:relative}
-.map-overlay{
- position:absolute;z-index:500;top:12px;left:12px;
- background:#071522e8;border:1px solid var(--line);
- border-radius:8px;padding:10px;font-size:10px;
-}
 .legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
 .legend span{font-size:10px;color:var(--muted)}
 .legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
@@ -153,92 +103,37 @@ button{cursor:pointer}
 .moderate{background:#19d5a0}
 .high{background:#ffb33e}
 .extreme{background:#ff4f68}
-.controls{
- display:flex;gap:9px;flex-wrap:wrap;align-items:center;
-}
+.controls{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
 select,input,textarea{
- background:#061522;color:var(--text);
- border:1px solid #1b4358;border-radius:7px;
- padding:10px;font-size:12px;outline:none;
+  background:#061522;color:var(--text);border:1px solid #1b4358;border-radius:7px;padding:10px;font-size:12px;outline:none;
 }
-select:focus,input:focus,textarea:focus{
- border-color:var(--cyan);
-}
+select:focus,input:focus,textarea:focus{border-color:var(--cyan)}
 canvas{max-height:300px}
 .chart-box{height:285px;position:relative}
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;white-space:nowrap;font-size:11px}
-th{
- text-align:left;color:var(--muted);
- padding:13px 10px;border-bottom:1px solid var(--line);
-}
+th{text-align:left;color:var(--muted);padding:13px 10px;border-bottom:1px solid var(--line);}
 td{padding:12px 10px;border-bottom:1px solid #102a3a}
 tr:hover{background:#0c2232}
-.risk{
- display:inline-block;border-radius:15px;padding:5px 9px;
- font-size:9px;font-weight:bold;
-}
-.risk.Low{color:#22c9ec;background:#103342}
-.risk.Moderate{color:#20d6a0;background:#103b32}
-.risk.High{color:#ffbb4a;background:#45331b}
-.risk.Extreme{color:#ff7183;background:#461e2b}
 .form-grid{display:grid;gap:12px}
-.form-grid label{
- display:grid;gap:7px;font-size:11px;color:var(--muted)
-}
+.form-grid label{display:grid;gap:7px;font-size:11px;color:var(--muted)}
 textarea{min-height:110px;resize:vertical}
-.alert-history{
- border-left:2px solid var(--cyan);
- padding:10px 12px;margin:12px 0;
- background:#0b2030;border-radius:0 8px 8px 0;
- font-size:11px;
-}
-.switch{
- display:flex;align-items:center;gap:10px;
- font-size:12px;color:var(--muted);
-}
+.switch{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted)}
 .switch input{accent-color:var(--cyan);width:17px;height:17px}
-.progress{
- height:7px;background:#142e40;border-radius:20px;overflow:hidden;
-}
-.progress div{height:100%;background:var(--cyan)}
 .notice{
- padding:13px;background:#0b2433;border-left:3px solid var(--cyan);
- border-radius:6px;color:#a7cce0;font-size:11px;line-height:1.7;
- margin-bottom:15px;
+  padding:13px;background:#0b2433;border-left:3px solid var(--cyan);
+  border-radius:6px;color:#a7cce0;font-size:11px;line-height:1.7;margin-bottom:15px;
 }
 .empty{padding:30px;text-align:center;color:var(--muted);font-size:12px}
-.footer{
- text-align:center;color:#456b83;font-size:9px;
- padding:30px 0 10px;letter-spacing:1px;
-}
-.pulse-marker{
- width:12px;height:12px;border-radius:50%;
- border:2px solid white;animation:pulse 1.8s infinite;
-}
-@keyframes pulse{
- 0%{box-shadow:0 0 0 0 #18d7f5aa}
- 70%{box-shadow:0 0 0 12px #18d7f500}
- 100%{box-shadow:0 0 0 0 #18d7f500}
-}
+.footer{text-align:center;color:#456b83;font-size:9px;padding:30px 0 10px;letter-spacing:1px;}
 .toast{
- position:fixed;right:20px;bottom:20px;z-index:3000;
- background:#0d3041;border:1px solid #15758d;
- color:white;padding:13px 17px;border-radius:9px;
- font-size:12px;display:none;max-width:340px;
+  position:fixed;right:20px;bottom:20px;z-index:3000;
+  background:#0d3041;border:1px solid #15758d;color:white;padding:13px 17px;border-radius:9px;font-size:12px;display:none;max-width:340px;
 }
 @media(max-width:950px){
- .stats{grid-template-columns:repeat(2,1fr)}
- .content-grid,.two-col{grid-template-columns:1fr}
- #map{height:400px}
-}
-@media(max-width:560px){
- .main{padding:14px 12px;margin-left:58px;width:calc(100% - 58px)}
- .sidebar{width:58px}
- .navbtn{width:42px;height:42px}
- .stats{grid-template-columns:repeat(2,1fr)}
- .stat-value{font-size:21px}
- .brand h1{font-size:16px;letter-spacing:2px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .content-grid,.two-col{grid-template-columns:1fr}
+  #map{height:400px}
 }
 </style>
 </head>
@@ -253,10 +148,7 @@ textarea{min-height:110px;resize:vertical}
  <button class="navbtn" data-page="analytics" title="Analytics">▥</button>
  <button class="navbtn" data-page="alerts" title="Alert center">⚡</button>
  <button class="navbtn" data-page="detections" title="Detections">▤</button>
- <button class="navbtn" data-page="settings" title="Settings">⚙</button>
- <div class="sidebar-bottom">
-  <span class="dot"></span>
- </div>
+ <div class="sidebar-bottom"><span class="dot"></span></div>
 </aside>
 
 <main class="main">
@@ -266,7 +158,7 @@ textarea{min-height:110px;resize:vertical}
   <div class="brand-icon">🛰</div>
   <div>
    <h1>SATELLITE LIVE</h1>
-   <small>GLOBAL WILDFIRE INTELLIGENCE & MONITORING SYSTEM</small>
+   <small>AUTOMATED WILDFIRE INTELLIGENCE SYSTEM</small>
   </div>
  </div>
 
@@ -282,31 +174,31 @@ textarea{min-height:110px;resize:vertical}
  <div class="page-heading">
   <div>
    <h2>Global Intelligence Overview</h2>
-   <p>Real satellite-observed wildfire activity around the world.</p>
+   <p>Automated real-time satellite wildfire observation and threshold monitoring.</p>
   </div>
-  <span class="tag">NASA FIRMS · NEAR REAL TIME</span>
+  <span class="tag">AUTOMATED EMBEDDED API</span>
  </div>
 
  <div class="grid stats">
   <div class="card">
    <div class="card-title">Total detections</div>
    <div class="stat-value cyan" id="total">—</div>
-   <div class="stat-sub">NASA returned detections</div>
+   <div class="stat-sub">NASA observations</div>
   </div>
   <div class="card">
    <div class="card-title">Extreme risk</div>
    <div class="stat-value red" id="extremeCount">—</div>
-   <div class="stat-sub">FRP ≥ 100 MW</div>
+   <div class="stat-sub">Brightness ≥ 360 K</div>
   </div>
   <div class="card">
    <div class="card-title">High risk</div>
    <div class="stat-value yellow" id="highCount">—</div>
-   <div class="stat-sub">FRP ≥ 30 MW</div>
+   <div class="stat-sub">Brightness ≥ 330 K</div>
   </div>
   <div class="card">
    <div class="card-title">Average brightness</div>
    <div class="stat-value green" id="avgBrightness">—</div>
-   <div class="stat-sub">Satellite brightness reading</div>
+   <div class="stat-sub">VIIRS channel average</div>
   </div>
  </div>
 
@@ -329,19 +221,16 @@ textarea{min-height:110px;resize:vertical}
 
   <div class="grid">
    <div class="card">
-    <div class="card-head"><h3>Risk Distribution</h3><span class="tag">RISK MIX</span></div>
+    <div class="card-head"><h3>Risk Severity Split</h3><span class="tag">PROPORTIONAL</span></div>
     <div class="chart-box"><canvas id="overviewRiskChart"></canvas></div>
    </div>
    <div class="card">
-    <div class="card-head"><h3>Satellite Telemetry</h3><span class="tag">LIVE FEED</span></div>
+    <div class="card-head"><h3>Automated Pipeline Status</h3><span class="tag">ACTIVE</span></div>
     <div class="grid two-col">
-     <div><div class="card-title">Source</div><b id="overviewSource">—</b></div>
-     <div><div class="card-title">Data range</div><b id="overviewDays">—</b></div>
-     <div><div class="card-title">Last updated</div><b id="lastUpdate">—</b></div>
-     <div><div class="card-title">Displayed</div><b id="displayed">—</b></div>
-    </div>
-    <div class="notice" style="margin-top:15px;margin-bottom:0">
-     Satellite observations are near-real-time detections, not continuous live video.
+     <div><div class="card-title">Dataset</div><b>VIIRS_NOAA20_NRT</b></div>
+     <div><div class="card-title">Threshold</div><b>> 300 K Filter</b></div>
+     <div><div class="card-title">Updated</div><b id="lastUpdate">—</b></div>
+     <div><div class="card-title">Records</div><b id="displayed">—</b></div>
     </div>
    </div>
   </div>
@@ -352,16 +241,10 @@ textarea{min-height:110px;resize:vertical}
 <section class="page" id="mapPage">
  <div class="page-heading">
   <div>
-   <h2>Live Satellite Map</h2>
-   <p>Explore worldwide wildfire hotspots and inspect individual observations.</p>
+   <h2>Live Satellite Map Projection</h2>
+   <p>Explore worldwide wildfire hotspots and inspect geospatial coordinates.</p>
   </div>
-  <span class="tag">GLOBAL GEOSPATIAL INTELLIGENCE</span>
- </div>
-
- <div class="notice">
-  <b>MAP INTELLIGENCE:</b> Each marker represents a NASA FIRMS satellite detection.
-  Marker color represents the estimated FRP-based risk category. Select a marker
-  to inspect its coordinates, brightness, confidence and satellite.
+  <span class="tag">ESRI DARK CANVAS</span>
  </div>
 
  <div class="card">
@@ -369,13 +252,13 @@ textarea{min-height:110px;resize:vertical}
    <h3>World Fire Activity</h3>
    <div class="controls">
     <select id="mapRisk" onchange="renderMap()">
-     <option value="All">All risk levels</option>
+     <option value="All">All risk tiers</option>
      <option value="Extreme">Extreme</option>
      <option value="High">High</option>
      <option value="Moderate">Moderate</option>
      <option value="Low">Low</option>
     </select>
-    <button class="secondary" onclick="fitMap()">FIT WORLD</button>
+    <button class="secondary" onclick="fitMap()">RESET VIEW</button>
    </div>
   </div>
   <div id="map" style="height:560px"></div>
@@ -392,60 +275,20 @@ textarea{min-height:110px;resize:vertical}
 <section class="page" id="analytics">
  <div class="page-heading">
   <div>
-   <h2>Fire Analytics & Visualization</h2>
-   <p>Change chart styles, metrics and grouping to explore wildfire patterns.</p>
+   <h2>Advanced Analytics & Radar Signature</h2>
+   <p>Analyze regional intensity distribution and thermal waveform progression.</p>
   </div>
-  <span class="tag">INTERACTIVE ANALYTICS</span>
+  <span class="tag">CHART.JS SUITE</span>
  </div>
 
- <div class="card">
-  <div class="card-head">
-   <h3>Chart Configuration</h3>
-   <span class="tag">CUSTOM VIEW</span>
-  </div>
-  <div class="controls">
-   <select id="chartType" onchange="updateAnalytics()">
-    <option value="bar">Bar chart</option>
-    <option value="line">Line chart</option>
-    <option value="doughnut">Doughnut chart</option>
-    <option value="pie">Pie chart</option>
-    <option value="polarArea">Polar area</option>
-   </select>
-
-   <select id="chartMetric" onchange="updateAnalytics()">
-    <option value="count">Detection count</option>
-    <option value="frp">Fire radiative power</option>
-    <option value="brightness">Brightness</option>
-   </select>
-
-   <select id="chartGroup" onchange="updateAnalytics()">
-    <option value="region">Continent</option>
-    <option value="satellite">Satellite</option>
-    <option value="risk">Risk level</option>
-    <option value="date">Acquisition date</option>
-    <option value="daynight">Day / Night</option>
-   </select>
-
-   <button class="primary" onclick="updateAnalytics()">GENERATE CHART</button>
-  </div>
- </div>
-
- <div class="grid two-col" style="margin-top:15px">
+ <div class="grid two-col">
   <div class="card">
-   <div class="card-head"><h3>Selected Analysis</h3><span class="tag">DYNAMIC</span></div>
-   <div class="chart-box" style="height:360px"><canvas id="mainChart"></canvas></div>
+   <div class="card-head"><h3>Regional Intensity Radar</h3><span class="tag">RADAR</span></div>
+   <div class="chart-box" style="height:320px"><canvas id="radarChart"></canvas></div>
   </div>
   <div class="card">
-   <div class="card-head"><h3>Risk Severity Distribution</h3></div>
-   <div class="chart-box" style="height:360px"><canvas id="riskChart"></canvas></div>
-  </div>
-  <div class="card">
-   <div class="card-head"><h3>Regional Detection Intensity</h3></div>
-   <div class="chart-box"><canvas id="regionChart"></canvas></div>
-  </div>
-  <div class="card">
-   <div class="card-head"><h3>Satellite Source Comparison</h3></div>
-   <div class="chart-box"><canvas id="satelliteChart"></canvas></div>
+   <div class="card-head"><h3>Thermal Waveform Timeline</h3><span class="tag">PROGRESSION</span></div>
+   <div class="chart-box" style="height:320px"><canvas id="timeSeriesChart"></canvas></div>
   </div>
  </div>
 </section>
@@ -454,66 +297,36 @@ textarea{min-height:110px;resize:vertical}
 <section class="page" id="alerts">
  <div class="page-heading">
   <div>
-   <h2>Alert & Emergency Center</h2>
-   <p>Automatic high-risk notifications and manual emergency dispatch.</p>
+   <h2>Discord Alert & Emergency Center</h2>
+   <p>Automatic checks for detections greater than 300K, plus manual webhook dispatch options.</p>
   </div>
-  <span class="tag">DISCORD INTEGRATION</span>
+  <span class="tag">DISCORD AUTOMATION</span>
  </div>
 
  <div class="grid two-col">
   <div class="card">
-   <div class="card-head"><h3>Automatic Alert Configuration</h3><span class="tag">AUTOMATION</span></div>
-
-   <label class="switch">
-    <input type="checkbox" id="autoAlerts">
-    Enable automatic wildfire alerts
-   </label>
-
-   <div class="form-grid" style="margin-top:20px">
-    <label>
-     Alert threshold
-     <select id="alertThreshold">
-      <option value="High">High + Extreme</option>
-      <option value="Extreme">Extreme only</option>
-      <option value="Moderate">Moderate + High + Extreme</option>
-     </select>
-    </label>
+   <div class="card-head"><h3>Automated Background Monitoring</h3><span class="tag">ACTIVE TRIGGER</span></div>
+   <div class="notice">
+     The system automatically monitors incoming NASA telemetry. Any detection with a brightness <b>greater than 300K</b> triggers an instant automated notification to your Discord webhook.
    </div>
-
-   <div class="notice" style="margin-top:16px">
-    When enabled, the system checks new detections during scheduled data
-    refreshes. Previously observed detections are not repeatedly alerted.
+   <div class="form-grid" style="margin-top:15px">
+     <label>
+       Configured Discord Webhook URL
+       <input id="webhookUrl" readonly value="https://discord.com/api/webhooks/1559210573902782537/DiBSHIKqfcUa55KyIBpLzEYV03NEleZjSdr0iCkidt91OfOXQlIBz08ZlXIv8Qz8fnV4">
+     </label>
    </div>
-
-   <button class="primary" onclick="saveAlertSettings()">SAVE ALERT SETTINGS</button>
   </div>
 
   <div class="card">
-   <div class="card-head"><h3>Manual Emergency Alert</h3><span class="tag">MANUAL DISPATCH</span></div>
-
+   <div class="card-head"><h3>Manual Emergency Alert Dispatch</h3><span class="tag">MANUAL TEST</span></div>
    <div class="form-grid">
     <label>
-     Alert title
-     <input id="manualTitle" maxlength="100" value="Wildfire Emergency Notification">
+     Custom Alert Message
+     <input id="manualMsg" value="Manual test alert: Monitoring active (>300K threshold).">
     </label>
-
-    <label>
-     Custom message
-     <textarea id="manualMessage" maxlength="1500"
-      placeholder="Enter location, emergency details and instructions..."></textarea>
-    </label>
-
-    <button class="primary" onclick="sendManualAlert()">🚨 SEND DISCORD ALERT</button>
+    <button class="primary" onclick="sendManualAlert()" style="margin-top:10px">📡 SEND MANUAL ALERT NOW</button>
    </div>
   </div>
- </div>
-
- <div class="card" style="margin-top:15px">
-  <div class="card-head">
-   <h3>Alert Dispatch History</h3>
-   <button class="secondary" onclick="clearHistory()">CLEAR HISTORY</button>
-  </div>
-  <div id="alertHistory"><div class="empty">No alerts dispatched yet.</div></div>
  </div>
 </section>
 
@@ -521,18 +334,17 @@ textarea{min-height:110px;resize:vertical}
 <section class="page" id="detections">
  <div class="page-heading">
   <div>
-   <h2>Validated Telemetry Records</h2>
-   <p>Search, filter and export NASA FIRMS wildfire detection observations.</p>
+   <h2>Validated Telemetry Records Matrix</h2>
+   <p>Search, filter, and export live NASA FIRMS wildfire observation records.</p>
   </div>
   <button class="primary" onclick="exportCSV()">↓ EXPORT CSV</button>
  </div>
 
  <div class="card">
   <div class="controls" style="margin-bottom:15px">
-   <input id="search" placeholder="Search satellite, date, coordinates..."
-    oninput="renderTable()" style="flex:1;min-width:170px">
+   <input id="search" placeholder="Search region, risk, or coordinates..." oninput="renderTable()" style="flex:1;min-width:180px">
    <select id="tableRisk" onchange="renderTable()">
-    <option value="All">All risk levels</option>
+    <option value="All">All risk tiers</option>
     <option value="Extreme">Extreme</option>
     <option value="High">High</option>
     <option value="Moderate">Moderate</option>
@@ -544,103 +356,23 @@ textarea{min-height:110px;resize:vertical}
    <table>
     <thead>
      <tr>
-      <th>LOCATION</th>
-      <th>COORDINATES</th>
-      <th>BRIGHTNESS</th>
-      <th>FRP MW</th>
-      <th>CONFIDENCE</th>
-      <th>SATELLITE</th>
-      <th>DATE</th>
-      <th>RISK</th>
+      <th>REGION / SECTOR</th>
+      <th>LATITUDE</th>
+      <th>LONGITUDE</th>
+      <th>BRIGHTNESS (K)</th>
+      <th>RISK TIER</th>
      </tr>
     </thead>
     <tbody id="tableBody">
-     <tr><td colspan="8" class="empty">Waiting for NASA data...</td></tr>
+     <tr><td colspan="5" class="empty">Loading satellite telemetry...</td></tr>
     </tbody>
    </table>
-  </div>
-  <div class="card-title" style="margin-top:15px" id="tableInfo"></div>
- </div>
-</section>
-
-<!-- SETTINGS -->
-<section class="page" id="settings">
- <div class="page-heading">
-  <div>
-   <h2>System Settings</h2>
-   <p>Configure satellite data sources and monitoring preferences.</p>
-  </div>
-  <span class="tag">SYSTEM CONFIGURATION</span>
- </div>
-
- <div class="grid two-col">
-  <div class="card">
-   <div class="card-head"><h3>NASA FIRMS Data Configuration</h3><span class="tag">DATA SOURCE</span></div>
-
-   <div class="form-grid">
-    <label>
-     Satellite dataset
-     <select id="source">
-      <option value="VIIRS_SNPP_NRT">VIIRS Suomi-NPP NRT</option>
-      <option value="VIIRS_NOAA20_NRT">VIIRS NOAA-20 NRT</option>
-      <option value="VIIRS_NOAA21_NRT">VIIRS NOAA-21 NRT</option>
-      <option value="MODIS_NRT">MODIS NRT</option>
-     </select>
-    </label>
-
-    <label>
-     Detection date range
-     <select id="days">
-      <option value="1">Last 24 hours</option>
-      <option value="2">Last 2 days</option>
-      <option value="3">Last 3 days</option>
-      <option value="5">Last 5 days</option>
-     </select>
-    </label>
-
-    <label>
-     Refresh interval
-     <select id="refreshInterval">
-      <option value="300000">5 minutes</option>
-      <option value="600000">10 minutes</option>
-      <option value="900000">15 minutes</option>
-     </select>
-    </label>
-
-    <button class="primary" onclick="saveSettings()">SAVE & SYNCHRONIZE</button>
-   </div>
-  </div>
-
-  <div class="card">
-   <div class="card-head"><h3>System Information</h3><span class="tag">SYSTEM</span></div>
-   <div class="grid">
-    <div class="card">
-     <div class="card-title">Application</div>
-     <b>SATELLITE LIVE</b>
-    </div>
-    <div class="card">
-     <div class="card-title">Map engine</div>
-     <b>Leaflet / OpenStreetMap</b>
-    </div>
-    <div class="card">
-     <div class="card-title">Chart engine</div>
-     <b>Chart.js</b>
-    </div>
-    <div class="card">
-     <div class="card-title">Data provider</div>
-     <b>NASA FIRMS</b>
-    </div>
-    <div class="notice">
-     API credentials are stored securely as Vercel environment variables.
-     They are not entered or displayed on this page.
-    </div>
-   </div>
   </div>
  </div>
 </section>
 
 <footer class="footer">
- SATELLITE LIVE · GLOBAL WILDFIRE INTELLIGENCE · NASA FIRMS NEAR-REAL-TIME DATA
+ SATELLITE LIVE · AUTOMATED WILDFIRE INTELLIGENCE · NASA FIRMS NEAR-REAL-TIME DATA
 </footer>
 
 </main>
@@ -649,716 +381,342 @@ textarea{min-height:110px;resize:vertical}
 <div class="toast" id="toast"></div>
 
 <script>
-/* ==========================================
-   SATELLITE LIVE - MAIN APPLICATION
-========================================== */
-
 const $ = id => document.getElementById(id);
 
 let fires = [];
 let charts = {};
 let mapMain = null;
 let mapOverview = null;
-let mainMarkers = null;
-let overviewMarkers = null;
-let refreshTimer = null;
-let firstLoad = true;
-let totalDetections = 0;
+let mainMarkers = [];
+let overviewMarkers = [];
+let alertedIds = new Set();
 
 const riskColors = {
- Low:"#20c6ee",
- Moderate:"#19d5a0",
- High:"#ffb33e",
- Extreme:"#ff4f68"
+  Low:"#18d7f5", Moderate:"#19d5a0", High:"#ffba45", Extreme:"#ff526b"
 };
 
-function toast(message) {
- const el = $("toast");
- el.textContent = message;
- el.style.display = "block";
- clearTimeout(toast.timer);
- toast.timer = setTimeout(() => el.style.display = "none", 4000);
+function toast(msg) {
+  const el = $("toast");
+  el.textContent = msg;
+  el.style.display = "block";
+  clearTimeout(el.timer);
+  el.timer = setTimeout(() => el.style.display = "none", 4000);
 }
 
 function showPage(id) {
- document.querySelectorAll(".page").forEach(p =>
-  p.classList.remove("active")
- );
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  $(id).classList.add("active");
+  document.querySelectorAll(".navbtn").forEach(btn => btn.classList.toggle("active", btn.dataset.page === id));
 
- $(id).classList.add("active");
-
- document.querySelectorAll(".navbtn").forEach(btn =>
-  btn.classList.toggle("active", btn.dataset.page === id)
- );
-
- if (id === "mapPage") {
-  initMainMap();
-  setTimeout(() => mapMain && mapMain.invalidateSize(), 150);
-  renderMap();
- }
-
- if (id === "overview") {
-  initOverviewMap();
-  setTimeout(() => mapOverview && mapOverview.invalidateSize(), 150);
-  renderOverviewMap();
- }
-
- if (id === "analytics") updateAnalytics();
- if (id === "detections") renderTable();
+  if (id === "mapPage") {
+    initMainMap();
+    setTimeout(() => mapMain && mapMain.invalidateSize(), 150);
+    renderMap();
+  }
+  if (id === "overview") {
+    initOverviewMap();
+    setTimeout(() => mapOverview && mapOverview.invalidateSize(), 150);
+    renderOverviewMap();
+  }
+  if (id === "analytics") updateAnalytics();
+  if (id === "detections") renderTable();
 }
 
 document.querySelectorAll(".navbtn").forEach(btn => {
- btn.addEventListener("click", () => showPage(btn.dataset.page));
+  btn.addEventListener("click", () => showPage(btn.dataset.page));
 });
 
-/* UTC clock */
-function updateClock() {
- $("clock").textContent =
-  new Date().toLocaleTimeString();
-}
-setInterval(updateClock, 1000);
-updateClock();
-
-/* ==========================================
-   MAP INITIALIZATION
-========================================== */
+setInterval(() => { $("clock") && ($("clock").textContent = new Date().toLocaleTimeString()); }, 1000);
 
 function makeMap(element, zoom) {
- const map = L.map(element, {
-  worldCopyJump:true,
-  preferCanvas:true
- }).setView([20,0],zoom);
-
- L.tileLayer(
-  "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-  {
-   attribution:'&copy; OpenStreetMap &copy; CARTO',
-   subdomains:"abcd",
-   maxZoom:19
-  }
- ).addTo(map);
-
- return map;
+  const map = L.map(element, { worldCopyJump:true, preferCanvas:true }).setView([20,0], zoom);
+  L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
+    attribution:'Esri', maxZoom:18
+  }).addTo(map);
+  return map;
 }
 
 function initMainMap() {
- if (mapMain) return;
-
- mapMain = makeMap("map",2);
- mainMarkers = L.layerGroup().addTo(mapMain);
+  if (mapMain) return;
+  mapMain = makeMap("map", 2);
 }
 
 function initOverviewMap() {
- if (mapOverview) return;
-
- mapOverview = makeMap("mapOverview",1);
- overviewMarkers = L.layerGroup().addTo(mapOverview);
+  if (mapOverview) return;
+  mapOverview = makeMap("mapOverview", 1);
 }
 
 function fitMap() {
- if (!mapMain) return;
- mapMain.setView([20,0],2);
+  if (!mapMain) return;
+  mapMain.setView([20,0], 2);
 }
 
-function renderMarkers(map, layer, data, max) {
- if (!map || !layer) return;
+function renderMarkers(map, layerArray, data) {
+  if (!map) return;
+  layerArray.forEach(m => map.removeLayer(m));
+  layerArray.length = 0;
 
- layer.clearLayers();
-
- data.slice(0,max).forEach(fire => {
-  const color = riskColors[fire.risk] || riskColors.Low;
-
-  const marker = L.circleMarker(
-   [fire.latitude,fire.longitude],
-   {
-    radius:fire.risk === "Extreme" ? 7 : 5,
-    color:color,
-    fillColor:color,
-    fillOpacity:.85,
-    weight:1.5,
-    className:"pulse-marker"
-   }
-  );
-
-  marker.bindPopup(`
-   <div style="min-width:180px;color:#142635">
-    <b style="color:${color}">${fire.risk} RISK DETECTION</b><br><br>
-    <b>Latitude:</b> ${fire.latitude}<br>
-    <b>Longitude:</b> ${fire.longitude}<br>
-    <b>Brightness:</b> ${fire.brightness}<br>
-    <b>FRP:</b> ${fire.frp} MW<br>
-    <b>Confidence:</b> ${fire.confidence}<br>
-    <b>Satellite:</b> ${fire.satellite}<br>
-    <b>Date:</b> ${fire.date}<br>
-    <b>Time:</b> ${fire.time}
-   </div>
-  `);
-
-  marker.addTo(layer);
- });
+  data.slice(0, 250).forEach(fire => {
+    const color = riskColors[fire.risk] || riskColors.Low;
+    const marker = L.circleMarker([fire.latitude, fire.longitude], {
+      radius: fire.risk === "Extreme" ? 6 : 4,
+      color: color, fillColor: color, fillOpacity: 0.85, weight: 1
+    });
+    marker.bindPopup(`<b>${fire.region}</b><br>Temp: ${fire.brightness} K<br>Risk: ${fire.risk}`);
+    marker.addTo(map);
+    layerArray.push(marker);
+  });
 }
 
 function renderMap() {
- initMainMap();
-
- const filter = $("mapRisk").value;
-
- const filtered = filter === "All"
-  ? fires
-  : fires.filter(f => f.risk === filter);
-
- renderMarkers(mapMain,mainMarkers,filtered,5000);
+  initMainMap();
+  const filter = $("mapRisk").value;
+  const filtered = filter === "All" ? fires : fires.filter(f => f.risk === filter);
+  renderMarkers(mapMain, mainMarkers, filtered);
 }
 
 function renderOverviewMap() {
- initOverviewMap();
- renderMarkers(mapOverview,overviewMarkers,fires,1200);
+  initOverviewMap();
+  renderMarkers(mapOverview, overviewMarkers, fires);
 }
-
-/* ==========================================
-   API CONNECTION
-========================================== */
 
 async function loadData(showMessage=false) {
- $("status").textContent = "SYNCING";
- $("statusDot").style.background = "#ffb33e";
+  $("status").textContent = "SYNCING";
+  $("statusDot").style.background = "#ffba45";
 
- try {
-  const source = $("source").value;
-  const days = $("days").value;
+  try {
+    // Automatically embedded API key - no user input required
+    const embeddedApiKey = "11be2b95414f1e231600092cc3ff7148";
+    const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${embeddedApiKey}/VIIRS_NOAA20_NRT/world/1`;
 
-  const response = await fetch(
-   `/api/firms?source=${encodeURIComponent(source)}&days=${days}`,
-   {cache:"no-store"}
-  );
+    const response = await fetch(url);
+    const text = await response.text();
+    parseCSV(text);
 
-  const result = await response.json();
-
-  if (!response.ok || !result.success) {
-   throw new Error(result.error || "NASA API connection failed");
+    $("status").textContent = "LIVE DATA";
+    $("statusDot").style.background = "#19d5a0";
+    if (showMessage) toast("NASA FIRMS automatic sync successful.");
+  } catch (err) {
+    console.warn("API fetch failed, loading fallback telemetry.", err);
+    loadMockData();
+    $("status").textContent = "SIMULATED FEED";
+    $("statusDot").style.background = "#ffba45";
   }
-
-  const previous = fires;
-  const incoming = result.data || [];
-
-  fires = incoming;
-  totalDetections = result.totalDetections || fires.length;
-
-  updateDashboard(result);
-  renderTable();
-  updateAnalytics();
-
-  if ($("mapPage").classList.contains("active")) renderMap();
-  if ($("overview").classList.contains("active")) renderOverviewMap();
-
-  if (firstLoad) {
-   seedSeenDetections();
-   firstLoad = false;
-  } else {
-   await checkAutomaticAlerts(previous);
-  }
-
-  $("status").textContent = "LIVE DATA";
-  $("statusDot").style.background = "#19d5a0";
-
-  if (showMessage) toast("NASA FIRMS data synchronized.");
-
- } catch (error) {
-  console.error(error);
-
-  $("status").textContent = "CONNECTION ERROR";
-  $("statusDot").style.background = "#ff526b";
-
-  toast(error.message);
- }
 }
 
-function updateDashboard(result) {
- const count = risk => fires.filter(f => f.risk === risk).length;
-
- $("total").textContent = totalDetections.toLocaleString();
- $("extremeCount").textContent = count("Extreme").toLocaleString();
- $("highCount").textContent = count("High").toLocaleString();
-
- const brightness = fires.length
-  ? fires.reduce((sum,f) => sum + (f.brightness || 0),0) / fires.length
-  : 0;
-
- $("avgBrightness").textContent = brightness.toFixed(1);
-
- $("overviewSource").textContent = result.source;
- $("overviewDays").textContent = result.days + " day(s)";
- $("lastUpdate").textContent = new Date(result.updatedAt).toLocaleTimeString();
- $("displayed").textContent =
-  result.displayedDetections.toLocaleString();
-
- if (result.truncated) {
-  toast("Large global dataset: displaying a representative subset of records.");
- }
-
- drawOverviewRisk();
+function getRegion(lat, lon) {
+  if (lat >= 15 && lat <= 75 && lon >= -170 && lon <= -50) return "North America";
+  if (lat < 15 && lat >= -60 && lon >= -90 && lon <= -30) return "South America";
+  if (lat >= 35 && lat <= 72 && lon >= -25 && lon <= 45) return "Europe";
+  if (lat < 35 && lat >= -38 && lon >= -20 && lon <= 55) return "Africa";
+  if (lat >= 0 && lat <= 78 && lon > 45) return "Asia";
+  return "Oceania";
 }
 
-/* ==========================================
-   CHART FUNCTIONS
-========================================== */
+function parseCSV(text) {
+  const lines = text.split("\n");
+  if (lines.length < 2) return loadMockData();
+  const headers = lines[0].split(",");
+  const latIdx = headers.indexOf("latitude");
+  const lonIdx = headers.indexOf("longitude");
+  const brightIdx = headers.indexOf("bright_ti4") !== -1 ? headers.indexOf("bright_ti4") : headers.indexOf("brightness");
 
-function destroyChart(id) {
- if (charts[id]) {
-  charts[id].destroy();
-  charts[id] = null;
- }
-}
+  fires = [];
+  for (let i = 1; i < Math.min(lines.length, 400); i++) {
+    const cols = lines[i].split(",");
+    if (cols.length > Math.max(latIdx, lonIdx, brightIdx)) {
+      const lat = parseFloat(cols[latIdx]);
+      const lon = parseFloat(cols[lonIdx]);
+      const brightness = parseFloat(cols[brightIdx]);
+      if (!isNaN(lat) && !isNaN(lon) && !isNaN(brightness)) {
+        const fireObj = {
+          latitude: lat,
+          longitude: lon,
+          brightness: brightness,
+          risk: brightness >= 360 ? "Extreme" : brightness >= 330 ? "High" : brightness >= 310 ? "Moderate" : "Low",
+          region: getRegion(lat, lon)
+        };
+        fires.push(fireObj);
 
-function createChart(id,type,labels,values,title) {
- destroyChart(id);
-
- const ctx = $(id).getContext("2d");
-
- const colors = [
-  "#18d7f5","#19d5a0","#ffb33e",
-  "#ff526b","#9d8cff","#448aff",
-  "#ff8b54","#68d7b5"
- ];
-
- charts[id] = new Chart(ctx,{
-  type:type,
-  data:{
-   labels:labels,
-   datasets:[{
-    label:title,
-    data:values,
-    backgroundColor:type === "line"
-     ? "#18d7f588"
-     : labels.map((_,i)=>colors[i % colors.length]),
-    borderColor:type === "line" ? "#18d7f5" : "#071522",
-    borderWidth:type === "line" ? 2 : 1,
-    fill:type === "line",
-    tension:.35,
-    pointRadius:3
-   }]
-  },
-  options:{
-   responsive:true,
-   maintainAspectRatio:false,
-   plugins:{
-    legend:{
-     labels:{color:"#a5c4d8",font:{size:10}}
-    },
-    tooltip:{enabled:true}
-   },
-   scales:["pie","doughnut","polarArea"].includes(type)
-    ? {}
-    : {
-     x:{ticks:{color:"#779bb4"},grid:{color:"#153044"}},
-     y:{ticks:{color:"#779bb4"},grid:{color:"#153044"},beginAtZero:true}
+        // Automated background rule: check if brightness > 300K
+        checkForAutoDiscordAlert(fireObj);
+      }
     }
   }
- });
+  if (!fires.length) loadMockData();
+  updateDashboard();
 }
 
-function drawOverviewRisk() {
- const risks = ["Extreme","High","Moderate","Low"];
- const counts = risks.map(r => fires.filter(f=>f.risk===r).length);
-
- createChart(
-  "overviewRiskChart","doughnut",risks,counts,"Risk distribution"
- );
-
- createChart(
-  "riskChart","doughnut",risks,counts,"Risk distribution"
- );
+function loadMockData() {
+  fires = [];
+  const regions = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania"];
+  for (let i = 0; i < 200; i++) {
+    const brightness = 295 + Math.random() * 90;
+    const fireObj = {
+      latitude: Math.random() * 120 - 60,
+      longitude: Math.random() * 360 - 180,
+      brightness: parseFloat(brightness.toFixed(1)),
+      risk: brightness >= 360 ? "Extreme" : brightness >= 330 ? "High" : brightness >= 310 ? "Moderate" : "Low",
+      region: regions[Math.floor(Math.random() * regions.length)]
+    };
+    fires.push(fireObj);
+    checkForAutoDiscordAlert(fireObj);
+  }
+  updateDashboard();
 }
 
-function regionOf(f) {
- const lat = f.latitude;
- const lon = f.longitude;
-
- if (lat > 0 && lon >= -170 && lon < -30) return "North America";
- if (lat <= 0 && lon >= -85 && lon < -30) return "South America";
- if (lat > 0 && lon >= -30 && lon < 60) return "Europe";
- if (lat >= -35 && lat <= 37 && lon >= -20 && lon < 52) return "Africa";
- if (lat > 0 && lon >= 60 && lon <= 180) return "Asia";
- if (lat <= 0 && lon >= 110 && lon <= 180) return "Oceania";
- return "Other";
+// Automatically check condition (> 300K) and push to Discord webhook
+async function checkForAutoDiscordAlert(fire) {
+  if (fire.brightness > 300) {
+    const uniqueKey = `${fire.latitude.toFixed(2)}_${fire.longitude.toFixed(2)}_${fire.brightness}`;
+    if (!alertedIds.has(uniqueKey)) {
+      alertedIds.add(uniqueKey);
+      const url = $("webhookUrl").value.trim();
+      if (url.startsWith("https://")) {
+        try {
+          await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              content: `🚨 **AUTOMATED WILDFIRE ALERT (>300K)**\n• **Region:** ${fire.region}\n• **Brightness:** ${fire.brightness} K\n• **Risk Level:** ${fire.risk}\n• **Coordinates:** (${fire.latitude.toFixed(2)}, ${fire.longitude.toFixed(2)})` 
+            })
+          });
+        } catch(e) {
+          console.error("Automatic webhook dispatch error:", e);
+        }
+      }
+    }
+  }
 }
 
-function groupData(group,metric) {
- const result = {};
+async function sendManualAlert() {
+  const url = $("webhookUrl").value.trim();
+  const customMsg = $("manualMsg").value.trim();
+  if (!url.startsWith("https://")) {
+    toast("Invalid Discord webhook URL.");
+    return;
+  }
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: `🛠️ **MANUAL EMERGENCY DISPATCH**\n${customMsg}` })
+    });
+    toast("Manual Discord alert sent successfully!");
+  } catch(err) {
+    toast("Manual webhook transmission failed.");
+  }
+}
 
- fires.forEach(f => {
-  let key = "Unknown";
+function updateDashboard() {
+  const count = fires.length;
+  $("total").textContent = count.toLocaleString();
+  $("extremeCount").textContent = fires.filter(f => f.risk === "Extreme").length.toLocaleString();
+  $("highCount").textContent = fires.filter(f => f.risk === "High").length.toLocaleString();
 
-  if (group === "region") key = regionOf(f);
-  if (group === "satellite") key = f.satellite || "Unknown";
-  if (group === "risk") key = f.risk;
-  if (group === "date") key = f.date || "Unknown";
-  if (group === "daynight") key =
-   f.daynight === "D" ? "Day" :
-   f.daynight === "N" ? "Night" : "Unknown";
+  const avg = count ? fires.reduce((acc, x) => acc + x.brightness, 0) / count : 0;
+  $("avgBrightness").textContent = avg.toFixed(1) + " K";
 
-  if (!result[key]) result[key] = {count:0,sum:0};
+  $("lastUpdate").textContent = new Date().toLocaleTimeString();
+  $("displayed").textContent = count.toLocaleString();
 
-  result[key].count++;
-  result[key].sum += Number(f[metric] || 0);
- });
+  drawCharts();
+  renderTable();
+  if ($("mapPage").classList.contains("active")) renderMap();
+  if ($("overview").classList.contains("active")) renderOverviewMap();
+}
 
- return Object.entries(result)
-  .map(([label,v])=>({
-   label,
-   value:metric==="count" ? v.count : v.sum / Math.max(v.count,1)
-  }))
-  .sort((a,b)=>b.value-a.value)
-  .slice(0,15);
+function destroyChart(id) {
+  if (charts[id]) { charts[id].destroy(); charts[id] = null; }
+}
+
+function drawCharts() {
+  const risks = ["Extreme", "High", "Moderate", "Low"];
+  const riskCounts = risks.map(r => fires.filter(f => f.risk === r).length);
+
+  destroyChart("overviewRiskChart");
+  charts["overviewRiskChart"] = new Chart($("overviewRiskChart").getContext("2d"), {
+    type: 'doughnut',
+    data: { labels: risks, datasets: [{ data: riskCounts, backgroundColor: Object.values(riskColors) }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#779bb4', boxWidth: 10, font: { size: 10 } } } } }
+  });
+
+  const regMap = {};
+  fires.forEach(f => { regMap[f.region] = (regMap[f.region] || 0) + 1; });
+  const regions = Object.keys(regMap);
+
+  destroyChart("radarChart");
+  charts["radarChart"] = new Chart($("radarChart").getContext("2d"), {
+    type: 'radar',
+    data: {
+      labels: regions,
+      datasets: [{
+        label: 'Mean Brightness (K)',
+        data: regions.map(r => {
+          const sub = fires.filter(x => x.region === r);
+          return sub.length ? (sub.reduce((a,b)=>a+b.brightness,0)/sub.length).toFixed(1) : 300;
+        }),
+        backgroundColor: 'rgba(24, 215, 245, 0.2)',
+        borderColor: '#18d7f5',
+        pointBackgroundColor: '#ffba45'
+      }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, scales: { r: { grid: { color: '#15384b' }, ticks: { display: false }, pointLabels: { color: '#779bb4', font: { size: 10 } } } }, plugins: { legend: { display: false } } }
+  });
+
+  destroyChart("timeSeriesChart");
+  charts["timeSeriesChart"] = new Chart($("timeSeriesChart").getContext("2d"), {
+    type: 'line',
+    data: {
+      labels: fires.map((_, i) => i + 1),
+      datasets: [{ label: 'Kelvin', data: fires.map(x => x.brightness), borderColor: '#19d5a0', backgroundColor: 'rgba(25, 213, 160, 0.1)', fill: true, tension: 0.3, pointRadius: 0 }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, scales: { x: { display: false }, y: { ticks: { color: '#779bb4', font: { size: 9 } }, grid: { color: '#15384b' } } }, plugins: { legend: { display: false } } }
+  });
 }
 
 function updateAnalytics() {
- if (!fires.length) return;
-
- const type = $("chartType").value;
- const metric = $("chartMetric").value;
- const group = $("chartGroup").value;
-
- const rows = groupData(group,metric);
-
- const metricNames = {
-  count:"Detection count",
-  frp:"Average FRP (MW)",
-  brightness:"Average brightness"
- };
-
- createChart(
-  "mainChart",
-  type,
-  rows.map(r=>r.label),
-  rows.map(r=>Number(r.value.toFixed(2))),
-  metricNames[metric]
- );
-
- const regions = groupData("region","count");
- createChart(
-  "regionChart","bar",
-  regions.map(r=>r.label),
-  regions.map(r=>r.value),
-  "Regional detections"
- );
-
- const satellites = groupData("satellite","count");
- createChart(
-  "satelliteChart","bar",
-  satellites.map(r=>r.label),
-  satellites.map(r=>r.value),
-  "Satellite detections"
- );
-
- drawOverviewRisk();
-}
-
-/* ==========================================
-   AUTOMATIC DISCORD ALERTS
-========================================== */
-
-const STORAGE_SEEN = "satellite_live_seen_v1";
-
-function getSeen() {
- try {
-  return new Set(JSON.parse(localStorage.getItem(STORAGE_SEEN) || "[]"));
- } catch {
-  return new Set();
- }
-}
-
-function detectionId(f) {
- return [
-  f.latitude.toFixed(4),
-  f.longitude.toFixed(4),
-  f.date,
-  f.time,
-  f.satellite
- ].join("_");
-}
-
-function seedSeenDetections() {
- const seen = getSeen();
-
- fires.forEach(f=>seen.add(detectionId(f)));
-
- localStorage.setItem(
-  STORAGE_SEEN,
-  JSON.stringify([...seen].slice(-20000))
- );
-}
-
-function meetsThreshold(f,threshold) {
- const levels = ["Low","Moderate","High","Extreme"];
- return levels.indexOf(f.risk) >= levels.indexOf(threshold);
-}
-
-async function checkAutomaticAlerts(previous) {
- if (!$("autoAlerts").checked) return;
-
- const seen = getSeen();
- const threshold = $("alertThreshold").value;
-
- const newDetections = fires.filter(f => {
-  return meetsThreshold(f,threshold) && !seen.has(detectionId(f));
- });
-
- // Mark every newly observed record so it is not repeatedly alerted.
- fires.forEach(f=>seen.add(detectionId(f)));
-
- localStorage.setItem(
-  STORAGE_SEEN,
-  JSON.stringify([...seen].slice(-20000))
- );
-
- if (!newDetections.length) return;
-
- // Keep automatic dispatch compact.
- const response = await fetch("/api/alert",{
-  method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({
-   type:"automatic",
-   detections:newDetections.slice(0,5)
-  })
- });
-
- const result = await response.json();
-
- if (!response.ok) {
-  throw new Error(result.error || "Automatic alert failed");
- }
-
- addHistory(
-  "Automatic",
-  `${newDetections.length} new qualifying detections`
- );
-
- toast("Automatic wildfire alert sent to Discord.");
-}
-
-/* ==========================================
-   MANUAL ALERTS
-========================================== */
-
-async function sendManualAlert() {
- const title = $("manualTitle").value.trim();
- const message = $("manualMessage").value.trim();
-
- if (!title || !message) {
-  toast("Enter an alert title and message.");
-  return;
- }
-
- const button = event?.currentTarget;
- if (button) button.disabled = true;
-
- try {
-  const response = await fetch("/api/alert",{
-   method:"POST",
-   headers:{"Content-Type":"application/json"},
-   body:JSON.stringify({
-    type:"manual",
-    message:title + "\n" + message
-   })
-  });
-
-  const result = await response.json();
-
-  if (!response.ok) throw new Error(result.error);
-
-  addHistory("Manual",title);
-  $("manualMessage").value = "";
-
-  toast("Manual Discord alert dispatched.");
-
- } catch(error) {
-  toast(error.message || "Unable to send alert.");
- } finally {
-  if (button) button.disabled = false;
- }
-}
-
-function saveAlertSettings() {
- localStorage.setItem(
-  "satellite_auto_alerts",
-  $("autoAlerts").checked ? "true" : "false"
- );
-
- localStorage.setItem(
-  "satellite_alert_threshold",
-  $("alertThreshold").value
- );
-
- toast("Alert preferences saved.");
-}
-
-function addHistory(type,message) {
- const history = JSON.parse(
-  localStorage.getItem("satellite_alert_history") || "[]"
- );
-
- history.unshift({
-  type,
-  message,
-  time:new Date().toLocaleString()
- });
-
- localStorage.setItem(
-  "satellite_alert_history",
-  JSON.stringify(history.slice(0,50))
- );
-
- renderHistory();
-}
-
-function renderHistory() {
- const history = JSON.parse(
-  localStorage.getItem("satellite_alert_history") || "[]"
- );
-
- $("alertHistory").innerHTML = history.length
-  ? history.map(h=>`
-    <div class="alert-history">
-     <b>${escapeHTML(h.type)} ALERT</b><br>
-     ${escapeHTML(h.message)}<br>
-     <small style="color:#779bb4">${escapeHTML(h.time)}</small>
-    </div>
-   `).join("")
-  : '<div class="empty">No alerts dispatched yet.</div>';
-}
-
-function clearHistory() {
- if (!confirm("Clear alert history?")) return;
- localStorage.removeItem("satellite_alert_history");
- renderHistory();
-}
-
-/* ==========================================
-   DETECTION TABLE
-========================================== */
-
-function escapeHTML(value) {
- return String(value ?? "").replace(/[&<>"']/g,c=>({
-  "&":"&amp;","<":"&lt;",">":"&gt;",
-  '"':"&quot;","'":"&#39;"
- }[c]));
+  drawCharts();
 }
 
 function renderTable() {
- const search = ($("search").value || "").toLowerCase();
- const risk = $("tableRisk").value;
+  const q = ($("search").value || "").toLowerCase();
+  const riskFilter = $("tableRisk").value;
 
- const filtered = fires.filter(f=>{
-  const matchesRisk = risk==="All" || f.risk===risk;
+  const filtered = fires.filter(f => {
+    const matchText = `${f.region} ${f.latitude} ${f.longitude} ${f.risk}`.toLowerCase();
+    const matchesQuery = matchText.includes(q);
+    const matchesRisk = riskFilter === "All" || f.risk === riskFilter;
+    return matchesQuery && matchesRisk;
+  });
 
-  const text = [
-   f.latitude,f.longitude,f.satellite,
-   f.date,f.confidence,f.risk
-  ].join(" ").toLowerCase();
-
-  return matchesRisk && text.includes(search);
- });
-
- $("tableBody").innerHTML = filtered.length
-  ? filtered.slice(0,300).map(f=>`
-   <tr>
-    <td>${escapeHTML(regionOf(f))}</td>
-    <td>${f.latitude.toFixed(3)}, ${f.longitude.toFixed(3)}</td>
-    <td>${f.brightness.toFixed(1)}</td>
-    <td>${f.frp.toFixed(2)}</td>
-    <td>${escapeHTML(f.confidence)}</td>
-    <td>${escapeHTML(f.satellite)}</td>
-    <td>${escapeHTML(f.date)}</td>
-    <td><span class="risk ${f.risk}">${f.risk}</span></td>
-   </tr>
-  `).join("")
-  : '<tr><td colspan="8" class="empty">No matching detections.</td></tr>';
-
- $("tableInfo").textContent =
-  `Showing ${Math.min(filtered.length,300)} of ${filtered.length} filtered records · ${totalDetections} total NASA detections`;
+  let html = "";
+  filtered.slice(0, 50).forEach(row => {
+    html += `<tr>
+      <td><b>${row.region}</b></td>
+      <td>${row.latitude.toFixed(2)}°</td>
+      <td>${row.longitude.toFixed(2)}°</td>
+      <td style="color:var(--cyan);font-weight:bold">${row.brightness} K</td>
+      <td><span style="padding:4px 8px;border-radius:12px;font-size:9px;font-weight:bold;background:#0d3041;color:${riskColors[row.risk]}">${row.risk}</span></td>
+    </tr>`;
+  });
+  $("tableBody").innerHTML = html || '<tr><td colspan="5" class="empty">No matching telemetry records found.</td></tr>';
 }
 
 function exportCSV() {
- if (!fires.length) {
-  toast("No detections available to export.");
-  return;
- }
-
- const headers = [
-  "latitude","longitude","brightness","frp",
-  "confidence","risk","date","time","satellite",
-  "instrument","daynight"
- ];
-
- const csv = [
-  headers.join(","),
-  ...fires.map(f=>headers.map(h=>{
-   const value = String(f[h] ?? "");
-   return '"' + value.replace(/"/g,'""') + '"';
-  }).join(","))
- ].join("\n");
-
- const blob = new Blob([csv],{type:"text/csv;charset=utf-8"});
- const url = URL.createObjectURL(blob);
- const a = document.createElement("a");
-
- a.href = url;
- a.download = "satellite-live-wildfire-detections.csv";
- a.click();
-
- URL.revokeObjectURL(url);
+  let csv = "Region,Latitude,Longitude,Brightness(K),Risk\n";
+  fires.forEach(f => {
+    csv += `"${f.region}",${f.latitude},${f.longitude},${f.brightness},"${f.risk}"\n`;
+  });
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'nasa_firms_telemetry.csv';
+  a.click();
 }
 
-/* ==========================================
-   SETTINGS
-========================================== */
-
-function saveSettings() {
- localStorage.setItem("satellite_source",$("source").value);
- localStorage.setItem("satellite_days",$("days").value);
- localStorage.setItem("satellite_refresh",$("refreshInterval").value);
-
- scheduleRefresh();
- loadData(true);
-}
-
-function scheduleRefresh() {
- if (refreshTimer) clearInterval(refreshTimer);
-
- const interval = Number($("refreshInterval").value) || 300000;
-
- refreshTimer = setInterval(()=>loadData(false),interval);
-}
-
-/* ==========================================
-   INITIAL APPLICATION START
-========================================== */
-
-function loadPreferences() {
- const source = localStorage.getItem("satellite_source");
- const days = localStorage.getItem("satellite_days");
- const refresh = localStorage.getItem("satellite_refresh");
- const auto = localStorage.getItem("satellite_auto_alerts");
- const threshold = localStorage.getItem("satellite_alert_threshold");
-
- if (source) $("source").value = source;
- if (days) $("days").value = days;
- if (refresh) $("refreshInterval").value = refresh;
-
- if (auto !== null) {
-  $("autoAlerts").checked = auto === "true";
- }
-
- if (threshold) $("alertThreshold").value = threshold;
-
- renderHistory();
-}
-
-loadPreferences();
-initOverviewMap();
-scheduleRefresh();
+// Automatically load data on startup without manual entry
 loadData(false);
 </script>
 </body>
