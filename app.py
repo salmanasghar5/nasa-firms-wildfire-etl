@@ -9,59 +9,169 @@ import requests
 import io
 from datetime import datetime, timezone
 
-# 1. Page Setup
+# 1. Page Configuration
 st.set_page_config(
-    page_title="NASA FIRMS | Wildfire Intelligence Command",
+    page_title="NASA FIRMS | Orbital Wildfire Intelligence",
     page_icon="🔥",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# 2. Custom Glassmorphism & Executive UI Styling
+# 2. Modern SaaS / Vercel-Grade Dark Glassmorphism CSS
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
-    .block-container { padding-top: 1.4rem; padding-bottom: 2rem; }
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
 
-    /* Styled KPI Cards */
-    div[data-testid="metric-container"] {
-        background: linear-gradient(145deg, #131A2A 0%, #0F1523 100%);
-        border: 1px solid rgba(255, 87, 34, 0.28);
-        padding: 16px 20px;
-        border-radius: 14px;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
-        transition: all 0.2s ease;
-    }
-    div[data-testid="metric-container"]:hover {
-        border-color: #FF5722;
-        transform: translateY(-2px);
+    html, body, [class*="css"] {
+        font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* Modern Pill Tabs */
+    /* Hide default Streamlit top header bar & footer for a clean web-app look */
+    header[data-testid="stHeader"] {
+        background: transparent;
+    }
+    footer { visibility: hidden; }
+
+    /* Deep Space Mesh Gradient Background */
+    .stApp {
+        background:
+            radial-gradient(circle at 15% 15%, rgba(255, 87, 34, 0.08) 0%, transparent 40%),
+            radial-gradient(circle at 85% 20%, rgba(56, 189, 248, 0.07) 0%, transparent 40%),
+            linear-gradient(180deg, #070A12 0%, #0B0F1A 100%);
+    }
+
+    .block-container {
+        padding-top: 1.2rem;
+        padding-bottom: 2.5rem;
+        max-width: 1440px;
+    }
+
+    /* Hero Banner Styling */
+    .hero-box {
+        background: linear-gradient(135deg, rgba(19, 27, 46, 0.85) 0%, rgba(12, 17, 30, 0.92) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 18px;
+        padding: 22px 28px;
+        margin-bottom: 22px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(16px);
+    }
+    .hero-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        background: linear-gradient(90deg, #FFFFFF 0%, #CBD5E1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+        letter-spacing: -0.02em;
+    }
+    .hero-sub {
+        color: #94A3B8;
+        font-size: 0.9rem;
+        margin-top: 4px;
+    }
+    .live-badge {
+        background: rgba(16, 185, 129, 0.14);
+        border: 1px solid rgba(16, 185, 129, 0.4);
+        color: #34D399;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        font-family: 'JetBrains Mono', monospace;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .pulse-dot {
+        height: 8px;
+        width: 8px;
+        background-color: #10B981;
+        border-radius: 50%;
+        box-shadow: 0 0 8px #10B981;
+    }
+
+    /* Fixed KPI Metric Cards (Targets both old & new Streamlit DOM classes) */
+    div[data-testid="stMetric"], div[data-testid="metric-container"] {
+        background: linear-gradient(145deg, rgba(20, 28, 48, 0.85) 0%, rgba(13, 18, 32, 0.95) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-top: 2px solid rgba(255, 87, 34, 0.65);
+        padding: 18px 22px;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        backdrop-filter: blur(12px);
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    div[data-testid="stMetric"]:hover, div[data-testid="metric-container"]:hover {
+        transform: translateY(-3px);
+        border-color: rgba(255, 87, 34, 0.9);
+    }
+    div[data-testid="stMetricValue"] {
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 700;
+        font-size: 1.85rem !important;
+        color: #F8FAFC !important;
+    }
+    div[data-testid="stMetricLabel"] {
+        color: #94A3B8 !important;
+        font-weight: 600 !important;
+        font-size: 0.85rem !important;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    /* Glass Card Container for Panels */
+    .glass-card {
+        background: rgba(17, 24, 39, 0.72);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 18px 20px;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+        backdrop-filter: blur(12px);
+        margin-bottom: 16px;
+    }
+
+    /* Modern Segmented Pill Navigation Tabs */
     .stTabs [data-baseweb="tab-list"] {
         gap: 8px;
-        background-color: #131A2A;
+        background-color: rgba(15, 21, 36, 0.9);
         padding: 6px;
-        border-radius: 12px;
+        border-radius: 14px;
         border: 1px solid rgba(255, 255, 255, 0.08);
+        margin-bottom: 14px;
     }
     .stTabs [data-baseweb="tab"] {
-        border-radius: 8px;
-        padding: 8px 16px;
+        border-radius: 10px;
+        padding: 9px 18px;
         font-weight: 600;
+        font-size: 0.88rem;
         color: #94A3B8;
+        transition: all 0.2s ease;
+    }
+    .stTabs [data-baseweb="tab"]:hover {
+        color: #FFFFFF;
+        background-color: rgba(255, 255, 255, 0.05);
     }
     .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, #FF5722 0%, #E91E63 100%) !important;
+        background: linear-gradient(135deg, #FF5722 0%, #F43F5E 100%) !important;
         color: #FFFFFF !important;
+        box-shadow: 0 4px 14px rgba(255, 87, 34, 0.4);
+    }
+
+    /* Sidebar Polish */
+    section[data-testid="stSidebar"] {
+        background-color: #090D16;
+        border-right: 1px solid rgba(255, 255, 255, 0.07);
     }
 </style>
 """, unsafe_allow_html=True)
 
 DB_PATH = "wildfire_pipeline.db"
 
-# 3. Helper Enrichment Functions
+# 3. Data Enrichment & NASA API Engine
 def classify_risk(brightness):
     if brightness >= 360:
         return "Extreme"
@@ -84,7 +194,7 @@ def assign_region(lat, lon):
         return "Oceania"
     elif 0 <= lat <= 78 and 45 < lon <= 180:
         return "Asia"
-    return "Other / Maritime"
+    return "Maritime / Other"
 
 def enrich_dataframe(df):
     if "bright_ti4" in df.columns and "brightness" not in df.columns:
@@ -126,42 +236,41 @@ except Exception as e:
     st.error(f"Pipeline load error: {e}")
     st.stop()
 
-# 4. Sidebar Controls
+# 4. Sidebar Control Center
 with st.sidebar:
-    st.markdown("### 🛰️ Satellite Telemetry Hub")
-    st.caption("VIIRS NOAA-20 Global Thermal Anomaly Pipeline")
+    st.markdown("### 🛰️ Telemetry Controls")
+    st.caption("VIIRS NOAA-20 Orbital Sensor Pipeline")
 
-    if st.button("🔄 Sync Live NASA Satellite Data", use_container_width=True, type="primary"):
-        with st.spinner("Ingesting & validating NASA FIRMS feed..."):
+    if st.button("🔄 Sync Live NASA Feed", use_container_width=True, type="primary"):
+        with st.spinner("Streaming NASA FIRMS satellite feed..."):
             try:
                 sync_live_nasa_feed()
                 st.cache_data.clear()
                 st.rerun()
             except Exception as err:
-                st.error(f"API Sync Error: {err}")
+                st.error(f"Sync failed: {err}")
 
     st.divider()
 
-    # Multi-select filters for deeper exploration
     all_tiers = [t for t in ["Extreme", "High", "Moderate", "Low"] if t in df["risk_tier"].unique()]
-    selected_tiers = st.multiselect("Filter Risk Tiers", options=all_tiers, default=all_tiers)
+    selected_tiers = st.multiselect("Thermal Risk Tiers", options=all_tiers, default=all_tiers)
 
     all_regions = sorted(df["region"].unique().tolist())
-    selected_regions = st.multiselect("Filter Global Regions", options=all_regions, default=all_regions)
+    selected_regions = st.multiselect("Continental Zones", options=all_regions, default=all_regions)
 
     min_b, max_b = float(df["brightness"].min()), float(df["brightness"].max())
-    b_range = st.slider("Brightness Threshold (K)", min_b, max_b, (min_b, max_b))
+    b_range = st.slider("Brightness Filter (Kelvin)", min_b, max_b, (min_b, max_b))
 
     map_style = st.selectbox(
-        "Satellite Map Layer",
-        ["Esri World Imagery (Satellite)", "CartoDB Dark Matter", "OpenStreetMap Terrain"]
+        "Orbital Map Basemap",
+        ["CartoDB Dark Matter (Sleek)", "Esri World Imagery (Satellite)", "OpenStreetMap Terrain"]
     )
 
     st.divider()
-    st.caption(f"🗄️ **SQLite Records:** `{len(df):,}`")
-    st.caption(f"🕒 **Updated:** {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}")
+    st.caption(f"🗄️ **Database Rows:** `{len(df):,}`")
+    st.caption(f"⚡ **Pipeline:** `Pydantic + SQLite`")
 
-# Apply Filters
+# Filter Data
 filtered_df = df[
     (df["risk_tier"].isin(selected_tiers)) &
     (df["region"].isin(selected_regions)) &
@@ -169,235 +278,5 @@ filtered_df = df[
     (df["brightness"] <= b_range[1])
 ]
 
-# 5. Header Banner
-st.markdown("## 🔥 NASA FIRMS Global Wildfire Intelligence")
-st.caption("Real-Time Satellite ETL • Pydantic Schema Validation • Geospatial & Statistical Analytics")
-
-# 6. Top Row: 4 Executive KPI Cards
-k1, k2, k3, k4 = st.columns(4)
-with k1:
-    pct = (len(filtered_df) / max(len(df), 1)) * 100
-    st.metric("Active Detections", f"{len(filtered_df):,}", delta=f"{pct:.0f}% of dataset")
-with k2:
-    mean_k = filtered_df["brightness"].mean() if not filtered_df.empty else 0.0
-    max_k = filtered_df["brightness"].max() if not filtered_df.empty else 0.0
-    st.metric("Mean Brightness", f"{mean_k:.2f} K", delta=f"Max: {max_k:.1f} K")
-with k3:
-    ext_cnt = len(filtered_df[filtered_df["risk_tier"] == "Extreme"])
-    st.metric("Extreme Risk (>360K)", f"{ext_cnt}", delta="Critical Alert" if ext_cnt > 0 else "Nominal", delta_color="inverse")
-with k4:
-    top_reg = filtered_df["region"].mode()[0] if not filtered_df.empty else "N/A"
-    st.metric("Most Active Region", top_reg, delta=f"{len(filtered_df[filtered_df['region']==top_reg])} hotspots" if top_reg != "N/A" else "")
-
-st.markdown("<br>", unsafe_allow_html=True)
-
-# 7. 5-Tab Workspace
-tab_map, tab_eda, tab_intel, tab_alerts, tab_data = st.tabs([
-    "🌍 Live Satellite Map",
-    "📊 Interactive EDA",
-    "🎯 Regional & Hotspot Intel",
-    "🚨 Alert Simulator",
-    "📋 Data & Export"
-])
-
-# TAB 1: Geospatial Satellite Map
-with tab_map:
-    col_map, col_side = st.columns([3, 1])
-    with col_map:
-        if not filtered_df.empty:
-            tile_urls = {
-                "Esri World Imagery (Satellite)": ("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", "Esri"),
-                "CartoDB Dark Matter": ("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", "CartoDB"),
-                "OpenStreetMap Terrain": ("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", "OpenStreetMap")
-            }
-            tile_url, tile_attr = tile_urls[map_style]
-
-            m = folium.Map(
-                location=[filtered_df["latitude"].mean(), filtered_df["longitude"].mean()],
-                zoom_start=2,
-                tiles=tile_url,
-                attr=tile_attr
-            )
-            colors = {"Extreme": "#FF2B2B", "High": "#FF8C00", "Moderate": "#FFD700", "Low": "#00E676"}
-            for _, row in filtered_df.head(400).iterrows():
-                tier = row["risk_tier"]
-                folium.CircleMarker(
-                    location=[row["latitude"], row["longitude"]],
-                    radius=7 if tier == "Extreme" else (5 if tier == "High" else 4),
-                    color=colors.get(tier, "#00E676"),
-                    fill=True,
-                    fill_opacity=0.85,
-                    popup=(
-                        f"<b>Region:</b> {row['region']}<br>"
-                        f"<b>Risk Tier:</b> {tier}<br>"
-                        f"<b>Brightness:</b> {row['brightness']:.2f} K<br>"
-                        f"<b>Coords:</b> {row['latitude']:.3f}, {row['longitude']:.3f}"
-                    )
-                ).add_to(m)
-            st_folium(m, width=None, height=500, use_container_width=True)
-        else:
-            st.warning("No thermal anomalies match the selected filters.")
-
-    with col_side:
-        st.markdown("#### Risk Distribution")
-        if not filtered_df.empty:
-            fig_donut = px.pie(
-                filtered_df,
-                names="risk_tier",
-                hole=0.58,
-                color="risk_tier",
-                color_discrete_map={"Extreme": "#FF2B2B", "High": "#FF8C00", "Moderate": "#FFD700", "Low": "#00E676"}
-            )
-            fig_donut.update_layout(
-                paper_bgcolor="rgba(0,0,0,0)",
-                plot_bgcolor="rgba(0,0,0,0)",
-                font_color="#F1F5F9",
-                margin=dict(t=10, b=10, l=10, r=10),
-                height=260
-            )
-            st.plotly_chart(fig_donut, use_container_width=True)
-        st.info("**Kelvin Risk Thresholds:**\n- 🔴 **Extreme:** ≥ 360 K\n- 🟠 **High:** 330 – 359 K\n- 🟡 **Moderate:** 310 – 329 K\n- 🟢 **Low:** < 310 K")
-
-# TAB 2: Interactive Plotly EDA
-with tab_eda:
-    if not filtered_df.empty:
-        c1, c2 = st.columns(2)
-        with c1:
-            fig_hist = px.histogram(
-                filtered_df,
-                x="brightness",
-                color="risk_tier",
-                nbins=28,
-                title="Thermal Brightness Distribution (Kelvin)",
-                color_discrete_map={"Extreme": "#FF2B2B", "High": "#FF8C00", "Moderate": "#FFD700", "Low": "#00E676"}
-            )
-            fig_hist.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(19,26,42,0.6)", font_color="#F1F5F9")
-            st.plotly_chart(fig_hist, use_container_width=True)
-
-        with c2:
-            fig_scatter = px.scatter(
-                filtered_df,
-                x="latitude",
-                y="brightness",
-                color="region",
-                size="brightness",
-                hover_data=["longitude", "risk_tier"],
-                title="Latitude vs. Thermal Intensity by Global Region"
-            )
-            fig_scatter.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(19,26,42,0.6)", font_color="#F1F5F9")
-            st.plotly_chart(fig_scatter, use_container_width=True)
-
-        st.markdown("#### Statistical Summary (`describe()`)")
-        num_cols = [c for c in ["brightness", "latitude", "longitude", "frp", "confidence"] if c in filtered_df.columns]
-        st.dataframe(filtered_df[num_cols].describe().T, use_container_width=True)
-    else:
-        st.warning("No data available to plot.")
-
-# TAB 3: Regional & Hotspot Intelligence
-with tab_intel:
-    if not filtered_df.empty:
-        r_col1, r_col2 = st.columns([3, 2])
-        with r_col1:
-            reg_summary = filtered_df.groupby("region", as_index=False).agg(
-                Detections=("brightness", "count"),
-                Avg_Brightness=("brightness", "mean"),
-                Peak_Brightness=("brightness", "max")
-            ).sort_values("Detections", ascending=False)
-
-            fig_bar = px.bar(
-                reg_summary,
-                x="region",
-                y="Detections",
-                color="Avg_Brightness",
-                color_continuous_scale="YlOrRd",
-                title="Active Thermal Detections & Mean Intensity by Region"
-            )
-            fig_bar.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(19,26,42,0.6)", font_color="#F1F5F9")
-            st.plotly_chart(fig_bar, use_container_width=True)
-
-        with r_col2:
-            peak_val = float(filtered_df["brightness"].max())
-            fig_gauge = go.Figure(go.Indicator(
-                mode="gauge+number+delta",
-                value=peak_val,
-                delta={"reference": 330, "increasing": {"color": "#FF2B2B"}},
-                title={"text": "Peak Thermal Anomaly (K)"},
-                gauge={
-                    "axis": {"range": [280, 420]},
-                    "bar": {"color": "#FF5722"},
-                    "steps": [
-                        {"range": [280, 310], "color": "#1E293B"},
-                        {"range": [310, 330], "color": "#334155"},
-                        {"range": [330, 360], "color": "#7C2D12"},
-                        {"range": [360, 420], "color": "#991B1B"}
-                    ]
-                }
-            ))
-            fig_gauge.update_layout(paper_bgcolor="rgba(0,0,0,0)", font_color="#F1F5F9", height=320)
-            st.plotly_chart(fig_gauge, use_container_width=True)
-
-        st.markdown("#### 🔥 Top 10 Highest-Intensity Thermal Hotspots")
-        top10 = filtered_df.sort_values("brightness", ascending=False).head(10)
-        cols = [c for c in ["region", "risk_tier", "brightness", "latitude", "longitude", "acq_date", "acq_time"] if c in top10.columns]
-        st.dataframe(top10[cols], use_container_width=True, hide_index=True)
-
-# TAB 4: Alert & Threshold Simulator
-with tab_alerts:
-    st.markdown("#### 🚨 Automated Emergency Alert Simulator")
-    st.caption("Test custom Kelvin trigger thresholds and dispatch real-time webhook notifications.")
-
-    sim_col1, sim_col2 = st.columns([1, 2])
-    with sim_col1:
-        custom_thresh = st.slider("Custom Alert Trigger (Kelvin)", 300.0, 400.0, 345.0, step=1.0)
-        webhook_url = st.text_input("Discord Webhook URL (Optional)", placeholder="https://discord.com/api/webhooks/...")
-        triggered_df = filtered_df[filtered_df["brightness"] >= custom_thresh]
-        st.metric("Detections Exceeding Threshold", f"{len(triggered_df)}")
-
-        if st.button("📡 Dispatch Test Alert", use_container_width=True):
-            if webhook_url.startswith("https://"):
-                try:
-                    payload = {
-                        "content": f"🔥 **NASA FIRMS Alert:** {len(triggered_df)} thermal anomalies detected above **{custom_thresh} K** (Peak: {triggered_df['brightness'].max():.1f} K)."
-                    }
-                    res = requests.post(webhook_url, json=payload, timeout=5)
-                    if res.status_code in [200, 204]:
-                        st.success("Alert dispatched to Discord successfully!")
-                    else:
-                        st.error(f"Webhook returned status {res.status_code}")
-                except Exception as w_err:
-                    st.error(f"Webhook error: {w_err}")
-            else:
-                st.info(f"Simulated Alert Preview: **{len(triggered_df)} anomalies ≥ {custom_thresh} K** flagged for immediate response.")
-
-    with sim_col2:
-        st.markdown(f"**Flagged Hotspots (≥ {custom_thresh} K):**")
-        if not triggered_df.empty:
-            show_cols = [c for c in ["region", "brightness", "latitude", "longitude", "acq_date"] if c in triggered_df.columns]
-            st.dataframe(triggered_df.sort_values("brightness", ascending=False)[show_cols], use_container_width=True, height=300, hide_index=True)
-        else:
-            st.success("No detections exceed this threshold.")
-
-# TAB 5: Data Explorer & Multi-Format Export
-with tab_data:
-    s_col, b1, b2, b3 = st.columns([3, 1, 1, 1])
-    with s_col:
-        search_txt = st.text_input("🔍 Instant Search (Region, Risk Tier, Date, or Coordinate):", placeholder="e.g. Asia or High")
-
-    export_df = filtered_df.copy()
-    if search_txt:
-        mask = export_df.astype(str).apply(lambda col: col.str.contains(search_txt, case=False, na=False)).any(axis=1)
-        export_df = export_df[mask]
-
-    with b1:
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.download_button("⬇️ CSV", export_df.to_csv(index=False).encode("utf-8"), "nasa_firms_data.csv", "text/csv", use_container_width=True)
-    with b2:
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.download_button("⬇️ JSON", export_df.to_json(orient="records", indent=2).encode("utf-8"), "nasa_firms_data.json", "application/json", use_container_width=True)
-    with b3:
-        st.markdown("<br>", unsafe_allow_html=True)
-        excel_buf = io.BytesIO()
-        export_df.to_excel(excel_buf, index=False, engine="openpyxl")
-        st.download_button("⬇️ Excel", excel_buf.getvalue(), "nasa_firms_data.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", use_container_width=True)
-
-    st.dataframe(export_df, use_container_width=True, height=450)
+# 5. Glass Hero Header Banner
+now_utc = datetime.now(timezone
