@@ -26,13 +26,11 @@ st.markdown("""
         font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* Hide default Streamlit top header bar & footer for a clean web-app look */
     header[data-testid="stHeader"] {
         background: transparent;
     }
     footer { visibility: hidden; }
 
-    /* Deep Space Mesh Gradient Background */
     .stApp {
         background:
             radial-gradient(circle at 15% 15%, rgba(255, 87, 34, 0.08) 0%, transparent 40%),
@@ -46,7 +44,6 @@ st.markdown("""
         max-width: 1440px;
     }
 
-    /* Hero Banner Styling */
     .hero-box {
         background: linear-gradient(135deg, rgba(19, 27, 46, 0.85) 0%, rgba(12, 17, 30, 0.92) 100%);
         border: 1px solid rgba(255, 255, 255, 0.09);
@@ -94,7 +91,6 @@ st.markdown("""
         box-shadow: 0 0 8px #10B981;
     }
 
-    /* Fixed KPI Metric Cards */
     div[data-testid="stMetric"], div[data-testid="metric-container"] {
         background: linear-gradient(145deg, rgba(20, 28, 48, 0.85) 0%, rgba(13, 18, 32, 0.95) 100%);
         border: 1px solid rgba(255, 255, 255, 0.08);
@@ -123,7 +119,6 @@ st.markdown("""
         letter-spacing: 0.04em;
     }
 
-    /* Glass Card Container for Panels */
     .glass-card {
         background: rgba(17, 24, 39, 0.72);
         border: 1px solid rgba(255, 255, 255, 0.08);
@@ -134,7 +129,6 @@ st.markdown("""
         margin-bottom: 16px;
     }
 
-    /* Modern Segmented Pill Navigation Tabs */
     .stTabs [data-baseweb="tab-list"] {
         gap: 8px;
         background-color: rgba(15, 21, 36, 0.9);
@@ -161,7 +155,6 @@ st.markdown("""
         box-shadow: 0 4px 14px rgba(255, 87, 34, 0.4);
     }
 
-    /* Sidebar Polish */
     section[data-testid="stSidebar"] {
         background-color: #090D16;
         border-right: 1px solid rgba(255, 255, 255, 0.07);
@@ -475,4 +468,79 @@ with tab_intel:
                 delta={"reference": 330, "increasing": {"color": "#FF2B2B"}},
                 title={"text": "Peak Orbital Brightness (K)", "font": {"color": "#F1F5F9"}},
                 gauge={
-                    "axis": {"range": [280, 4
+                    "axis": {"range": [280, 420], "tickcolor": "#94A3B8"},
+                    "bar": {"color": "#FF5722"},
+                    "bgcolor": "rgba(15,23,42,0.8)",
+                    "steps": [
+                        {"range": [280, 310], "color": "#064E3B"},
+                        {"range": [310, 330], "color": "#713F12"},
+                        {"range": [330, 360], "color": "#7C2D12"},
+                        {"range": [360, 420], "color": "#7F1D1D"}
+                    ]
+                }
+            ))
+            fig_gauge.update_layout(paper_bgcolor="rgba(17,24,39,0.7)", font_color="#F1F5F9", height=360)
+            st.plotly_chart(fig_gauge, use_container_width=True)
+
+        st.markdown("#### 🔥 Top 10 Highest-Intensity Thermal Hotspots")
+        top10 = filtered_df.sort_values("brightness", ascending=False).head(10)
+        cols = [c for c in ["region", "risk_tier", "brightness", "latitude", "longitude", "acq_date", "acq_time"] if c in top10.columns]
+        st.dataframe(top10[cols], use_container_width=True, hide_index=True)
+
+# TAB 4: Alert & Threshold Simulator
+with tab_alerts:
+    sim1, sim2 = st.columns([1, 2], gap="medium")
+    with sim1:
+        st.markdown('<div class="glass-card"><h4 style="margin-top:0;">🚨 Threshold Trigger Control</h4>', unsafe_allow_html=True)
+        custom_thresh = st.slider("Alert Trigger Threshold (Kelvin)", 300.0, 400.0, 340.0, step=1.0)
+        webhook_url = st.text_input("Discord Webhook URL (Optional)", placeholder="https://discord.com/api/webhooks/...")
+        triggered_df = filtered_df[filtered_df["brightness"] >= custom_thresh]
+        st.metric("Anomalies Triggering Alert", f"{len(triggered_df)}")
+
+        if st.button("📡 Dispatch Emergency Alert", use_container_width=True, type="primary"):
+            if webhook_url.startswith("https://"):
+                try:
+                    payload = {"content": f"🔥 **NASA FIRMS Alert:** {len(triggered_df)} anomalies >= **{custom_thresh} K** detected."}
+                    res = requests.post(webhook_url, json=payload, timeout=5)
+                    if res.status_code in [200, 204]:
+                        st.success("Dispatched to Discord!")
+                    else:
+                        st.error(f"Webhook returned {res.status_code}")
+                except Exception as w_err:
+                    st.error(f"Error: {w_err}")
+            else:
+                st.info(f"Simulated Alert: Flagged **{len(triggered_df)} hotspots >= {custom_thresh} K**.")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with sim2:
+        st.markdown(f"#### Flagged Detections (≥ {custom_thresh} K)")
+        if not triggered_df.empty:
+            show_cols = [c for c in ["region", "brightness", "latitude", "longitude", "acq_date"] if c in triggered_df.columns]
+            st.dataframe(triggered_df.sort_values("brightness", ascending=False)[show_cols], use_container_width=True, height=340, hide_index=True)
+        else:
+            st.success("No detections exceed this threshold.")
+
+# TAB 5: Data Explorer & Export
+with tab_data:
+    s_col, b1, b2, b3 = st.columns([3, 1, 1, 1])
+    with s_col:
+        search_txt = st.text_input("🔍 Search Telemetry Records:", placeholder="Filter by region, risk tier, date, or coordinate...")
+
+    export_df = filtered_df.copy()
+    if search_txt:
+        mask = export_df.astype(str).apply(lambda col: col.str.contains(search_txt, case=False, na=False)).any(axis=1)
+        export_df = export_df[mask]
+
+    with b1:
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.download_button("⬇️ CSV", export_df.to_csv(index=False).encode("utf-8"), "nasa_firms_data.csv", "text/csv", use_container_width=True)
+    with b2:
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.download_button("⬇️ JSON", export_df.to_json(orient="records", indent=2).encode("utf-8"), "nasa_firms_data.json", "application/json", use_container_width=True)
+    with b3:
+        st.markdown("<br>", unsafe_allow_html=True)
+        excel_buf = io.BytesIO()
+        export_df.to_excel(excel_buf, index=False, engine="openpyxl")
+        st.download_button("⬇️ Excel", excel_buf.getvalue(), "nasa_firms_data.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", use_container_width=True)
+
+    st.dataframe(export_df, use_container_width=True, height=450)
