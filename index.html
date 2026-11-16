@@ -14,7 +14,8 @@
         tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } } }
     </script>
     <style>
-        .glass-card { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(51, 65, 85, 0.8); backdrop-filter: blur(12px); }
+        .glass-card { background: rgba(30, 41, 59, 0.75); border: 1px solid rgba(51, 65, 85, 0.8); backdrop-filter: blur(12px); }
+        .panel-content { transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; overflow: hidden; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans p-4 md:p-6">
@@ -55,92 +56,104 @@
         </div>
     </div>
 
-    <!-- MAIN TWO-PANEL ARCHITECTURE -->
+    <!-- MAIN TWO-PANEL ARCHITECTURE WITH ACCORDIONS -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
         <!-- PANEL 1: STATISTICAL DATA & ANALYTICS (7 Cols) -->
         <div class="lg:col-span-7 space-y-6">
-            <!-- Time Series Waveform Trend -->
-            <div class="glass-card p-5 rounded-2xl">
-                <h3 class="text-sm font-bold text-white mb-3 flex items-center justify-between">
-                    <span>📈 Thermal Waveform Progression</span>
-                    <span class="text-xs font-normal text-slate-400">VIIRS TI4 Channel</span>
-                </h3>
-                <div class="h-64">
-                    <canvas id="timeSeriesChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Risk Level Severity Ratios -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="glass-card p-5 rounded-2xl">
-                    <h3 class="text-sm font-bold text-white mb-3">◔ Risk Severity Breakdown</h3>
-                    <div class="h-48 flex items-center justify-center">
-                        <canvas id="donutRisk"></canvas>
+            
+            <!-- Accordion Section 1: Statistical Trend & Breakdown -->
+            <div class="glass-card rounded-2xl overflow-hidden">
+                <button onclick="togglePanel('statPanel', 'statArrow')" class="w-full p-5 flex justify-between items-center text-left bg-slate-900/40 hover:bg-slate-900/70 transition">
+                    <span class="text-sm font-bold text-white flex items-center gap-2">📊 Statistical Analytics & Risk Breakdown</span>
+                    <span id="statArrow" class="transform rotate-180 transition text-sky-400 font-bold">▼</span>
+                </button>
+                <div id="statPanel" class="panel-content p-5 space-y-6 max-h-[2000px] opacity-100">
+                    <div class="h-64">
+                        <canvas id="timeSeriesChart"></canvas>
                     </div>
-                </div>
-                <div class="glass-card p-5 rounded-2xl">
-                    <h3 class="text-sm font-bold text-white mb-3">🌍 Continental Distribution</h3>
-                    <div class="h-48 flex items-center justify-center">
-                        <canvas id="barChart"></canvas>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="h-48 flex items-center justify-center">
+                            <canvas id="donutRisk"></canvas>
+                        </div>
+                        <div class="h-48 flex items-center justify-center">
+                            <canvas id="barChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Telemetry Data Table -->
-            <div class="glass-card p-5 rounded-2xl">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-sm font-bold text-white">📋 Validated Telemetry Records</h3>
-                    <input type="text" id="searchInput" oninput="filterTable()" placeholder="Search region or risk..." class="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-xs text-white focus:outline-none focus:border-sky-500">
-                </div>
-                <div class="overflow-x-auto max-h-64">
-                    <table class="w-full text-left text-xs text-slate-300">
-                        <thead class="bg-slate-900/90 sticky top-0 uppercase text-slate-400 border-b border-slate-800">
-                            <tr>
-                                <th class="px-3 py-2.5">Region</th>
-                                <th class="px-3 py-2.5">Lat / Lon</th>
-                                <th class="px-3 py-2.5">Kelvin</th>
-                                <th class="px-3 py-2.5">Risk Tier</th>
-                            </tr>
-                        </thead>
-                        <tbody id="dataTableBody" class="divide-y divide-slate-800/60">
-                            <!-- Populated by JS -->
-                        </tbody>
-                    </table>
+            <!-- Accordion Section 2: Validated Telemetry Records Table -->
+            <div class="glass-card rounded-2xl overflow-hidden">
+                <button onclick="togglePanel('tablePanel', 'tableArrow')" class="w-full p-5 flex justify-between items-center text-left bg-slate-900/40 hover:bg-slate-900/70 transition">
+                    <span class="text-sm font-bold text-white flex items-center gap-2">📋 Validated Telemetry Records Matrix</span>
+                    <span id="tableArrow" class="transform rotate-180 transition text-sky-400 font-bold">▼</span>
+                </button>
+                <div id="tablePanel" class="panel-content p-5 max-h-[2000px] opacity-100">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-xs text-slate-400">Database live query sync</span>
+                        <input type="text" id="searchInput" oninput="filterTable()" placeholder="Search region or risk..." class="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-xs text-white focus:outline-none focus:border-sky-500">
+                    </div>
+                    <div class="overflow-x-auto max-h-60">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead class="bg-slate-900/90 sticky top-0 uppercase text-slate-400 border-b border-slate-800">
+                                <tr>
+                                    <th class="px-3 py-2.5">Region</th>
+                                    <th class="px-3 py-2.5">Lat / Lon</th>
+                                    <th class="px-3 py-2.5">Kelvin</th>
+                                    <th class="px-3 py-2.5">Risk Tier</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataTableBody" class="divide-y divide-slate-800/60">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
+
         </div>
 
         <!-- PANEL 2: IMAGERY, RADAR & DISCORD ALERTS (5 Cols) -->
         <div class="lg:col-span-5 space-y-6">
-            <!-- Satellite Map Imagery -->
-            <div class="glass-card p-5 rounded-2xl">
-                <h3 class="text-sm font-bold text-white mb-3">🌍 Live Satellite Hotspot Projection</h3>
-                <div id="map" class="h-72 rounded-xl z-10 border border-slate-800"></div>
-            </div>
-
-            <!-- Continental Radar Signature -->
-            <div class="glass-card p-5 rounded-2xl">
-                <h3 class="text-sm font-bold text-white mb-3">◎ Continental Intensity Radar</h3>
-                <div class="h-60 flex items-center justify-center">
-                    <canvas id="radarChart"></canvas>
+            
+            <!-- Accordion Section 3: Satellite Projection Map -->
+            <div class="glass-card rounded-2xl overflow-hidden">
+                <button onclick="togglePanel('mapPanel', 'mapArrow')" class="w-full p-5 flex justify-between items-center text-left bg-slate-900/40 hover:bg-slate-900/70 transition">
+                    <span class="text-sm font-bold text-white flex items-center gap-2">🌍 Live Satellite Hotspot Projection</span>
+                    <span id="mapArrow" class="transform rotate-180 transition text-sky-400 font-bold">▼</span>
+                </button>
+                <div id="mapPanel" class="panel-content p-5 max-h-[2000px] opacity-100">
+                    <div id="map" class="h-64 rounded-xl z-10 border border-slate-800"></div>
                 </div>
             </div>
 
-            <!-- Discord Alert Simulator & Emergency Beep Siren -->
-            <div class="glass-card p-5 rounded-2xl border border-amber-500/30">
-                <h3 class="text-sm font-bold text-amber-400 mb-2 flex items-center gap-2">
-                    <span>🚨</span> Discord Alert & Emergency Beep Siren
-                </h3>
-                <p class="text-xs text-slate-400 mb-4">Triggers an automatic audio warning siren and webhook dispatch when hotspots exceed your Kelvin threshold.</p>
-                
-                <div class="space-y-3">
+            <!-- Accordion Section 4: Continental Radar -->
+            <div class="glass-card rounded-2xl overflow-hidden">
+                <button onclick="togglePanel('radarPanel', 'radarArrow')" class="w-full p-5 flex justify-between items-center text-left bg-slate-900/40 hover:bg-slate-900/70 transition">
+                    <span class="text-sm font-bold text-white flex items-center gap-2">◎ Continental Intensity Radar</span>
+                    <span id="radarArrow" class="transform rotate-180 transition text-sky-400 font-bold">▼</span>
+                </button>
+                <div id="radarPanel" class="panel-content p-5 max-h-[2000px] opacity-100">
+                    <div class="h-56 flex items-center justify-center">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accordion Section 5: Discord Alert & Siren -->
+            <div class="glass-card rounded-2xl overflow-hidden border border-amber-500/30">
+                <button onclick="togglePanel('sirenPanel', 'sirenArrow')" class="w-full p-5 flex justify-between items-center text-left bg-slate-900/40 hover:bg-slate-900/70 transition">
+                    <span class="text-sm font-bold text-amber-400 flex items-center gap-2">🚨 Discord Alert & Emergency Beep Siren</span>
+                    <span id="sirenArrow" class="transform rotate-180 transition text-amber-400 font-bold">▼</span>
+                </button>
+                <div id="sirenPanel" class="panel-content p-5 space-y-3 max-h-[2000px] opacity-100">
+                    <p class="text-xs text-slate-400">Triggers an automatic audio warning siren and webhook dispatch when hotspots exceed your Kelvin threshold.</p>
                     <div>
                         <label class="text-xs text-slate-300 block mb-1">Alert Trigger Threshold: <span id="threshVal" class="text-sky-400 font-bold">330</span> K</label>
                         <input type="range" id="threshSlider" min="300" max="390" value="330" oninput="document.getElementById('threshVal').innerText = this.value; checkSiren();" class="w-full accent-sky-500">
                     </div>
-                    <input type="text" id="webhookInput" placeholder="Discord Webhook URL (https://discord.com/...)" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-xs text-white focus:outline-none focus:border-sky-500">
-                    
+                    <input type="text" id="webhookInput" value="https://discord.com/api/webhooks/1559210573902782537/DiBSHIKqfcUa55KyIBpLzEYV03NEleZjSdr0iCkidt91OfOXQlIBz08ZlXIv8Qz8fnV4" class="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-xs text-white focus:outline-none focus:border-sky-500">
                     <div class="flex items-center justify-between pt-2">
                         <div id="sirenStatus" class="text-xs font-bold text-emerald-400">● Siren Armed (Quiet)</div>
                         <button onclick="dispatchAlert()" class="bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow">
@@ -149,6 +162,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
 
     </div>
@@ -159,11 +173,25 @@
         let map, mapMarkers = [];
         let timeSeriesInst, donutRiskInst, radarChartInst, barInst;
 
-        // Initialize Leaflet Map
+        // Accordion Toggle Handler
+        function togglePanel(panelId, arrowId) {
+            const panel = document.getElementById(panelId);
+            const arrow = document.getElementById(arrowId);
+            if (panel.style.maxHeight === "0px" || panel.style.maxHeight === "") {
+                panel.style.maxHeight = panel.scrollHeight + "px";
+                panel.style.opacity = "1";
+                arrow.style.transform = "rotate(180deg)";
+            } else {
+                panel.style.maxHeight = "0px";
+                panel.style.opacity = "0";
+                arrow.style.transform = "rotate(0deg)";
+            }
+        }
+
         function initMap() {
             map = L.map('map', { zoomControl: false }).setView([20, 0], 2);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; CartoDB',
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Esri',
                 maxZoom: 18
             }).addTo(map);
         }
@@ -256,6 +284,14 @@
             renderTable(globalData);
             renderCharts(regCounts);
             checkSiren();
+            
+            // Refresh accordion heights if open
+            setTimeout(() => {
+                ['statPanel', 'tablePanel', 'mapPanel', 'radarPanel', 'sirenPanel'].forEach(id => {
+                    const p = document.getElementById(id);
+                    if(p.style.maxHeight && p.style.maxHeight !== "0px") p.style.maxHeight = p.scrollHeight + "px";
+                });
+            }, 200);
         }
 
         function renderMap() {
@@ -264,11 +300,7 @@
             globalData.slice(0, 200).forEach(d => {
                 const color = d.risk === 'Extreme' ? '#EF4444' : d.risk === 'High' ? '#F59E0B' : '#0EA5E9';
                 const circle = L.circleMarker([d.latitude, d.longitude], {
-                    radius: 5,
-                    color: color,
-                    fillColor: color,
-                    fillOpacity: 0.85,
-                    weight: 1
+                    radius: 5, color: color, fillColor: color, fillOpacity: 0.85, weight: 1
                 }).bindPopup(`<b>${d.region}</b><br>Temp: ${d.brightness} K<br>Risk: ${d.risk}`);
                 circle.addTo(map);
                 mapMarkers.push(circle);
@@ -300,92 +332,48 @@
             const regions = Object.keys(regCounts);
             const regValues = Object.values(regCounts);
 
-            // Time Series Waveform
             if (timeSeriesInst) timeSeriesInst.destroy();
             timeSeriesInst = new Chart(document.getElementById('timeSeriesChart'), {
                 type: 'line',
                 data: {
                     labels: globalData.map((_, i) => i + 1),
-                    datasets: [{
-                        label: 'Temperature (K)',
-                        data: globalData.map(x => x.brightness),
-                        borderColor: '#0EA5E9',
-                        backgroundColor: 'rgba(14, 165, 233, 0.1)',
-                        fill: true,
-                        tension: 0.3,
-                        pointRadius: 0
-                    }]
+                    datasets: [{ label: 'Temperature (K)', data: globalData.map(x => x.brightness), borderColor: '#0EA5E9', backgroundColor: 'rgba(14, 165, 233, 0.1)', fill: true, tension: 0.3, pointRadius: 0 }]
                 },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    scales: { x: { display: false }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94A3B8', font: { size: 10 } } } },
-                    plugins: { legend: { display: false } }
-                }
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { display: false }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94A3B8', font: { size: 10 } } } }, plugins: { legend: { display: false } } }
             });
 
-            // Donut Risk
             const riskCounts = { Extreme: 0, High: 0, Moderate: 0, Low: 0 };
             globalData.forEach(x => riskCounts[x.risk]++);
             if (donutRiskInst) donutRiskInst.destroy();
             donutRiskInst = new Chart(document.getElementById('donutRisk'), {
                 type: 'doughnut',
-                data: {
-                    labels: Object.keys(riskCounts),
-                    datasets: [{ data: Object.values(riskCounts), backgroundColor: ['#EF4444', '#F59E0B', '#10B981', '#0EA5E9'] }]
-                },
+                data: { labels: Object.keys(riskCounts), datasets: [{ data: Object.values(riskCounts), backgroundColor: ['#EF4444', '#F59E0B', '#10B981', '#0EA5E9'] }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94A3B8', boxWidth: 10, font: { size: 10 } } } } }
             });
 
-            // Bar Chart
             if (barInst) barInst.destroy();
             barInst = new Chart(document.getElementById('barChart'), {
                 type: 'bar',
-                data: {
-                    labels: regions,
-                    datasets: [{ data: regValues, backgroundColor: '#0EA5E9', borderRadius: 4 }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    scales: { x: { grid: { display: false }, ticks: { color: '#94A3B8', font: { size: 9 } } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94A3B8' } } },
-                    plugins: { legend: { display: false } }
-                }
+                data: { labels: regions, datasets: [{ data: regValues, backgroundColor: '#0EA5E9', borderRadius: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false }, ticks: { color: '#94A3B8', font: { size: 9 } } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94A3B8' } } }, plugins: { legend: { display: false } } }
             });
 
-            // Radar Chart
             if (radarChartInst) radarChartInst.destroy();
             radarChartInst = new Chart(document.getElementById('radarChart'), {
                 type: 'radar',
                 data: {
                     labels: regions,
-                    datasets: [{
-                        label: 'Mean Temp',
-                        data: regions.map(r => {
-                            const sub = globalData.filter(x => x.region === r);
-                            return sub.length ? (sub.reduce((a,b)=>a+b.brightness,0)/sub.length).toFixed(1) : 300;
-                        }),
-                        backgroundColor: 'rgba(14, 165, 233, 0.2)',
-                        borderColor: '#0EA5E9',
-                        pointBackgroundColor: '#F59E0B'
-                    }]
+                    datasets: [{ label: 'Mean Temp', data: regions.map(r => { const sub = globalData.filter(x => x.region === r); return sub.length ? (sub.reduce((a,b)=>a+b.brightness,0)/sub.length).toFixed(1) : 300; }), backgroundColor: 'rgba(14, 165, 233, 0.2)', borderColor: '#0EA5E9', pointBackgroundColor: '#F59E0B' }]
                 },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    scales: { r: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { display: false }, pointLabels: { color: '#94A3B8', font: { size: 10 } } } },
-                    plugins: { legend: { display: false } }
-                }
+                options: { responsive: true, maintainAspectRatio: false, scales: { r: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { display: false }, pointLabels: { color: '#94A3B8', font: { size: 10 } } } }, plugins: { legend: { display: false } } }
             });
         }
 
-        // Emergency Siren Audio Synthesizer via Web Audio API
-        let audioCtx = null;
-        let sirenOsc = null;
-        let sirenActive = false;
-
+        let audioCtx = null, sirenOsc = null, sirenActive = false;
         function checkSiren() {
             const thresh = parseFloat(document.getElementById('threshSlider').value);
             const triggered = globalData.filter(x => x.brightness >= thresh).length;
             const statusEl = document.getElementById('sirenStatus');
-
             if (triggered > 0) {
                 statusEl.innerText = `🚨 SIREN ACTIVE: ${triggered} nodes ≥ ${thresh}K`;
                 statusEl.className = "text-xs font-bold text-rose-500 animate-pulse";
@@ -403,36 +391,25 @@
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 sirenOsc = audioCtx.createOscillator();
                 const gainNode = audioCtx.createGain();
-                
                 sirenOsc.type = 'sine';
                 sirenOsc.frequency.setValueAtTime(440, audioCtx.currentTime);
-                
-                // Frequency sweep (European emergency siren simulation)
                 setInterval(() => {
                     if (!sirenActive || !audioCtx) return;
                     sirenOsc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.8);
                     sirenOsc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 1.6);
                 }, 1600);
-
-                gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime); // Low safe volume
+                gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
                 sirenOsc.connect(gainNode);
                 gainNode.connect(audioCtx.destination);
                 sirenOsc.start();
                 sirenActive = true;
-            } catch (e) {
-                console.warn("Audio Context blocked until user interaction.");
-            }
+            } catch (e) {}
         }
 
         function stopSirenSound() {
             if (!sirenActive) return;
-            if (sirenOsc) {
-                try { sirenOsc.stop(); } catch(e){}
-            }
-            if (audioCtx) {
-                audioCtx.close();
-                audioCtx = null;
-            }
+            if (sirenOsc) { try { sirenOsc.stop(); } catch(e){} }
+            if (audioCtx) { audioCtx.close(); audioCtx = null; }
             sirenActive = false;
         }
 
@@ -440,25 +417,17 @@
             const url = document.getElementById('webhookInput').value;
             const thresh = document.getElementById('threshSlider').value;
             const triggered = globalData.filter(x => x.brightness >= parseFloat(thresh)).length;
-            
-            if (!url || !url.startsWith("https://")) {
-                alert("Please enter a valid Discord Webhook URL.");
-                return;
-            }
-            
+            if (!url || !url.startsWith("https://")) { alert("Invalid Webhook URL"); return; }
             try {
                 await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ content: `🔥 **NASA FIRMS Emergency Alert**: **${triggered}** active wildfire anomalies detected above **${thresh} K**!` })
                 });
-                alert("Discord alert dispatched successfully!");
-            } catch (e) {
-                alert("Failed to send webhook. Check URL permissions.");
-            }
+                alert("Discord alert dispatched successfully to your webhook!");
+            } catch (e) { alert("Webhook dispatch failed."); }
         }
 
-        // Initialize Map and Data on load
         initMap();
         syncLiveFeed();
     </script>
