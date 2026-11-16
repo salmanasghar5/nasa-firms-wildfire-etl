@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SATELLITE LIVE | Global Wildfire Intelligence</title>
+<title>SATELLITE LIVE | Worldwide Wildfire Intelligence</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -118,8 +118,6 @@ tr:hover{background:#0c2232}
 .form-grid{display:grid;gap:12px}
 .form-grid label{display:grid;gap:7px;font-size:11px;color:var(--muted)}
 textarea{min-height:110px;resize:vertical}
-.switch{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted)}
-.switch input{accent-color:var(--cyan);width:17px;height:17px}
 .notice{
   padding:13px;background:#0b2433;border-left:3px solid var(--cyan);
   border-radius:6px;color:#a7cce0;font-size:11px;line-height:1.7;margin-bottom:15px;
@@ -158,14 +156,14 @@ textarea{min-height:110px;resize:vertical}
   <div class="brand-icon">🛰</div>
   <div>
    <h1>SATELLITE LIVE</h1>
-   <small>AUTOMATED WILDFIRE INTELLIGENCE SYSTEM</small>
+   <small>WORLDWIDE WILDFIRE INTELLIGENCE SYSTEM</small>
   </div>
  </div>
 
  <div class="status-area">
   <span class="pill"><span class="dot" id="statusDot"></span><span id="status">CONNECTING</span></span>
   <span class="pill" id="clock">--:--:--</span>
-  <button class="primary" onclick="loadData(true)">↻ SYNC DATA</button>
+  <button class="primary" onclick="loadData(true)">↻ SYNC WORLDWIDE FEED</button>
  </div>
 </header>
 
@@ -173,17 +171,17 @@ textarea{min-height:110px;resize:vertical}
 <section class="page active" id="overview">
  <div class="page-heading">
   <div>
-   <h2>Global Intelligence Overview</h2>
-   <p>Automated real-time satellite wildfire observation and threshold monitoring.</p>
+   <h2>Worldwide Intelligence Overview</h2>
+   <p>Global real-time satellite wildfire observation across all continental sectors[cite: 1].</p>
   </div>
-  <span class="tag">AUTOMATED EMBEDDED API</span>
+  <span class="tag">GLOBAL SCOPE · WORLDWIDE</span>
  </div>
 
  <div class="grid stats">
   <div class="card">
-   <div class="card-title">Total detections</div>
+   <div class="card-title">Worldwide detections</div>
    <div class="stat-value cyan" id="total">—</div>
-   <div class="stat-sub">NASA observations</div>
+   <div class="stat-sub">Global NASA records</div>
   </div>
   <div class="card">
    <div class="card-title">Extreme risk</div>
@@ -198,14 +196,14 @@ textarea{min-height:110px;resize:vertical}
   <div class="card">
    <div class="card-title">Average brightness</div>
    <div class="stat-value green" id="avgBrightness">—</div>
-   <div class="stat-sub">VIIRS channel average</div>
+   <div class="stat-sub">Global thermal average</div>
   </div>
  </div>
 
  <div class="grid content-grid">
   <div class="card">
    <div class="card-head">
-    <h3>Global Satellite Activity</h3>
+    <h3>Worldwide Satellite Map</h3>
     <button class="secondary" onclick="showPage('mapPage')">EXPLORE MAP ↗</button>
    </div>
    <div class="map-wrap">
@@ -221,14 +219,14 @@ textarea{min-height:110px;resize:vertical}
 
   <div class="grid">
    <div class="card">
-    <div class="card-head"><h3>Risk Severity Split</h3><span class="tag">PROPORTIONAL</span></div>
+    <div class="card-head"><h3>Global Risk Severity Split</h3><span class="tag">PROPORTIONAL</span></div>
     <div class="chart-box"><canvas id="overviewRiskChart"></canvas></div>
    </div>
    <div class="card">
-    <div class="card-head"><h3>Automated Pipeline Status</h3><span class="tag">ACTIVE</span></div>
+    <div class="card-head"><h3>Worldwide Pipeline Status</h3><span class="tag">ACTIVE</span></div>
     <div class="grid two-col">
-     <div><div class="card-title">Dataset</div><b>VIIRS_NOAA20_NRT</b></div>
-     <div><div class="card-title">Threshold</div><b>> 300 K Filter</b></div>
+     <div><div class="card-title">Scope</div><b>Worldwide (Global)</b></div>
+     <div><div class="card-title">Auto Alert</div><b>> 300 K Filter</b></div>
      <div><div class="card-title">Updated</div><b id="lastUpdate">—</b></div>
      <div><div class="card-title">Records</div><b id="displayed">—</b></div>
     </div>
@@ -241,15 +239,15 @@ textarea{min-height:110px;resize:vertical}
 <section class="page" id="mapPage">
  <div class="page-heading">
   <div>
-   <h2>Live Satellite Map Projection</h2>
-   <p>Explore worldwide wildfire hotspots and inspect geospatial coordinates.</p>
+   <h2>Worldwide Live Satellite Map</h2>
+   <p>Inspect global wildfire hotspots across North America, South America, Europe, Africa, Asia, and Oceania[cite: 1].</p>
   </div>
-  <span class="tag">ESRI DARK CANVAS</span>
+  <span class="tag">GLOBAL PROJECTION</span>
  </div>
 
  <div class="card">
   <div class="card-head">
-   <h3>World Fire Activity</h3>
+   <h3>Global Fire Activity</h3>
    <div class="controls">
     <select id="mapRisk" onchange="renderMap()">
      <option value="All">All risk tiers</option>
@@ -258,7 +256,7 @@ textarea{min-height:110px;resize:vertical}
      <option value="Moderate">Moderate</option>
      <option value="Low">Low</option>
     </select>
-    <button class="secondary" onclick="fitMap()">RESET VIEW</button>
+    <button class="secondary" onclick="fitMap()">RESET WORLD VIEW</button>
    </div>
   </div>
   <div id="map" style="height:560px"></div>
@@ -275,19 +273,19 @@ textarea{min-height:110px;resize:vertical}
 <section class="page" id="analytics">
  <div class="page-heading">
   <div>
-   <h2>Advanced Analytics & Radar Signature</h2>
-   <p>Analyze regional intensity distribution and thermal waveform progression.</p>
+   <h2>Worldwide Analytics & Radar Signature</h2>
+   <p>Analyze continental intensity distribution and global thermal waveform progression.</p>
   </div>
   <span class="tag">CHART.JS SUITE</span>
  </div>
 
  <div class="grid two-col">
   <div class="card">
-   <div class="card-head"><h3>Regional Intensity Radar</h3><span class="tag">RADAR</span></div>
+   <div class="card-head"><h3>Continental Intensity Radar</h3><span class="tag">RADAR</span></div>
    <div class="chart-box" style="height:320px"><canvas id="radarChart"></canvas></div>
   </div>
   <div class="card">
-   <div class="card-head"><h3>Thermal Waveform Timeline</h3><span class="tag">PROGRESSION</span></div>
+   <div class="card-head"><h3>Global Thermal Waveform Timeline</h3><span class="tag">PROGRESSION</span></div>
    <div class="chart-box" style="height:320px"><canvas id="timeSeriesChart"></canvas></div>
   </div>
  </div>
@@ -298,16 +296,16 @@ textarea{min-height:110px;resize:vertical}
  <div class="page-heading">
   <div>
    <h2>Discord Alert & Emergency Center</h2>
-   <p>Automatic checks for detections greater than 300K, plus manual webhook dispatch options.</p>
+   <p>Automated global monitoring for detections >300K, plus manual Discord webhook dispatch.</p>
   </div>
   <span class="tag">DISCORD AUTOMATION</span>
  </div>
 
  <div class="grid two-col">
   <div class="card">
-   <div class="card-head"><h3>Automated Background Monitoring</h3><span class="tag">ACTIVE TRIGGER</span></div>
+   <div class="card-head"><h3>Automated Worldwide Monitoring</h3><span class="tag">ACTIVE TRIGGER</span></div>
    <div class="notice">
-     The system automatically monitors incoming NASA telemetry. Any detection with a brightness <b>greater than 300K</b> triggers an instant automated notification to your Discord webhook.
+     The system continuously monitors worldwide satellite feeds[cite: 1]. Any global anomaly exceeding <b>300 K</b> automatically triggers an instant notification to your Discord webhook.
    </div>
    <div class="form-grid" style="margin-top:15px">
      <label>
@@ -322,7 +320,7 @@ textarea{min-height:110px;resize:vertical}
    <div class="form-grid">
     <label>
      Custom Alert Message
-     <input id="manualMsg" value="Manual test alert: Monitoring active (>300K threshold).">
+     <input id="manualMsg" value="Manual global test alert: Worldwide monitoring active (>300K threshold).">
     </label>
     <button class="primary" onclick="sendManualAlert()" style="margin-top:10px">📡 SEND MANUAL ALERT NOW</button>
    </div>
@@ -334,10 +332,10 @@ textarea{min-height:110px;resize:vertical}
 <section class="page" id="detections">
  <div class="page-heading">
   <div>
-   <h2>Validated Telemetry Records Matrix</h2>
-   <p>Search, filter, and export live NASA FIRMS wildfire observation records.</p>
+   <h2>Validated Worldwide Telemetry Records</h2>
+   <p>Search, filter, and export global NASA FIRMS wildfire observation records.</p>
   </div>
-  <button class="primary" onclick="exportCSV()">↓ EXPORT CSV</button>
+  <button class="primary" onclick="exportCSV()">↓ EXPORT GLOBAL CSV</button>
  </div>
 
  <div class="card">
@@ -364,7 +362,7 @@ textarea{min-height:110px;resize:vertical}
      </tr>
     </thead>
     <tbody id="tableBody">
-     <tr><td colspan="5" class="empty">Loading satellite telemetry...</td></tr>
+     <tr><td colspan="5" class="empty">Loading worldwide satellite telemetry...</td></tr>
     </tbody>
    </table>
   </div>
@@ -372,7 +370,7 @@ textarea{min-height:110px;resize:vertical}
 </section>
 
 <footer class="footer">
- SATELLITE LIVE · AUTOMATED WILDFIRE INTELLIGENCE · NASA FIRMS NEAR-REAL-TIME DATA
+ SATELLITE LIVE · WORLDWIDE WILDFIRE INTELLIGENCE · NASA FIRMS NEAR-REAL-TIME DATA
 </footer>
 
 </main>
@@ -456,7 +454,7 @@ function renderMarkers(map, layerArray, data) {
   layerArray.forEach(m => map.removeLayer(m));
   layerArray.length = 0;
 
-  data.slice(0, 250).forEach(fire => {
+  data.slice(0, 400).forEach(fire => {
     const color = riskColors[fire.risk] || riskColors.Low;
     const marker = L.circleMarker([fire.latitude, fire.longitude], {
       radius: fire.risk === "Extreme" ? 6 : 4,
@@ -481,11 +479,11 @@ function renderOverviewMap() {
 }
 
 async function loadData(showMessage=false) {
-  $("status").textContent = "SYNCING";
+  $("status").textContent = "SYNCING WORLD";
   $("statusDot").style.background = "#ffba45";
 
   try {
-    // Automatically embedded API key - no user input required
+    // Embedded API key targeting worldwide ('world') feed[cite: 1]
     const embeddedApiKey = "11be2b95414f1e231600092cc3ff7148";
     const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${embeddedApiKey}/VIIRS_NOAA20_NRT/world/1`;
 
@@ -493,11 +491,11 @@ async function loadData(showMessage=false) {
     const text = await response.text();
     parseCSV(text);
 
-    $("status").textContent = "LIVE DATA";
+    $("status").textContent = "WORLDWIDE LIVE";
     $("statusDot").style.background = "#19d5a0";
-    if (showMessage) toast("NASA FIRMS automatic sync successful.");
+    if (showMessage) toast("Worldwide NASA FIRMS synchronization successful.");
   } catch (err) {
-    console.warn("API fetch failed, loading fallback telemetry.", err);
+    console.warn("Global API fetch failed, loading fallback worldwide telemetry.", err);
     loadMockData();
     $("status").textContent = "SIMULATED FEED";
     $("statusDot").style.background = "#ffba45";
@@ -522,7 +520,7 @@ function parseCSV(text) {
   const brightIdx = headers.indexOf("bright_ti4") !== -1 ? headers.indexOf("bright_ti4") : headers.indexOf("brightness");
 
   fires = [];
-  for (let i = 1; i < Math.min(lines.length, 400); i++) {
+  for (let i = 1; i < lines.length; i++) {
     const cols = lines[i].split(",");
     if (cols.length > Math.max(latIdx, lonIdx, brightIdx)) {
       const lat = parseFloat(cols[latIdx]);
@@ -538,7 +536,7 @@ function parseCSV(text) {
         };
         fires.push(fireObj);
 
-        // Automated background rule: check if brightness > 300K
+        // Automated background rule for worldwide detections > 300K
         checkForAutoDiscordAlert(fireObj);
       }
     }
@@ -550,7 +548,7 @@ function parseCSV(text) {
 function loadMockData() {
   fires = [];
   const regions = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania"];
-  for (let i = 0; i < 200; i++) {
+  for (let i = 0; i < 300; i++) {
     const brightness = 295 + Math.random() * 90;
     const fireObj = {
       latitude: Math.random() * 120 - 60,
@@ -565,7 +563,7 @@ function loadMockData() {
   updateDashboard();
 }
 
-// Automatically check condition (> 300K) and push to Discord webhook
+// Automatically check condition (> 300K) and push to Discord webhook worldwide
 async function checkForAutoDiscordAlert(fire) {
   if (fire.brightness > 300) {
     const uniqueKey = `${fire.latitude.toFixed(2)}_${fire.longitude.toFixed(2)}_${fire.brightness}`;
@@ -578,7 +576,7 @@ async function checkForAutoDiscordAlert(fire) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-              content: `🚨 **AUTOMATED WILDFIRE ALERT (>300K)**\n• **Region:** ${fire.region}\n• **Brightness:** ${fire.brightness} K\n• **Risk Level:** ${fire.risk}\n• **Coordinates:** (${fire.latitude.toFixed(2)}, ${fire.longitude.toFixed(2)})` 
+              content: `🚨 **WORLDWIDE WILDFIRE ALERT (>300K)**\n• **Region:** ${fire.region}\n• **Brightness:** ${fire.brightness} K\n• **Risk Level:** ${fire.risk}\n• **Coordinates:** (${fire.latitude.toFixed(2)}, ${fire.longitude.toFixed(2)})` 
             })
           });
         } catch(e) {
@@ -600,7 +598,7 @@ async function sendManualAlert() {
     await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: `🛠️ **MANUAL EMERGENCY DISPATCH**\n${customMsg}` })
+      body: JSON.stringify({ content: `🛠️ **MANUAL GLOBAL DISPATCH**\n${customMsg}` })
     });
     toast("Manual Discord alert sent successfully!");
   } catch(err) {
@@ -691,7 +689,7 @@ function renderTable() {
   });
 
   let html = "";
-  filtered.slice(0, 50).forEach(row => {
+  filtered.slice(0, 100).forEach(row => {
     html += `<tr>
       <td><b>${row.region}</b></td>
       <td>${row.latitude.toFixed(2)}°</td>
@@ -712,11 +710,11 @@ function exportCSV() {
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'nasa_firms_telemetry.csv';
+  a.download = 'worldwide_nasa_firms_telemetry.csv';
   a.click();
 }
 
-// Automatically load data on startup without manual entry
+// Automatically load worldwide data on startup without manual API input
 loadData(false);
 </script>
 </body>
