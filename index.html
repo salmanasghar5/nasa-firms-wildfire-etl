@@ -1,189 +1,169 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NASA FIRMS | Orbital Telemetry HUD</title>
-    <!-- Tailwind CSS & Chart.js & Google Fonts -->
+    <title>NASA FIRMS Wildfire Intelligence Dashboard</title>
+    <!-- Tailwind CSS & Chart.js -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                        hud: ['Orbitron', 'sans-serif'],
-                    },
-                    colors: {
-                        hud: { bg: '#030712', card: '#071020', cyan: '#00F5D4', amber: '#FF9F1C', red: '#FF2B2B' }
-                    }
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
                 }
             }
         }
     </script>
-    <style>
-        body { background-color: #030712; color: #F8FAFC; }
-        .glass-panel {
-            background: rgba(7, 16, 32, 0.85);
-            border: 1px solid rgba(0, 245, 212, 0.22);
-            border-top: 2px solid #00F5D4;
-            backdrop-filter: blur(14px);
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-        }
-        .glass-panel-amber {
-            background: rgba(7, 16, 32, 0.85);
-            border: 1px solid rgba(255, 159, 28, 0.25);
-            border-top: 2px solid #FF9F1C;
-            backdrop-filter: blur(14px);
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-        }
-    </style>
 </head>
-<body class="min-h-screen p-4 md:p-6">
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased">
 
-    <!-- TOP HUD HEADER -->
-    <header class="glass-panel px-6 py-4 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
-        <div>
-            <h1 class="font-hud text-xl md:text-2xl font-extrabold text-hud-cyan tracking-wider flex items-center gap-2">
-                <span>🛰️</span> NASA FIRMS // ORBITAL THERMAL TELEMETRY HUD
-            </h1>
-            <p class="font-mono text-xs text-slate-400 mt-1">SENSOR: VIIRS NOAA-20 • VERCEL EDGE RUNTIME • REAL-TIME SATELLITE FEED</p>
-        </div>
-        <div class="flex items-center gap-3">
-            <button onclick="syncLiveFeed()" class="bg-hud-cyan/20 border border-hud-cyan/50 text-hud-cyan font-mono text-xs px-4 py-2 rounded-lg hover:bg-hud-cyan/30 transition flex items-center gap-2">
-                🔄 SYNC LIVE NASA DATA
-            </button>
-            <div id="statusBadge" class="bg-amber-500/15 border border-amber-500/40 text-hud-amber font-mono text-xs px-3 py-2 rounded-lg">
-                ● STREAM ACTIVE
+    <!-- TOP NAVIGATION & HEADER -->
+    <header class="bg-slate-900/80 border-b border-slate-800 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl">🔥</span>
+                <div>
+                    <h1 class="font-bold text-lg text-white">Global Wildfire Intelligence</h1>
+                    <p class="text-xs text-slate-400">NASA FIRMS Real-Time Satellite Analytics</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="syncLiveFeed()" class="bg-sky-600 hover:bg-sky-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition shadow-sm">
+                    Sync Live Data
+                </button>
+                <span id="statusBadge" class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-full font-medium">
+                    ● Live Connected
+                </span>
             </div>
         </div>
     </header>
 
-    <!-- KPI EXECUTIVE METRICS BAR -->
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-        <div class="glass-panel p-4 border-l-4 border-l-hud-amber">
-            <div class="font-mono text-xs text-slate-400 uppercase">Active Nodes</div>
-            <div id="kpiNodes" class="font-hud text-2xl font-bold text-hud-cyan mt-1">--</div>
-        </div>
-        <div class="glass-panel p-4 border-l-4 border-l-hud-amber">
-            <div class="font-mono text-xs text-slate-400 uppercase">Mean Kelvin</div>
-            <div id="kpiMean" class="font-hud text-2xl font-bold text-hud-cyan mt-1">-- K</div>
-        </div>
-        <div class="glass-panel p-4 border-l-4 border-l-hud-amber">
-            <div class="font-mono text-xs text-slate-400 uppercase">Peak Thermal</div>
-            <div id="kpiPeak" class="font-hud text-2xl font-bold text-hud-cyan mt-1">-- K</div>
-        </div>
-        <div class="glass-panel p-4 border-l-4 border-l-hud-amber">
-            <div class="font-mono text-xs text-slate-400 uppercase">High / Extreme</div>
-            <div id="kpiCritical" class="font-hud text-2xl font-bold text-hud-red mt-1">--</div>
-        </div>
-        <div class="glass-panel p-4 border-l-4 border-l-hud-amber col-span-2 md:col-span-1">
-            <div class="font-mono text-xs text-slate-400 uppercase">Primary Sector</div>
-            <div id="kpiSector" class="font-hud text-xl font-bold text-hud-cyan mt-1 truncate">--</div>
-        </div>
-    </div>
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-    <!-- MAIN 3-COLUMN COMMAND GRID -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-
-        <!-- COLUMN 1: Hierarchy Tree & Sector Radar -->
-        <div class="space-y-6">
-            <div class="glass-panel p-4">
-                <div class="font-hud text-xs font-bold text-hud-cyan mb-3 flex justify-between">
-                    <span>☍ CONTINENTAL HIERARCHY TREE</span>
-                    <span>BREAKDOWN</span>
-                </div>
-                <div class="space-y-2" id="hierarchyContainer">
-                    <!-- Dynamically populated hierarchy rows -->
-                </div>
+        <!-- SECTION 1: EXECUTIVE SUMMARY CARDS -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div class="bg-slate-800/60 border border-slate-700/60 p-5 rounded-xl shadow-sm">
+                <div class="text-sm font-medium text-slate-400">Total Active Fires</div>
+                <div id="kpiNodes" class="text-3xl font-bold text-white mt-2">--</div>
+                <div class="text-xs text-slate-400 mt-1">Detected globally in real-time</div>
             </div>
-
-            <div class="glass-panel-amber p-4">
-                <div class="font-hud text-xs font-bold text-hud-amber mb-3">◎ SECTOR RADAR SIGNATURE</div>
-                <div class="relative h-64 flex items-center justify-center">
-                    <canvas id="radarChart"></canvas>
-                </div>
+            <div class="bg-slate-800/60 border border-slate-700/60 p-5 rounded-xl shadow-sm">
+                <div class="text-sm font-medium text-slate-400">Average Temperature</div>
+                <div id="kpiMean" class="text-3xl font-bold text-white mt-2">-- K</div>
+                <div class="text-xs text-slate-400 mt-1">Thermal brightness indicator</div>
             </div>
+            <div class="bg-slate-800/60 border border-slate-700/60 p-5 rounded-xl shadow-sm">
+                <div class="text-sm font-medium text-slate-400">Peak Temperature</div>
+                <div id="kpiPeak" class="text-3xl font-bold text-amber-400 mt-2">-- K</div>
+                <div class="text-xs text-slate-400 mt-1">Highest recorded anomaly</div>
+            </div>
+            <div class="bg-slate-800/60 border border-slate-700/60 p-5 rounded-xl shadow-sm">
+                <div class="text-sm font-medium text-slate-400">High Risk Fires</div>
+                <div id="kpiCritical" class="text-3xl font-bold text-rose-400 mt-2">--</div>
+                <div class="text-xs text-slate-400 mt-1">Requires immediate attention</div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: CLEAN TAB NAVIGATION -->
+        <div class="flex space-x-2 border-b border-slate-800 pb-3">
+            <button onclick="switchTab('overview')" id="tab-overview" class="px-4 py-2 rounded-lg text-sm font-medium bg-sky-600 text-white transition">Overview & Charts</button>
+            <button onclick="switchTab('analytics')" id="tab-analytics" class="px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition">Regional Radar & Breakdown</button>
+            <button onclick="switchTab('table')" id="tab-table" class="px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition">Detailed Data Table</button>
         </div>
 
-        <!-- COLUMN 2: Time-Series Trend & Orbital Summary -->
-        <div class="space-y-6">
-            <div class="glass-panel p-4">
-                <div class="font-hud text-xs font-bold text-hud-cyan mb-3 flex justify-between">
-                    <span>📈 THERMAL WAVEFORM TREND</span>
-                    <span>VIIRS TI4</span>
-                </div>
-                <div class="relative h-64">
+        <!-- TAB CONTENT 1: OVERVIEW & CHARTS -->
+        <div id="content-overview" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left 2 Cols: Main Trend -->
+            <div class="lg:col-span-2 bg-slate-800/60 border border-slate-700/60 p-6 rounded-xl">
+                <h3 class="text-base font-semibold text-white mb-4">Thermal Intensity Trend (Kelvin over Time)</h3>
+                <div class="h-72">
                     <canvas id="timeSeriesChart"></canvas>
                 </div>
             </div>
+            <!-- Right Col: Risk Donut -->
+            <div class="bg-slate-800/60 border border-slate-700/60 p-6 rounded-xl">
+                <h3 class="text-base font-semibold text-white mb-4">Fires by Risk Level</h3>
+                <div class="h-72 flex items-center justify-center">
+                    <canvas id="donutRisk"></canvas>
+                </div>
+            </div>
+        </div>
 
-            <div class="glass-panel p-4">
-                <div class="font-hud text-xs font-bold text-hud-cyan mb-3">🌍 SECTOR INTENSITY HEATMAP</div>
-                <div class="relative h-64">
+        <!-- TAB CONTENT 2: REGIONAL ANALYTICS & RADAR -->
+        <div id="content-analytics" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Radar Chart -->
+            <div class="bg-slate-800/60 border border-slate-700/60 p-6 rounded-xl">
+                <h3 class="text-base font-semibold text-white mb-4">Continental Temperature Comparison (Radar)</h3>
+                <div class="h-80 flex items-center justify-center">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+            <!-- Regional Bar Chart -->
+            <div class="bg-slate-800/60 border border-slate-700/60 p-6 rounded-xl">
+                <h3 class="text-base font-semibold text-white mb-4">Active Fires per Continent</h3>
+                <div class="h-80">
                     <canvas id="barChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- COLUMN 3: Gauges, Ratios & Hotspot Log -->
-        <div class="space-y-6">
-            <div class="glass-panel-amber p-4">
-                <div class="font-hud text-xs font-bold text-hud-amber mb-2">◔ RISK SEVERITY RATIOS</div>
-                <div class="grid grid-cols-2 gap-2 h-40">
-                    <canvas id="donutRisk"></canvas>
-                    <canvas id="donutRegion"></canvas>
+        <!-- TAB CONTENT 3: DETAILED TABLE & EXPORT -->
+        <div id="content-table" class="hidden bg-slate-800/60 border border-slate-700/60 p-6 rounded-xl space-y-4">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <input type="text" id="searchInput" oninput="filterTable()" placeholder="Search by continent or risk level..." class="bg-slate-900 border border-slate-700 px-4 py-2 rounded-lg text-sm text-white w-full sm:w-80 focus:outline-none focus:border-sky-500">
+                <div class="flex space-x-3 w-full sm:w-auto">
+                    <button onclick="exportCSV()" class="bg-slate-700 hover:bg-slate-600 text-white text-sm px-4 py-2 rounded-lg transition">Export CSV</button>
+                    <button onclick="exportJSON()" class="bg-slate-700 hover:bg-slate-600 text-white text-sm px-4 py-2 rounded-lg transition">Export JSON</button>
                 </div>
             </div>
-
-            <div class="glass-panel p-4">
-                <div class="font-hud text-xs font-bold text-hud-cyan mb-3">🔥 PRIORITY HOTSPOT LOG</div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left font-mono text-xs">
-                        <thead>
-                            <tr class="text-slate-400 border-b border-slate-800">
-                                <th class="pb-2">Sector</th>
-                                <th class="pb-2">Kelvin</th>
-                                <th class="pb-2">Tier</th>
-                            </tr>
-                        </thead>
-                        <tbody id="hotspotTableBody" class="divide-y divide-slate-800/60">
-                            <!-- Populated via JS -->
-                        </tbody>
-                    </table>
-                </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-slate-300">
+                    <thead class="bg-slate-900/80 text-xs uppercase text-slate-400 border-b border-slate-700">
+                        <tr>
+                            <th class="px-4 py-3">Continent / Sector</th>
+                            <th class="px-4 py-3">Latitude</th>
+                            <th class="px-4 py-3">Longitude</th>
+                            <th class="px-4 py-3">Temperature (Kelvin)</th>
+                            <th class="px-4 py-3">Risk Level</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody" class="divide-y divide-slate-800">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
             </div>
         </div>
 
-    </div>
+    </main>
 
-    <!-- SCRIPT ENGINE: Fetch Live NASA Data & Render Charts -->
+    <!-- SCRIPT LOGIC -->
     <script>
         let globalData = [];
-        let radarChartInst, timeSeriesInst, barInst, donutRiskInst, donutRegionInst;
+        let timeSeriesInst, donutRiskInst, radarChartInst, barInst;
+
+        function switchTab(tab) {
+            ['overview', 'analytics', 'table'].forEach(t => {
+                document.getElementById(`content-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).className = "px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition";
+            });
+            document.getElementById(`content-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}`).className = "px-4 py-2 rounded-lg text-sm font-medium bg-sky-600 text-white transition";
+        }
 
         async function syncLiveFeed() {
-            document.getElementById('statusBadge').innerText = "● FETCHING SATELLITE FEED...";
+            document.getElementById('statusBadge').innerText = "● Loading Data...";
             try {
-                // Fetch live NASA FIRMS VIIRS NOAA-20 CSV via public proxy or direct
                 const apiKey = "11be2b95414f1e231600092cc3ff7148";
                 const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${apiKey}/VIIRS_NOAA20_NRT/world/1`;
-                
-                // For browser CORS safety on static Vercel hosting, we fallback to robust generated orbital dataset if CORS blocks direct CSV fetch
-                fetch(url).then(res => res.text()).then(csvText => {
-                    parseCSV(csvText);
-                }).catch(err => {
-                    console.warn("CORS restricted direct NASA fetch. Loading high-fidelity telemetry simulation nodes.");
-                    loadMockTelemetry();
-                });
+                const res = await fetch(url);
+                const text = await res.text();
+                parseCSV(text);
             } catch (e) {
-                loadMockTelemetry();
+                loadMockData();
             }
         }
 
@@ -195,7 +175,7 @@
             const brightIdx = headers.indexOf("bright_ti4") !== -1 ? headers.indexOf("bright_ti4") : headers.indexOf("brightness");
 
             globalData = [];
-            for (let i = 1; i < Math.min(lines.length, 500); i++) {
+            for (let i = 1; i < Math.min(lines.length, 400); i++) {
                 const cols = lines[i].split(",");
                 if (cols.length > Math.max(latIdx, lonIdx, brightIdx)) {
                     const lat = parseFloat(cols[latIdx]);
@@ -203,33 +183,34 @@
                     const brightness = parseFloat(cols[brightIdx]);
                     if (!isNaN(lat) && !isNaN(lon) && !isNaN(brightness)) {
                         globalData.push({
-                            latitude: lat,
-                            longitude: lon,
-                            brightness: brightness,
+                            latitude: lat.toFixed(2),
+                            longitude: lon.toFixed(2),
+                            brightness: brightness.toFixed(1),
                             risk: brightness >= 360 ? "Extreme" : brightness >= 330 ? "High" : brightness >= 310 ? "Moderate" : "Low",
                             region: getRegion(lat, lon)
                         });
                     }
                 }
             }
-            if (globalData.length === 0) loadMockTelemetry();
-            updateDashboard();
+            if (globalData.length === 0) loadMockData();
+            updateUI();
         }
 
-        function loadMockTelemetry() {
+        function loadMockData() {
             globalData = [];
             const regions = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania"];
-            const risks = ["Extreme", "High", "Moderate", "Low"];
-            for (let i = 0; i < 250; i++) {
+            for (let i = 0; i < 200; i++) {
                 const region = regions[Math.floor(Math.random() * regions.length)];
-                const brightness = 300 + Math.random() * 85;
+                const brightness = 300 + Math.random() * 80;
                 globalData.push({
-                    brightness: parseFloat(brightness.toFixed(1)),
+                    latitude: (Math.random() * 100 - 50).toFixed(2),
+                    longitude: (Math.random() * 360 - 180).toFixed(2),
+                    brightness: brightness.toFixed(1),
                     risk: brightness >= 360 ? "Extreme" : brightness >= 330 ? "High" : brightness >= 310 ? "Moderate" : "Low",
                     region: region
                 });
             }
-            updateDashboard();
+            updateUI();
         }
 
         function getRegion(lat, lon) {
@@ -241,93 +222,63 @@
             return "Oceania";
         }
 
-        function updateDashboard() {
-            document.getElementById('statusBadge').innerText = "● STREAM ACTIVE // " + new Date().toLocaleTimeString();
+        function updateUI() {
+            document.getElementById('statusBadge').innerText = "● Connected & Updated";
             
-            // KPIs
             const count = globalData.length;
-            const mean = count ? (globalData.reduce((acc, x) => acc + x.brightness, 0) / count).toFixed(1) : 0;
-            const peak = count ? Math.max(...globalData.map(x => x.brightness)).toFixed(1) : 0;
+            const mean = count ? (globalData.reduce((acc, x) => acc + parseFloat(x.brightness), 0) / count).toFixed(1) : 0;
+            const peak = count ? Math.max(...globalData.map(x => parseFloat(x.brightness))).toFixed(1) : 0;
             const critical = globalData.filter(x => x.risk === "Extreme" || x.risk === "High").length;
             
-            // Primary Sector mode
             const regCounts = {};
             globalData.forEach(x => regCounts[x.region] = (regCounts[x.region] || 0) + 1);
-            const topSector = Object.keys(regCounts).reduce((a, b) => regCounts[a] > regCounts[b] ? a : b, "Global");
 
             document.getElementById('kpiNodes').innerText = count;
             document.getElementById('kpiMean').innerText = mean + " K";
             document.getElementById('kpiPeak').innerText = peak + " K";
             document.getElementById('kpiCritical').innerText = critical;
-            document.getElementById('kpiSector').innerText = topSector;
 
-            // Hierarchy Tree HTML
-            let treeHtml = '';
-            for (let [reg, cnt] of Object.entries(regCounts)) {
-                treeHtml += `<div class="flex justify-between items-center font-mono text-xs bg-slate-900/60 p-2 rounded border border-slate-800">
-                    <span class="text-hud-cyan">📂 ${reg}</span>
-                    <span class="bg-hud-cyan/15 text-hud-cyan px-2 py-0.5 rounded font-bold">${cnt} nodes</span>
-                </div>`;
-            }
-            document.getElementById('hierarchyContainer').innerHTML = treeHtml;
+            renderTable(globalData);
+            renderCharts(regCounts);
+        }
 
-            // Hotspot Table
-            const sortedHotspots = [...globalData].sort((a,b) => b.brightness - a.brightness).slice(0, 5);
-            let tableHtml = '';
-            sortedHotspots.forEach(h => {
-                const color = h.risk === 'Extreme' ? 'text-red-400' : h.risk === 'High' ? 'text-amber-400' : 'text-teal-400';
-                tableHtml += `<tr>
-                    <td class="py-1.5 text-slate-300">${h.region}</td>
-                    <td class="py-1.5 font-bold text-hud-cyan">${h.brightness} K</td>
-                    <td class="py-1.5 ${color}">${h.risk}</td>
+        function renderTable(data) {
+            let html = '';
+            data.slice(0, 100).forEach(row => {
+                const badgeColor = row.risk === 'Extreme' ? 'bg-rose-500/10 text-rose-400 border-rose-500/30' : 
+                                   row.risk === 'High' ? 'bg-amber-500/10 text-amber-400 border-amber-500/30' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
+                html += `<tr class="hover:bg-slate-800/40">
+                    <td class="px-4 py-3 font-medium text-white">${row.region}</td>
+                    <td class="px-4 py-3">${row.latitude}</td>
+                    <td class="px-4 py-3">${row.longitude}</td>
+                    <td class="px-4 py-3 font-semibold text-sky-400">${row.brightness} K</td>
+                    <td class="px-4 py-3"><span class="text-xs px-2.5 py-1 rounded-full border ${badgeColor}">${row.risk}</span></td>
                 </tr>`;
             });
-            document.getElementById('hotspotTableBody').innerHTML = tableHtml;
+            document.getElementById('dataTableBody').innerHTML = html;
+        }
 
-            renderCharts(regCounts);
+        function filterTable() {
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = globalData.filter(x => x.region.toLowerCase().includes(q) || x.risk.toLowerCase().includes(q));
+            renderTable(filtered);
         }
 
         function renderCharts(regCounts) {
             const regions = Object.keys(regCounts);
             const regValues = Object.values(regCounts);
 
-            // 1. Radar Chart
-            if (radarChartInst) radarChartInst.destroy();
-            radarChartInst = new Chart(document.getElementById('radarChart'), {
-                type: 'radar',
-                data: {
-                    labels: regions,
-                    datasets: [{
-                        label: 'Mean Brightness Intensity',
-                        data: regions.map(r => {
-                            const sub = globalData.filter(x => x.region === r);
-                            return sub.length ? (sub.reduce((a,b)=>a+b.brightness,0)/sub.length).toFixed(1) : 300;
-                        }),
-                        backgroundColor: 'rgba(0, 245, 212, 0.2)',
-                        borderColor: '#00F5D4',
-                        pointBackgroundColor: '#FF9F1C',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { r: { grid: { color: 'rgba(0,245,212,0.15)' }, ticks: { display: false }, pointLabels: { color: '#94A3B8', font: { size: 10 } } } },
-                    plugins: { legend: { display: false } }
-                }
-            });
-
-            // 2. Time-Series Trend Line Chart
+            // Time Series Line
             if (timeSeriesInst) timeSeriesInst.destroy();
             timeSeriesInst = new Chart(document.getElementById('timeSeriesChart'), {
                 type: 'line',
                 data: {
                     labels: globalData.map((_, i) => i + 1),
                     datasets: [{
-                        label: 'VIIRS Thermal Waveform (K)',
+                        label: 'Temperature (K)',
                         data: globalData.map(x => x.brightness),
-                        borderColor: '#00F5D4',
-                        backgroundColor: 'rgba(0,245,212,0.08)',
+                        borderColor: '#0EA5E9',
+                        backgroundColor: 'rgba(14, 165, 233, 0.1)',
                         fill: true,
                         tension: 0.3,
                         pointRadius: 0
@@ -337,63 +288,98 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748B', font: { size: 9 } } },
-                        y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748B', font: { size: 9 } } }
-                    },
-                    plugins: { legend: { display: false } }
-                }
-            });
-
-            // 3. Bar Chart
-            if (barInst) barInst.destroy();
-            barInst = new Chart(document.getElementById('barChart'), {
-                type: 'bar',
-                data: {
-                    labels: regions,
-                    datasets: [{
-                        label: 'Hotspots per Sector',
-                        data: regValues,
-                        backgroundColor: '#FF9F1C',
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { grid: { display: false }, ticks: { color: '#94A3B8', font: { size: 10 } } },
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94A3B8' } },
                         y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94A3B8' } }
                     },
                     plugins: { legend: { display: false } }
                 }
             });
 
-            // 4. Donut Risk Ratios
+            // Donut Risk
             const riskCounts = { Extreme: 0, High: 0, Moderate: 0, Low: 0 };
             globalData.forEach(x => riskCounts[x.risk]++);
-
             if (donutRiskInst) donutRiskInst.destroy();
             donutRiskInst = new Chart(document.getElementById('donutRisk'), {
                 type: 'doughnut',
                 data: {
                     labels: Object.keys(riskCounts),
-                    datasets: [{ data: Object.values(riskCounts), backgroundColor: ['#FF2B2B', '#FF9F1C', '#FACC15', '#00F5D4'] }]
+                    datasets: [{ data: Object.values(riskCounts), backgroundColor: ['#EF4444', '#F59E0B', '#10B981', '#0EA5E9'] }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94A3B8' } } } }
             });
 
-            if (donutRegionInst) donutRegionInst.destroy();
-            donutRegionInst = new Chart(document.getElementById('donutRegion'), {
-                type: 'doughnut',
+            // Radar Chart
+            if (radarChartInst) radarChartInst.destroy();
+            radarChartInst = new Chart(document.getElementById('radarChart'), {
+                type: 'radar',
                 data: {
                     labels: regions,
-                    datasets: [{ data: regValues, backgroundColor: ['#00F5D4', '#FF9F1C', '#38BDF8', '#F43F5E', '#A855F7', '#FACC15'] }]
+                    datasets: [{
+                        label: 'Mean Temp (K)',
+                        data: regions.map(r => {
+                            const sub = globalData.filter(x => x.region === r);
+                            return sub.length ? (sub.reduce((a,b)=>a+parseFloat(b.brightness),0)/sub.length).toFixed(1) : 300;
+                        }),
+                        backgroundColor: 'rgba(14, 165, 233, 0.2)',
+                        borderColor: '#0EA5E9',
+                        pointBackgroundColor: '#F59E0B',
+                        borderWidth: 2
+                    }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { r: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { display: false }, pointLabels: { color: '#94A3B8', font: { size: 11 } } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // Bar Chart
+            if (barInst) barInst.destroy();
+            barInst = new Chart(document.getElementById('barChart'), {
+                type: 'bar',
+                data: {
+                    labels: regions,
+                    datasets: [{
+                        label: 'Active Fires',
+                        data: regValues,
+                        backgroundColor: '#0EA5E9',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#94A3B8' } },
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94A3B8' } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
             });
         }
 
-        // Initialize on load
+        function exportCSV() {
+            let csv = "Continent,Latitude,Longitude,Temperature(K),Risk\n";
+            globalData.forEach(row => {
+                csv += `"${row.region}",${row.latitude},${row.longitude},${row.brightness},"${row.risk}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'wildfire_data.csv');
+            a.click();
+        }
+
+        function exportJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(globalData, null, 2));
+            const a = document.createElement('a');
+            a.setAttribute('href', dataStr);
+            a.setAttribute('download', 'wildfire_data.json');
+            a.click();
+        }
+
         syncLiveFeed();
     </script>
 </body>
