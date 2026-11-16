@@ -2,8 +2,7 @@ streamlit
 pandas
 folium
 streamlit-folium
-matplotlib
-seaborn
+plotly
 pydantic
 requests
 openpyxl
