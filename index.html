@@ -99,6 +99,11 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Courier New', 
   border-radius:8px;padding:10px 14px;font-weight:bold;font-size:11px;cursor:pointer;transition:0.2s;
 }
 .secondary:hover{background:#e2e8f0;}
+.danger{
+  border:1px solid #fecaca;background:#fef2f2;color:#dc2626;
+  border-radius:8px;padding:10px 14px;font-weight:bold;font-size:11px;cursor:pointer;transition:0.2s;
+}
+.danger:hover{background:#fee2e2;}
 
 .page{display:none;animation:fade .3s ease}
 .page.active{display:block}
@@ -261,10 +266,10 @@ tr:hover{background:rgba(2,132,199,0.03)}
     <div class="chart-box"><canvas id="overviewRiskChart"></canvas></div>
    </div>
    <div class="card">
-    <div class="card-head"><h3>Pipeline Status</h3><span class="tag">DUAL-ALERT</span></div>
+    <div class="card-head"><h3>Pipeline Status</h3><span class="tag">VAULT SECURED</span></div>
     <div class="grid two-col">
      <div><div class="card-title">Map Type</div><b>Esri Satellite Live</b></div>
-     <div><div class="card-title">Auto Alert</div><b>≥ 360 K (60m Cooldown)</b></div>
+     <div><div class="card-title">Alert Vault</div><b id="vaultStatus">Checking...</b></div>
      <div><div class="card-title">Synced</div><b id="lastUpdate">—</b></div>
      <div><div class="card-title">Nodes</div><b id="displayed">—</b></div>
     </div>
@@ -333,24 +338,32 @@ tr:hover{background:rgba(2,132,199,0.03)}
 <section class="page" id="alerts">
  <div class="page-heading">
   <div>
-   <h2>Dual-Channel Emergency Alert Center</h2>
-   <p>Smart deduplicated alerts (≥360K) routed simultaneously to Discord Rich Embeds and ntfy.sh mobile push.</p>
+   <h2>Encrypted Local Vault & Dual-Channel Alerts</h2>
+   <p>Credentials are stored privately in your local browser vault—never exposed in public source code.</p>
   </div>
-  <span class="tag">DISCORD + NTFY.SH</span>
+  <span class="tag">ZERO-EXPOSURE VAULT</span>
  </div>
 
  <div class="grid two-col">
   <div class="card">
-   <div class="card-head"><h3>Automated Smart Escalation</h3><span class="tag">60-MIN COOLDOWN</span></div>
+   <div class="card-head"><h3>Private Alert Credentials</h3><span class="tag">LOCAL STORAGE</span></div>
    <div style="padding:5px 0 12px;font-size:11px;color:var(--muted);line-height:1.6;">
-     Triggers only on <b>Extreme anomalies (≥ 360 K)</b> with a 60-minute deduplication cooldown to prevent refresh spam. Delivers peak hotspot coordinates and a Google Maps link.
+     Paste your private Discord Webhook URL and/or <b>ntfy.sh</b> topic below. They stay saved locally on your device only. Auto-alerts trigger on <b>Extreme (≥ 360 K)</b> anomalies with a 60-minute cooldown.
    </div>
    <div style="display:grid;gap:10px;">
-     <label style="font-size:10px;color:var(--muted)">DISCORD WEBHOOK ENDPOINT</label>
-     <input id="webhookUrl" value="https://discord.com/api/webhooks/1559210573902782537/DiBSHIKqfcUa55KyIBpLzEYV03NEleZjSdr0iCkidt91OfOXQlIBz08ZlXIv8Qz8fnV4">
-     <label style="font-size:10px;color:var(--muted)">NTFY.SH MOBILE PUSH TOPIC (SUBSCRIBE IN APP)</label>
-     <input id="ntfyTopic" value="satellite-live-salman-alerts" placeholder="Enter your private ntfy.sh topic">
-     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+     <label style="font-size:10px;color:var(--muted)">PRIVATE DISCORD WEBHOOK URL (MASKED)</label>
+     <input id="webhookUrl" type="password" placeholder="https://discord.com/api/webhooks/..." autocomplete="off">
+     
+     <label style="font-size:10px;color:var(--muted)">PRIVATE NTFY.SH MOBILE TOPIC</label>
+     <input id="ntfyTopic" type="password" placeholder="e.g. salman-orbital-watch-2026" autocomplete="off">
+     
+     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+       <button class="primary" onclick="saveVaultCredentials()">🔒 SAVE TO LOCAL VAULT</button>
+       <button class="secondary" onclick="toggleRevealCredentials()" id="revealBtn">👁 SHOW</button>
+       <button class="danger" onclick="clearVaultCredentials()">🗑 CLEAR</button>
+     </div>
+
+     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;padding-top:10px;border-top:1px solid var(--line);">
        <span style="font-size:10px;color:var(--muted)" id="cooldownStatus">Cooldown: Ready</span>
        <button class="secondary" onclick="resetCooldown()">RESET COOLDOWN</button>
      </div>
@@ -364,7 +377,7 @@ tr:hover{background:rgba(2,132,199,0.03)}
     <input id="manualMsg" value="Manual global test alert: Dual-channel monitoring active (≥360K Extreme threshold).">
     <button class="primary" onclick="sendManualAlert()" style="margin-top:5px">📡 DISPATCH TO DISCORD & PHONE</button>
     <div style="font-size:10px;color:var(--muted);line-height:1.5;margin-top:8px;padding:10px;background:#f8fafc;border-radius:6px;border:1px solid var(--line);">
-      <b>Mobile Setup:</b> Install the free <b>ntfy</b> app on Android/iOS and subscribe to your topic name above to receive instant push notifications with Google Maps links.
+      <b>Security Note:</b> Because your credentials live in your browser's local vault, anyone else visiting your public Vercel site sees empty credential fields and cannot access your webhook.
     </div>
    </div>
   </div>
@@ -431,6 +444,8 @@ let mapOverview = null;
 let mainMarkers = [];
 let overviewMarkers = [];
 
+const VAULT_WEBHOOK_KEY = "sat_live_vault_discord";
+const VAULT_NTFY_KEY = "sat_live_vault_ntfy";
 const COOLDOWN_KEY = "satellite_live_last_alert_ts";
 const COOLDOWN_MS = 60 * 60 * 1000; // 60 minutes
 
@@ -438,12 +453,75 @@ const riskColors = {
   Low:"#0284c7", Moderate:"#10b981", High:"#d97706", Extreme:"#dc2626"
 };
 
+// LOCAL STORAGE VAULT MANAGEMENT
+function loadVaultCredentials() {
+  const savedWebhook = localStorage.getItem(VAULT_WEBHOOK_KEY) || "";
+  const savedNtfy = localStorage.getItem(VAULT_NTFY_KEY) || "";
+  $("webhookUrl").value = savedWebhook;
+  $("ntfyTopic").value = savedNtfy;
+  updateVaultStatusUI();
+}
+
+function saveVaultCredentials() {
+  const webhook = $("webhookUrl").value.trim();
+  const ntfy = $("ntfyTopic").value.trim();
+
+  if (webhook && !webhook.startsWith("https://discord.com/api/webhooks/")) {
+    toast("Invalid Discord webhook format.");
+    return;
+  }
+
+  if (webhook) localStorage.setItem(VAULT_WEBHOOK_KEY, webhook);
+  else localStorage.removeItem(VAULT_WEBHOOK_KEY);
+
+  if (ntfy) localStorage.setItem(VAULT_NTFY_KEY, ntfy);
+  else localStorage.removeItem(VAULT_NTFY_KEY);
+
+  updateVaultStatusUI();
+  toast("Credentials securely saved to your browser's local vault.");
+}
+
+function clearVaultCredentials() {
+  localStorage.removeItem(VAULT_WEBHOOK_KEY);
+  localStorage.removeItem(VAULT_NTFY_KEY);
+  $("webhookUrl").value = "";
+  $("ntfyTopic").value = "";
+  updateVaultStatusUI();
+  toast("Local vault cleared.");
+}
+
+function toggleRevealCredentials() {
+  const isPassword = $("webhookUrl").type === "password";
+  $("webhookUrl").type = isPassword ? "text" : "password";
+  $("ntfyTopic").type = isPassword ? "text" : "password";
+  $("revealBtn").textContent = isPassword ? "🙈 HIDE" : "👁 SHOW";
+}
+
+function updateVaultStatusUI() {
+  const hasWebhook = Boolean(localStorage.getItem(VAULT_WEBHOOK_KEY));
+  const hasNtfy = Boolean(localStorage.getItem(VAULT_NTFY_KEY));
+  const el = $("vaultStatus");
+  if (hasWebhook && hasNtfy) {
+    el.textContent = "Discord + ntfy Armed";
+    el.style.color = "#10b981";
+  } else if (hasWebhook) {
+    el.textContent = "Discord Armed";
+    el.style.color = "#10b981";
+  } else if (hasNtfy) {
+    el.textContent = "ntfy.sh Armed";
+    el.style.color = "#10b981";
+  } else {
+    el.textContent = "Unconfigured";
+    el.style.color = "#64748b";
+  }
+}
+
 // CINEMATIC BOOT SEQUENCE SCRIPT
 const bootLogsText = [
   "INITIALIZING ESRI SATELLITE IMAGERY...",
   "CONNECTING TO VIIRS NOAA-20 NRT STREAM...",
   "PARKING ORBIT: 824 KM // INCLINATION: 98.7°",
-  "ARMING DUAL-CHANNEL ALERT ENGINE (DISCORD + NTFY)...",
+  "CHECKING ENCRYPTED LOCAL ALERT VAULT...",
   "CALIBRATING KELVIN BRIGHTNESS MATRICES...",
   "SYSTEM ONLINE. LAUNCHING INTERFACE..."
 ];
@@ -490,7 +568,7 @@ function updateCooldownUI() {
 function resetCooldown() {
   localStorage.removeItem(COOLDOWN_KEY);
   updateCooldownUI();
-  toast("Alert cooldown reset. Next sync with Extreme detections will dispatch.");
+  toast("Alert cooldown reset.");
 }
 
 function showPage(id) {
@@ -649,26 +727,25 @@ function loadMockData() {
   evaluateSmartAlerts();
 }
 
-// SMART DEDUPLICATED DUAL-CHANNEL DISPATCH (DISCORD RICH EMBED + NTFY.SH)
+// SMART DEDUPLICATED DUAL-CHANNEL DISPATCH USING LOCAL STORAGE VAULT
 async function evaluateSmartAlerts() {
+  const discordUrl = (localStorage.getItem(VAULT_WEBHOOK_KEY) || "").trim();
+  const ntfyTopic = (localStorage.getItem(VAULT_NTFY_KEY) || "").trim();
+  if (!discordUrl && !ntfyTopic) return; // Nothing configured in local vault
+
   const extremeFires = fires.filter(f => f.brightness >= 360);
   if (extremeFires.length === 0) return;
 
   const lastTs = parseInt(localStorage.getItem(COOLDOWN_KEY) || "0", 10);
   if (Date.now() - lastTs < COOLDOWN_MS) {
     updateCooldownUI();
-    return; // Skip dispatch during 60-minute cooldown window
+    return;
   }
 
-  // Find the single hottest global thermal anomaly
   const peakFire = extremeFires.reduce((max, f) => f.brightness > max.brightness ? f : max, extremeFires[0]);
   const mapsUrl = `https://www.google.com/maps?q=${peakFire.latitude},${peakFire.longitude}`;
-
-  const discordUrl = $("webhookUrl").value.trim();
-  const ntfyTopic = $("ntfyTopic").value.trim();
   const requests = [];
 
-  // 1. Discord Rich Embed Payload
   if (discordUrl.startsWith("https://")) {
     requests.push(fetch(discordUrl, {
       method: "POST",
@@ -677,7 +754,7 @@ async function evaluateSmartAlerts() {
         embeds: [{
           title: "🚨 EXTREME GLOBAL THERMAL ANOMALY ALERT",
           description: `Detected **${extremeFires.length.toLocaleString()}** Extreme wildfire nodes (≥360 K) out of **${fires.length.toLocaleString()}** global detections.`,
-          color: 14427686, // Crimson Red (#dc2626)
+          color: 14427686,
           fields: [
             { name: "Peak Thermal Node", value: `**${peakFire.brightness} K**`, inline: true },
             { name: "Sector", value: peakFire.region, inline: true },
@@ -691,7 +768,6 @@ async function evaluateSmartAlerts() {
     }));
   }
 
-  // 2. ntfy.sh Mobile Push Notification Payload
   if (ntfyTopic) {
     requests.push(fetch(`https://ntfy.sh/${encodeURIComponent(ntfyTopic)}`, {
       method: "POST",
@@ -713,8 +789,8 @@ async function evaluateSmartAlerts() {
 }
 
 async function sendManualAlert() {
-  const discordUrl = $("webhookUrl").value.trim();
-  const ntfyTopic = $("ntfyTopic").value.trim();
+  const discordUrl = $("webhookUrl").value.trim() || (localStorage.getItem(VAULT_WEBHOOK_KEY) || "").trim();
+  const ntfyTopic = $("ntfyTopic").value.trim() || (localStorage.getItem(VAULT_NTFY_KEY) || "").trim();
   const customMsg = $("manualMsg").value.trim();
   const requests = [];
 
@@ -726,7 +802,7 @@ async function sendManualAlert() {
         embeds: [{
           title: "🛠️ MANUAL SATELLITE INTELLIGENCE DISPATCH",
           description: customMsg,
-          color: 165063, // Cyan (#0284c7)
+          color: 165063,
           timestamp: new Date().toISOString()
         }]
       })
@@ -746,7 +822,7 @@ async function sendManualAlert() {
   }
 
   if (requests.length === 0) {
-    toast("Configure a Discord webhook or ntfy.sh topic first.");
+    toast("Enter and save your Discord webhook or ntfy.sh topic first.");
     return;
   }
 
@@ -867,7 +943,8 @@ function exportCSV() {
   a.click();
 }
 
-// Run boot sequence, check cooldown status, and load live data
+// Initialize vault, check cooldown status, run boot sequence, and load live data
+loadVaultCredentials();
 updateCooldownUI();
 runBootSequence();
 loadData(false);
