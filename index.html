@@ -94,6 +94,11 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Courier New', 
   box-shadow:0 2px 5px rgba(2,132,199,0.3);cursor:pointer;transition:0.2s;
 }
 .primary:hover{background:#0369a1;}
+.secondary{
+  border:1px solid var(--line);background:#f8fafc;color:var(--text);
+  border-radius:8px;padding:10px 14px;font-weight:bold;font-size:11px;cursor:pointer;transition:0.2s;
+}
+.secondary:hover{background:#e2e8f0;}
 
 .page{display:none;animation:fade .3s ease}
 .page.active{display:block}
@@ -135,7 +140,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Courier New', 
 .extreme{background:#dc2626}
 
 input,select,textarea{
-  background:#f8fafc;color:var(--text);border:1px solid var(--line);border-radius:7px;padding:10px;font-size:11px;outline:none;font-family:inherit;
+  background:#f8fafc;color:var(--text);border:1px solid var(--line);border-radius:7px;padding:10px;font-size:11px;outline:none;font-family:inherit;width:100%;
 }
 input:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 5px rgba(2,132,199,0.3);}
 canvas{max-height:280px}
@@ -149,7 +154,7 @@ tr:hover{background:rgba(2,132,199,0.03)}
 .toast{
   position:fixed;right:20px;bottom:20px;z-index:3000;
   background:#ffffff;border:1px solid var(--line);color:var(--text);
-  padding:12px 16px;border-radius:8px;font-size:11px;display:none;box-shadow:0 4px 12px rgba(0,0,0,0.1);
+  padding:12px 16px;border-radius:8px;font-size:11px;display:none;box-shadow:0 4px 12px rgba(0,0,0,0.15);
 }
 @media(max-width:950px){
   .stats{grid-template-columns:repeat(2,1fr)}
@@ -256,10 +261,10 @@ tr:hover{background:rgba(2,132,199,0.03)}
     <div class="chart-box"><canvas id="overviewRiskChart"></canvas></div>
    </div>
    <div class="card">
-    <div class="card-head"><h3>Pipeline Status</h3><span class="tag">SECURE</span></div>
+    <div class="card-head"><h3>Pipeline Status</h3><span class="tag">DUAL-ALERT</span></div>
     <div class="grid two-col">
      <div><div class="card-title">Map Type</div><b>Esri Satellite Live</b></div>
-     <div><div class="card-title">Auto Alert</div><b>> 300 K Active</b></div>
+     <div><div class="card-title">Auto Alert</div><b>≥ 360 K (60m Cooldown)</b></div>
      <div><div class="card-title">Synced</div><b id="lastUpdate">—</b></div>
      <div><div class="card-title">Nodes</div><b id="displayed">—</b></div>
     </div>
@@ -282,7 +287,7 @@ tr:hover{background:rgba(2,132,199,0.03)}
   <div class="card-head">
    <h3>Global Hotspot Tracker</h3>
    <div style="display:flex;gap:10px;align-items:center;">
-    <select id="mapRisk" onchange="renderMap()">
+    <select id="mapRisk" onchange="renderMap()" style="width:auto;">
      <option value="All">All Risk Tiers</option>
      <option value="Extreme">Extreme</option>
      <option value="High">High</option>
@@ -328,30 +333,39 @@ tr:hover{background:rgba(2,132,199,0.03)}
 <section class="page" id="alerts">
  <div class="page-heading">
   <div>
-   <h2>Discord Alert & Emergency Center</h2>
-   <p>Automated global monitoring for detections >300K, plus manual Discord webhook dispatch.</p>
+   <h2>Dual-Channel Emergency Alert Center</h2>
+   <p>Smart deduplicated alerts (≥360K) routed simultaneously to Discord Rich Embeds and ntfy.sh mobile push.</p>
   </div>
-  <span class="tag">WEBHOOK INTEGRATION</span>
+  <span class="tag">DISCORD + NTFY.SH</span>
  </div>
 
  <div class="grid two-col">
   <div class="card">
-   <div class="card-head"><h3>Automated Worldwide Monitoring</h3><span class="tag">ACTIVE TRIGGER</span></div>
-   <div style="padding:10px 0;font-size:11px;color:var(--muted);line-height:1.6;">
-     System is actively scanning worldwide telemetry. Any anomaly exceeding <b>300 K</b> automatically dispatches a batched notification to your Discord webhook without rate-limit errors.
+   <div class="card-head"><h3>Automated Smart Escalation</h3><span class="tag">60-MIN COOLDOWN</span></div>
+   <div style="padding:5px 0 12px;font-size:11px;color:var(--muted);line-height:1.6;">
+     Triggers only on <b>Extreme anomalies (≥ 360 K)</b> with a 60-minute deduplication cooldown to prevent refresh spam. Delivers peak hotspot coordinates and a Google Maps link.
    </div>
-   <div class="form-grid" style="margin-top:15px;display:grid;gap:10px;">
+   <div style="display:grid;gap:10px;">
      <label style="font-size:10px;color:var(--muted)">DISCORD WEBHOOK ENDPOINT</label>
-     <input id="webhookUrl" readonly value="https://discord.com/api/webhooks/1559210573902782537/DiBSHIKqfcUa55KyIBpLzEYV03NEleZjSdr0iCkidt91OfOXQlIBz08ZlXIv8Qz8fnV4">
+     <input id="webhookUrl" value="https://discord.com/api/webhooks/1559210573902782537/DiBSHIKqfcUa55KyIBpLzEYV03NEleZjSdr0iCkidt91OfOXQlIBz08ZlXIv8Qz8fnV4">
+     <label style="font-size:10px;color:var(--muted)">NTFY.SH MOBILE PUSH TOPIC (SUBSCRIBE IN APP)</label>
+     <input id="ntfyTopic" value="satellite-live-salman-alerts" placeholder="Enter your private ntfy.sh topic">
+     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+       <span style="font-size:10px;color:var(--muted)" id="cooldownStatus">Cooldown: Ready</span>
+       <button class="secondary" onclick="resetCooldown()">RESET COOLDOWN</button>
+     </div>
    </div>
   </div>
 
   <div class="card">
-   <div class="card-head"><h3>Manual Emergency Dispatch</h3><span class="tag">MANUAL TEST</span></div>
-   <div class="form-grid" style="display:grid;gap:10px;">
+   <div class="card-head"><h3>Manual Dual-Channel Dispatch</h3><span class="tag">LIVE TEST</span></div>
+   <div style="display:grid;gap:10px;">
     <label style="font-size:10px;color:var(--muted)">CUSTOM DISPATCH MESSAGE</label>
-    <input id="manualMsg" value="Manual global test alert: Satellite map monitoring active (>300K threshold).">
-    <button class="primary" onclick="sendManualAlert()" style="margin-top:5px">📡 DISPATCH WEBHOOK ALERT</button>
+    <input id="manualMsg" value="Manual global test alert: Dual-channel monitoring active (≥360K Extreme threshold).">
+    <button class="primary" onclick="sendManualAlert()" style="margin-top:5px">📡 DISPATCH TO DISCORD & PHONE</button>
+    <div style="font-size:10px;color:var(--muted);line-height:1.5;margin-top:8px;padding:10px;background:#f8fafc;border-radius:6px;border:1px solid var(--line);">
+      <b>Mobile Setup:</b> Install the free <b>ntfy</b> app on Android/iOS and subscribe to your topic name above to receive instant push notifications with Google Maps links.
+    </div>
    </div>
   </div>
  </div>
@@ -370,7 +384,7 @@ tr:hover{background:rgba(2,132,199,0.03)}
  <div class="card">
   <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px">
    <input id="search" placeholder="Search region or coordinates..." oninput="renderTable()" style="flex:1;min-width:180px">
-   <select id="tableRisk" onchange="renderTable()">
+   <select id="tableRisk" onchange="renderTable()" style="width:auto;">
     <option value="All">All Risk Tiers</option>
     <option value="Extreme">Extreme</option>
     <option value="High">High</option>
@@ -416,7 +430,9 @@ let mapMain = null;
 let mapOverview = null;
 let mainMarkers = [];
 let overviewMarkers = [];
-let pendingAlerts = [];
+
+const COOLDOWN_KEY = "satellite_live_last_alert_ts";
+const COOLDOWN_MS = 60 * 60 * 1000; // 60 minutes
 
 const riskColors = {
   Low:"#0284c7", Moderate:"#10b981", High:"#d97706", Extreme:"#dc2626"
@@ -427,7 +443,7 @@ const bootLogsText = [
   "INITIALIZING ESRI SATELLITE IMAGERY...",
   "CONNECTING TO VIIRS NOAA-20 NRT STREAM...",
   "PARKING ORBIT: 824 KM // INCLINATION: 98.7°",
-  "TRACKING INFINITE GLOBAL THERMAL NODES...",
+  "ARMING DUAL-CHANNEL ALERT ENGINE (DISCORD + NTFY)...",
   "CALIBRATING KELVIN BRIGHTNESS MATRICES...",
   "SYSTEM ONLINE. LAUNCHING INTERFACE..."
 ];
@@ -458,6 +474,25 @@ function toast(msg) {
   el.timer = setTimeout(() => el.style.display = "none", 4000);
 }
 
+function updateCooldownUI() {
+  const lastTs = parseInt(localStorage.getItem(COOLDOWN_KEY) || "0", 10);
+  const elapsed = Date.now() - lastTs;
+  if (!lastTs || elapsed >= COOLDOWN_MS) {
+    $("cooldownStatus").textContent = "Cooldown: Ready to dispatch";
+    $("cooldownStatus").style.color = "#10b981";
+  } else {
+    const minsLeft = Math.ceil((COOLDOWN_MS - elapsed) / 60000);
+    $("cooldownStatus").textContent = `Cooldown active (${minsLeft}m left)`;
+    $("cooldownStatus").style.color = "#d97706";
+  }
+}
+
+function resetCooldown() {
+  localStorage.removeItem(COOLDOWN_KEY);
+  updateCooldownUI();
+  toast("Alert cooldown reset. Next sync with Extreme detections will dispatch.");
+}
+
 function showPage(id) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   $(id).classList.add("active");
@@ -475,6 +510,7 @@ function showPage(id) {
   }
   if (id === "analytics") updateAnalytics();
   if (id === "detections") renderTable();
+  if (id === "alerts") updateCooldownUI();
 }
 
 document.querySelectorAll(".navbtn").forEach(btn => {
@@ -485,7 +521,6 @@ setInterval(() => { $("clock") && ($("clock").textContent = new Date().toLocaleT
 
 function makeMap(element, zoom) {
   const map = L.map(element, { worldCopyJump:true, preferCanvas:true }).setView([20,0], zoom);
-  // Watermark-free, true-color satellite imagery (Esri World Imagery)
   L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
     attribution: 'Esri, Maxar, Earthstar Geographics',
     maxZoom: 18
@@ -513,7 +548,6 @@ function renderMarkers(map, layerArray, data) {
   layerArray.forEach(m => map.removeLayer(m));
   layerArray.length = 0;
 
-  // INFINITY MAP RENDERING with high-contrast markers over satellite imagery
   data.forEach(fire => {
     const color = riskColors[fire.risk] || riskColors.Low;
     const marker = L.circleMarker([fire.latitude, fire.longitude], {
@@ -575,7 +609,6 @@ function parseCSV(text) {
   const brightIdx = headers.indexOf("bright_ti4") !== -1 ? headers.indexOf("bright_ti4") : headers.indexOf("brightness");
 
   fires = [];
-  pendingAlerts = [];
 
   for (let i = 1; i < lines.length; i++) {
     const cols = lines[i].split(",");
@@ -584,69 +617,142 @@ function parseCSV(text) {
       const lon = parseFloat(cols[lonIdx]);
       const brightness = parseFloat(cols[brightIdx]);
       if (!isNaN(lat) && !isNaN(lon) && !isNaN(brightness)) {
-        const fireObj = {
+        fires.push({
           latitude: lat,
           longitude: lon,
           brightness: brightness,
           risk: brightness >= 360 ? "Extreme" : brightness >= 330 ? "High" : brightness >= 310 ? "Moderate" : "Low",
           region: getRegion(lat, lon)
-        };
-        fires.push(fireObj);
-        if (fireObj.brightness > 300) pendingAlerts.push(fireObj);
+        });
       }
     }
   }
   if (!fires.length) loadMockData();
   updateDashboard();
-  if (pendingAlerts.length > 0) sendBatchedDiscordAlert(pendingAlerts.length);
+  evaluateSmartAlerts();
 }
 
 function loadMockData() {
   fires = [];
-  pendingAlerts = [];
   const regions = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania"];
   for (let i = 0; i < 5000; i++) {
     const brightness = 295 + Math.random() * 90;
-    const fireObj = {
+    fires.push({
       latitude: Math.random() * 120 - 60,
       longitude: Math.random() * 360 - 180,
       brightness: parseFloat(brightness.toFixed(1)),
       risk: brightness >= 360 ? "Extreme" : brightness >= 330 ? "High" : brightness >= 310 ? "Moderate" : "Low",
       region: regions[Math.floor(Math.random() * regions.length)]
-    };
-    fires.push(fireObj);
-    if (fireObj.brightness > 300) pendingAlerts.push(fireObj);
+    });
   }
   updateDashboard();
-  if (pendingAlerts.length > 0) sendBatchedDiscordAlert(pendingAlerts.length);
+  evaluateSmartAlerts();
 }
 
-async function sendBatchedDiscordAlert(count) {
-  const url = $("webhookUrl").value.trim();
-  if (!url.startsWith("https://")) return;
-  try {
-    await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: `🛰️ **SATELLITE LIVE INTELLIGENCE SYNC**\n• **Thermal Nodes >300K:** ${count} active wildfire anomalies synchronized globally.` })
-    });
-  } catch(e) {}
+// SMART DEDUPLICATED DUAL-CHANNEL DISPATCH (DISCORD RICH EMBED + NTFY.SH)
+async function evaluateSmartAlerts() {
+  const extremeFires = fires.filter(f => f.brightness >= 360);
+  if (extremeFires.length === 0) return;
+
+  const lastTs = parseInt(localStorage.getItem(COOLDOWN_KEY) || "0", 10);
+  if (Date.now() - lastTs < COOLDOWN_MS) {
+    updateCooldownUI();
+    return; // Skip dispatch during 60-minute cooldown window
+  }
+
+  // Find the single hottest global thermal anomaly
+  const peakFire = extremeFires.reduce((max, f) => f.brightness > max.brightness ? f : max, extremeFires[0]);
+  const mapsUrl = `https://www.google.com/maps?q=${peakFire.latitude},${peakFire.longitude}`;
+
+  const discordUrl = $("webhookUrl").value.trim();
+  const ntfyTopic = $("ntfyTopic").value.trim();
+  const requests = [];
+
+  // 1. Discord Rich Embed Payload
+  if (discordUrl.startsWith("https://")) {
+    requests.push(fetch(discordUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        embeds: [{
+          title: "🚨 EXTREME GLOBAL THERMAL ANOMALY ALERT",
+          description: `Detected **${extremeFires.length.toLocaleString()}** Extreme wildfire nodes (≥360 K) out of **${fires.length.toLocaleString()}** global detections.`,
+          color: 14427686, // Crimson Red (#dc2626)
+          fields: [
+            { name: "Peak Thermal Node", value: `**${peakFire.brightness} K**`, inline: true },
+            { name: "Sector", value: peakFire.region, inline: true },
+            { name: "Coordinates", value: `${peakFire.latitude.toFixed(3)}°, ${peakFire.longitude.toFixed(3)}°`, inline: true },
+            { name: "Satellite Map Inspection", value: `[Open Hotspot in Google Maps ↗](${mapsUrl})`, inline: false }
+          ],
+          footer: { text: "NASA FIRMS VIIRS NOAA-20 · 60-Min Smart Cooldown Active" },
+          timestamp: new Date().toISOString()
+        }]
+      })
+    }));
+  }
+
+  // 2. ntfy.sh Mobile Push Notification Payload
+  if (ntfyTopic) {
+    requests.push(fetch(`https://ntfy.sh/${encodeURIComponent(ntfyTopic)}`, {
+      method: "POST",
+      headers: {
+        "Title": `Extreme Wildfire Alert: ${peakFire.brightness} K in ${peakFire.region}`,
+        "Priority": "high",
+        "Tags": "fire,rotating_light,satellite",
+        "Click": mapsUrl
+      },
+      body: `${extremeFires.length.toLocaleString()} Extreme nodes (>=360K) active globally. Peak hotspot at ${peakFire.latitude.toFixed(2)}°, ${peakFire.longitude.toFixed(2)}°. Tap to view on Google Maps.`
+    }));
+  }
+
+  if (requests.length > 0) {
+    await Promise.allSettled(requests);
+    localStorage.setItem(COOLDOWN_KEY, Date.now().toString());
+    updateCooldownUI();
+  }
 }
 
 async function sendManualAlert() {
-  const url = $("webhookUrl").value.trim();
+  const discordUrl = $("webhookUrl").value.trim();
+  const ntfyTopic = $("ntfyTopic").value.trim();
   const customMsg = $("manualMsg").value.trim();
-  if (!url.startsWith("https://")) { toast("Invalid webhook URL."); return; }
-  try {
-    await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: `🛠️ **MANUAL DISPATCH**\n${customMsg}` })
-    });
-    toast("Webhook alert dispatched successfully!");
-  } catch(err) {
-    toast("Webhook transmission failed.");
+  const requests = [];
+
+  if (discordUrl.startsWith("https://")) {
+    requests.push(fetch(discordUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        embeds: [{
+          title: "🛠️ MANUAL SATELLITE INTELLIGENCE DISPATCH",
+          description: customMsg,
+          color: 165063, // Cyan (#0284c7)
+          timestamp: new Date().toISOString()
+        }]
+      })
+    }));
   }
+
+  if (ntfyTopic) {
+    requests.push(fetch(`https://ntfy.sh/${encodeURIComponent(ntfyTopic)}`, {
+      method: "POST",
+      headers: {
+        "Title": "Manual Satellite Alert Dispatch",
+        "Priority": "default",
+        "Tags": "satellite,loudspeaker"
+      },
+      body: customMsg
+    }));
+  }
+
+  if (requests.length === 0) {
+    toast("Configure a Discord webhook or ntfy.sh topic first.");
+    return;
+  }
+
+  const results = await Promise.allSettled(requests);
+  const succeeded = results.filter(r => r.status === "fulfilled").length;
+  toast(`Dispatched alert across ${succeeded}/${requests.length} channel(s)!`);
 }
 
 function updateDashboard() {
@@ -761,7 +867,8 @@ function exportCSV() {
   a.click();
 }
 
-// Run boot sequence and load live data
+// Run boot sequence, check cooldown status, and load live data
+updateCooldownUI();
 runBootSequence();
 loadData(false);
 </script>
