@@ -1,4 +1,3 @@
-
 let lastAlertTime = 0;
 
 export default async function handler(req, res) {
@@ -73,12 +72,9 @@ export default async function handler(req, res) {
       "🚨 **SATELLITE LIVE — MANUAL ALERT**\n" +
       message.trim();
   } else {
-    const safe = detections.slice(0, 5);
-
-    content =
-      "🔥 **SATELLITE LIVE — AUTOMATIC WILDFIRE ALERT**\n" +
-      `New high/extreme-risk detections: ${safe.length}\n\n` +
-      safe.map((fire, index) => {
+    const formattedDetections = detections
+      .slice(0, 5)
+      .map((fire, index) => {
         const lat = Number(fire.latitude);
         const lon = Number(fire.longitude);
         const frp = Number(fire.frp);
@@ -97,7 +93,15 @@ export default async function handler(req, res) {
           `FRP: ${frp.toFixed(2)} MW\n` +
           `Satellite: ${String(fire.satellite || "VIIRS").slice(0, 30)}`
         );
-      }).filter(Boolean).join("\n\n");
+      })
+      .filter(Boolean);
+
+    if (formattedDetections.length > 0) {
+      content =
+        "🔥 **SATELLITE LIVE — AUTOMATIC WILDFIRE ALERT**\n" +
+        `New high/extreme-risk detections: ${formattedDetections.length}\n\n` +
+        formattedDetections.join("\n\n");
+    }
   }
 
   if (!content.trim()) {
