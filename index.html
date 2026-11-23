@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SATELLITE LIVE | Orbital AI Control & Thermal Intelligence</title>
 
+<!-- Modern AI Control Platform Typography -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -20,6 +21,7 @@
   --line: rgba(15, 23, 42, 0.08);
   --line-strong: rgba(15, 23, 42, 0.14);
   --accent: #2563eb;
+  --accent-glow: rgba(37, 99, 235, 0.25);
   --cyan: #0284c7;
   --emerald: #059669;
   --amber: #d97706;
@@ -31,7 +33,7 @@
   --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-*, *::before, *::after { box-sizing: border-box; }
+- { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -45,7 +47,9 @@ body {
   overflow-x: hidden;
 }
 
-/* BOOT SCREEN */
+/* =========================================================
+1. HEAVY ORBITAL SATELLITE BOOT SEQUENCE
+   ========================================================= */
 #bootScreen {
   position: fixed;
   inset: 0;
@@ -71,6 +75,7 @@ body {
   display: grid;
   place-items: center;
 }
+
 .ring-outer {
   position: absolute;
   inset: 0;
@@ -85,6 +90,7 @@ body {
   border: 2px solid transparent;
   border-top-color: #38bdf8;
   border-bottom-color: #818cf8;
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.25);
   animation: orbitCCW 4.5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
 .ring-inner {
@@ -94,6 +100,7 @@ body {
   border: 1px solid rgba(244, 63, 94, 0.45);
   animation: orbitCW 6s linear infinite;
 }
+
 .sat-carrier {
   position: absolute;
   inset: -6px;
@@ -109,17 +116,20 @@ body {
   border-radius: 10px;
   background: rgba(15, 23, 42, 0.9);
   border: 1px solid rgba(56, 189, 248, 0.6);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
   display: grid;
   place-items: center;
   font-size: 16px;
   animation: orbitCCW 5s linear infinite;
 }
+
 .planet-core {
   width: 72px;
   height: 72px;
   border-radius: 50%;
   background: radial-gradient(circle at 30% 30%, #38bdf8, #1d4ed8 65%, #0f172a 100%);
-  box-shadow: 0 0 40px rgba(37, 99, 235, 0.65);
+  box-shadow: 0 0 40px rgba(37, 99, 235, 0.65), inset 0 0 18px rgba(255, 255, 255, 0.35);
+  position: relative;
   display: grid;
   place-items: center;
   animation: coreBreathe 2.2s ease-in-out infinite alternate;
@@ -132,6 +142,7 @@ body {
   box-shadow: 0 0 14px #f43f5e;
   animation: hotspotPulse 1.1s ease-out infinite;
 }
+
 .boot-hud {
   margin-top: 32px;
   text-align: center;
@@ -149,6 +160,7 @@ body {
   font-family: var(--font-mono);
   font-size: 11px;
   color: #38bdf8;
+  letter-spacing: 0.04em;
   min-height: 18px;
 }
 .boot-bar-track {
@@ -173,11 +185,13 @@ body {
   100% { transform: scale(1.05); }
 }
 @keyframes hotspotPulse {
-  0% { transform: scale(0.8); opacity: 1; }
-  100% { transform: scale(1.4); opacity: 0.4; }
+  0% { transform: scale(0.8); opacity: 1; box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.8); }
+  100% { transform: scale(1.4); opacity: 0.4; box-shadow: 0 0 0 18px rgba(244, 63, 94, 0); }
 }
 
-/* LAYOUT */
+/* =========================================================
+2. MAIN AI CONTROL LAYOUT & SPRING ANIMATIONS
+   ========================================================= */
 .layout {
   display: flex;
   min-height: 100vh;
@@ -204,6 +218,7 @@ body {
   gap: 10px;
   z-index: 1000;
 }
+
 .logo {
   width: 44px;
   height: 44px;
@@ -215,7 +230,11 @@ body {
   font-size: 18px;
   font-weight: 800;
   margin-bottom: 20px;
+  box-shadow: 0 8px 20px -4px rgba(37, 99, 235, 0.45);
+  transition: transform 0.3s var(--ease-spring);
 }
+.logo:hover { transform: rotate(90deg) scale(1.06); }
+
 .navbtn {
   width: 46px;
   height: 46px;
@@ -228,8 +247,16 @@ body {
   position: relative;
   transition: all 0.25s var(--ease-spring);
 }
-.navbtn:hover { background: rgba(37, 99, 235, 0.08); color: var(--accent); transform: translateY(-2px); }
-.navbtn.active { background: rgba(37, 99, 235, 0.12); color: var(--accent); }
+.navbtn:hover {
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+.navbtn.active {
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--accent);
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.2);
+}
 .navbtn.active::before {
   content: '';
   position: absolute;
@@ -240,6 +267,7 @@ body {
   border-radius: 0 4px 4px 0;
   background: var(--accent);
 }
+
 .sidebar-bottom { margin-top: auto; }
 .main { margin-left: 76px; width: calc(100% - 76px); padding: 24px 30px; }
 
@@ -251,6 +279,7 @@ body {
   gap: 16px;
   margin-bottom: 26px;
 }
+
 .brand { display: flex; align-items: center; gap: 14px; }
 .brand-icon {
   width: 46px;
@@ -261,13 +290,21 @@ body {
   background: #ffffff;
   border: 1px solid var(--line);
   font-size: 20px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
 }
-.brand h1 { margin: 0; font-size: 19px; font-weight: 800; letter-spacing: -0.02em; }
+.brand h1 {
+  margin: 0;
+  color: var(--text);
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
 .brand small {
   display: block;
   color: var(--muted);
   font-family: var(--font-mono);
   font-size: 10px;
+  letter-spacing: 0.06em;
   margin-top: 3px;
 }
 
@@ -277,19 +314,29 @@ body {
   background: #ffffff;
   border-radius: 99px;
   padding: 8px 14px;
+  color: var(--text);
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 500;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
   display: inline-flex;
   align-items: center;
   gap: 7px;
 }
+
 .dot {
   display: inline-block;
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: liveBeacon 2s infinite;
+}
+@keyframes liveBeacon {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.65); }
+  70% { box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 
 .primary {
@@ -301,11 +348,16 @@ body {
   font-family: var(--font-ui);
   font-weight: 600;
   font-size: 12px;
+  letter-spacing: -0.01em;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
   cursor: pointer;
   transition: all 0.25s var(--ease-spring);
 }
-.primary:hover:not(:disabled) { transform: translateY(-2px); }
-.primary:disabled { opacity: 0.65; cursor: not-allowed; }
+.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+}
+.primary:active { transform: translateY(0) scale(0.98); }
 
 .secondary {
   border: 1px solid var(--line-strong);
@@ -317,13 +369,32 @@ body {
   font-weight: 600;
   font-size: 12px;
   cursor: pointer;
+  transition: all 0.2s var(--ease-spring);
 }
+.secondary:hover { background: #f8fafc; transform: translateY(-1px); }
+
+.danger {
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  background: #fef2f2;
+  color: #dc2626;
+  border-radius: 10px;
+  padding: 9px 14px;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s var(--ease-spring);
+}
+.danger:hover { background: #fee2e2; transform: translateY(-1px); }
 
 .page { display: none; }
-.page.active { display: block; animation: pageEnter 0.4s var(--ease-spring) forwards; }
+.page.active {
+  display: block;
+  animation: pageEnter 0.45s var(--ease-spring) forwards;
+}
 @keyframes pageEnter {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(12px) scale(0.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .page-heading {
@@ -334,8 +405,18 @@ body {
   gap: 10px;
   margin-bottom: 22px;
 }
-.page-heading h2 { font-size: 22px; font-weight: 800; margin: 0; }
-.page-heading p { font-size: 13px; color: var(--muted); margin: 4px 0 0; }
+.page-heading h2 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin: 0;
+  color: var(--text);
+}
+.page-heading p {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 4px 0 0;
+}
 
 .grid { display: grid; gap: 16px; }
 .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 18px; }
@@ -348,7 +429,16 @@ body {
   padding: 18px 20px;
   min-width: 0;
   box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s var(--ease-spring), box-shadow 0.3s var(--ease-spring), border-color 0.3s ease;
 }
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px -6px rgba(15, 23, 42, 0.09);
+  border-color: rgba(37, 99, 235, 0.25);
+}
+
 .card-title {
   color: var(--muted);
   font-size: 11px;
@@ -360,9 +450,15 @@ body {
   font-family: var(--font-mono);
   font-size: 28px;
   font-weight: 700;
+  letter-spacing: -0.03em;
   margin-top: 8px;
+  color: var(--text);
 }
-.stat-sub { font-size: 11px; color: var(--muted); margin-top: 5px; }
+.stat-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 5px;
+}
 
 .cyan { color: var(--accent); }
 .green { color: var(--emerald); }
@@ -379,7 +475,12 @@ body {
   gap: 10px;
   margin-bottom: 14px;
 }
-.card-head h3 { font-size: 14px; font-weight: 700; margin: 0; }
+.card-head h3 {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
 
 .tag {
   border: 1px solid rgba(37, 99, 235, 0.22);
@@ -392,8 +493,8 @@ body {
   border-radius: 99px;
 }
 
-#mapOverview { height: 370px; width: 100%; border-radius: 12px; background: #0f172a; z-index: 1; }
-#map { height: 520px; width: 100%; border-radius: 12px; background: #0f172a; z-index: 1; }
+#map { height: 460px; width: 100%; border-radius: 12px; background: #0f172a; z-index: 1; }
+.map-wrap { position: relative; }
 
 .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; }
 .legend span { font-size: 11px; font-weight: 500; color: var(--muted); display: inline-flex; align-items: center; }
@@ -413,10 +514,12 @@ input, select, textarea {
   outline: none;
   font-family: var(--font-ui);
   width: 100%;
+  transition: all 0.2s ease;
 }
 input:focus, select:focus {
   background: #ffffff;
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
 }
 
 canvas { max-height: 280px; }
@@ -429,10 +532,16 @@ th {
   color: var(--muted);
   font-size: 11px;
   font-weight: 700;
-  padding: 12px;
+  letter-spacing: 0.04em;
+  padding: 12px 12px;
   border-bottom: 1px solid var(--line);
 }
-td { padding: 12px; border-bottom: 1px solid var(--line); }
+td {
+  padding: 12px 12px;
+  border-bottom: 1px solid var(--line);
+  transition: background 0.15s ease;
+}
+tr:hover td { background: rgba(37, 99, 235, 0.04); }
 
 .footer {
   text-align: center;
@@ -440,6 +549,102 @@ td { padding: 12px; border-bottom: 1px solid var(--line); }
   font-family: var(--font-mono);
   font-size: 10px;
   padding: 28px 0 10px;
+  letter-spacing: 0.06em;
+}
+
+/* =========================================================
+3. SLEEK AI GLASSMORPHIC SATELLITE POPUPS & TOASTS
+   ========================================================= */
+.leaflet-popup-content-wrapper {
+  background: rgba(15, 23, 42, 0.92) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(56, 189, 248, 0.35) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.55), 0 0 20px rgba(37, 99, 235, 0.25) !important;
+  padding: 2px !important;
+  animation: popupSpring 0.35s var(--ease-spring) forwards;
+}
+.leaflet-popup-tip {
+  background: rgba(15, 23, 42, 0.92) !important;
+  border: 1px solid rgba(56, 189, 248, 0.35) !important;
+}
+.leaflet-popup-close-button {
+  color: #94a3b8 !important;
+  font-size: 16px !important;
+  padding: 6px 8px 0 0 !important;
+}
+.leaflet-popup-close-button:hover { color: #ffffff !important; }
+
+@keyframes popupSpring {
+  0% { opacity: 0; transform: scale(0.85) translateY(8px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.sat-popup {
+  font-family: var(--font-ui);
+  min-width: 215px;
+  padding: 4px 2px;
+}
+.sat-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.sat-popup-sector {
+  font-weight: 700;
+  font-size: 13px;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+.sat-popup-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 99px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.sat-popup-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.sat-popup-metric span {
+  display: block;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+}
+.sat-popup-metric strong {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: #38bdf8;
+}
+.sat-popup-link {
+  display: block;
+  text-align: center;
+  background: rgba(56, 189, 248, 0.16);
+  color: #38bdf8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 9px;
+  transition: all 0.2s ease;
+}
+.sat-popup-link:hover {
+  background: rgba(56, 189, 248, 0.28);
+  color: #ffffff !important;
 }
 
 .toast {
@@ -448,11 +653,20 @@ td { padding: 12px; border-bottom: 1px solid var(--line); }
   bottom: 24px;
   z-index: 3000;
   background: rgba(15, 23, 42, 0.94);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(56, 189, 248, 0.35);
   color: #f8fafc;
   padding: 13px 18px;
   border-radius: 14px;
   font-size: 12px;
+  font-weight: 500;
   display: none;
+  box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.45);
+  animation: toastSlide 0.4s var(--ease-spring) forwards;
+}
+@keyframes toastSlide {
+  from { opacity: 0; transform: translateY(18px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 @media(max-width:950px) {
@@ -465,13 +679,18 @@ td { padding: 12px; border-bottom: 1px solid var(--line); }
 
 <body>
 
+<!-- HEAVY ORBITAL SATELLITE BOOT SCREEN -->
 <div id="bootScreen">
   <div class="orbital-stage">
     <div class="ring-outer"></div>
     <div class="ring-mid"></div>
     <div class="ring-inner"></div>
-    <div class="sat-carrier"><div class="sat-badge">🛰️</div></div>
-    <div class="planet-core"><div class="thermal-ping"></div></div>
+    <div class="sat-carrier">
+      <div class="sat-badge">🛰️</div>
+    </div>
+    <div class="planet-core">
+      <div class="thermal-ping"></div>
+    </div>
   </div>
   <div class="boot-hud">
     <div class="boot-title">Orbital AI Control Core</div>
@@ -483,234 +702,250 @@ td { padding: 12px; border-bottom: 1px solid var(--line); }
 <div class="layout" id="mainLayout">
 
 <aside class="sidebar">
-  <div class="logo">✦</div>
-  <button class="navbtn active" data-page="overview" title="Overview">▦</button>
-  <button class="navbtn" data-page="mapPage" title="Live Satellite Map">◎</button>
-  <button class="navbtn" data-page="analytics" title="AI Telemetry Analytics">▥</button>
-  <button class="navbtn" data-page="alerts" title="Discord Alert Controls">⚡</button>
-  <button class="navbtn" data-page="detections" title="Telemetry Matrix">▤</button>
-  <div class="sidebar-bottom"><span class="dot"></span></div>
+ <div class="logo">✦</div>
+ <button class="navbtn active" data-page="overview" title="Overview">▦</button>
+ <button class="navbtn" data-page="mapPage" title="Live Satellite Map">◎</button>
+ <button class="navbtn" data-page="analytics" title="AI Telemetry Analytics">▥</button>
+ <button class="navbtn" data-page="alerts" title="Encrypted Alert Vault">⚡</button>
+ <button class="navbtn" data-page="detections" title="Telemetry Matrix">▤</button>
+ <div class="sidebar-bottom"><span class="dot"></span></div>
 </aside>
 
 <main class="main">
 
 <header class="topbar">
-  <div class="brand">
-    <div class="brand-icon">🛰️</div>
-    <div>
-      <h1>Orbital Control Intelligence</h1>
-      <small>NASA FIRMS WILDFIRE TELEMETRY · FRP RISK ENGINE</small>
-    </div>
+ <div class="brand">
+  <div class="brand-icon">🛰️</div>
+  <div>
+   <h1>Orbital Control Intelligence</h1>
+   <small>GLOBAL THERMAL ANOMALY & POLICY TELEMETRY</small>
   </div>
+ </div>
 
-  <div class="status-area">
-    <span class="pill"><span class="dot"></span><span id="status">SATELLITE LIVE</span></span>
-    <span class="pill" id="clock">--:--:--</span>
-    <select id="sourceSelect" onchange="loadData(true)" style="width:auto;padding:8px 10px;">
-      <option value="VIIRS_SNPP_NRT">VIIRS SNPP NRT</option>
-      <option value="VIIRS_NOAA20_NRT">VIIRS NOAA-20 NRT</option>
-      <option value="VIIRS_NOAA21_NRT">VIIRS NOAA-21 NRT</option>
-      <option value="MODIS_NRT">MODIS NRT</option>
-    </select>
-    <button class="primary" id="syncBtn" onclick="loadData(true)">↻ Sync Live Feed</button>
-  </div>
+ <div class="status-area">
+  <span class="pill"><span class="dot"></span><span id="status">SATELLITE LIVE</span></span>
+  <span class="pill" id="clock">--:--:--</span>
+  <button class="primary" onclick="loadData(true)">↻ Sync Live Feed</button>
+ </div>
 </header>
 
 <!-- OVERVIEW -->
 <section class="page active" id="overview">
-  <div class="page-heading">
-    <div>
-      <h2>Global Control Overview</h2>
-      <p>Real-time satellite thermal anomaly tracking classified by Fire Radiative Power (FRP).</p>
-    </div>
-    <span class="tag">FRP SEVERITY ENGINE</span>
+ <div class="page-heading">
+  <div>
+   <h2>Global Control Overview</h2>
+   <p>Real-time satellite thermal anomaly tracking across global sectors.</p>
+  </div>
+  <span class="tag">TRUE-COLOR SATELLITE MAP</span>
+ </div>
+
+ <div class="grid stats">
+  <div class="card">
+   <div class="card-title">Worldwide Detections</div>
+   <div class="stat-value cyan" id="total">—</div>
+   <div class="stat-sub">Active thermal nodes</div>
+  </div>
+  <div class="card">
+   <div class="card-title">Extreme Risk</div>
+   <div class="stat-value red" id="extremeCount">—</div>
+   <div class="stat-sub">Brightness ≥ 360 K</div>
+  </div>
+  <div class="card">
+   <div class="card-title">High Risk</div>
+   <div class="stat-value yellow" id="highCount">—</div>
+   <div class="stat-sub">Brightness ≥ 330 K</div>
+  </div>
+  <div class="card">
+   <div class="card-title">Mean Brightness</div>
+   <div class="stat-value green" id="avgBrightness">—</div>
+   <div class="stat-sub">VIIRS channel average</div>
+  </div>
+ </div>
+
+ <div class="grid content-grid">
+  <div class="card">
+   <div class="card-head">
+    <h3>Live Satellite Overview</h3>
+    <button class="primary" onclick="showPage('mapPage')">Expand Map ↗</button>
+   </div>
+   <div class="map-wrap">
+    <div id="mapOverview" style="height:370px;border-radius:12px;background:#0f172a;"></div>
+   </div>
+   <div class="legend">
+    <span><i class="low"></i>Low</span>
+    <span><i class="moderate"></i>Moderate</span>
+    <span><i class="high"></i>High</span>
+    <span><i class="extreme"></i>Extreme</span>
+   </div>
   </div>
 
-  <div class="grid stats">
-    <div class="card">
-      <div class="card-title">Worldwide Detections</div>
-      <div class="stat-value cyan" id="total">—</div>
-      <div class="stat-sub">Validated thermal records</div>
+  <div class="grid">
+   <div class="card">
+    <div class="card-head"><h3>Risk Severity Split</h3><span class="tag">PROPORTIONAL</span></div>
+    <div class="chart-box"><canvas id="overviewRiskChart"></canvas></div>
+   </div>
+   <div class="card">
+    <div class="card-head"><h3>Pipeline Telemetry</h3><span class="tag">VAULT SECURED</span></div>
+    <div class="grid two-col">
+     <div><div class="card-title">Imagery</div><b style="font-size:13px;">Esri Satellite Live</b></div>
+     <div><div class="card-title">Alert Vault</div><b id="vaultStatus" style="font-size:13px;">Checking...</b></div>
+     <div><div class="card-title">Last Sync</div><b id="lastUpdate" style="font-family:var(--font-mono);font-size:13px;">—</b></div>
+     <div><div class="card-title">Active Nodes</div><b id="displayed" style="font-family:var(--font-mono);font-size:13px;">—</b></div>
     </div>
-    <div class="card">
-      <div class="card-title">Extreme Risk</div>
-      <div class="stat-value red" id="extremeCount">—</div>
-      <div class="stat-sub">FRP ≥ 100 MW</div>
-    </div>
-    <div class="card">
-      <div class="card-title">High Risk</div>
-      <div class="stat-value yellow" id="highCount">—</div>
-      <div class="stat-sub">FRP 30 – 99.9 MW</div>
-    </div>
-    <div class="card">
-      <div class="card-title">Mean FRP</div>
-      <div class="stat-value green" id="avgFrp">—</div>
-      <div class="stat-sub">Fire Radiative Power (MW)</div>
-    </div>
+   </div>
   </div>
-
-  <div class="grid content-grid">
-    <div class="card">
-      <div class="card-head">
-        <h3>Live Satellite Overview</h3>
-        <button class="primary" onclick="showPage('mapPage')">Expand Map ↗</button>
-      </div>
-      <div id="mapOverview"></div>
-      <div class="legend">
-        <span><i class="low"></i>Low (&lt;10 MW)</span>
-        <span><i class="moderate"></i>Moderate (10–29 MW)</span>
-        <span><i class="high"></i>High (30–99 MW)</span>
-        <span><i class="extreme"></i>Extreme (≥100 MW)</span>
-      </div>
-    </div>
-
-    <div class="grid">
-      <div class="card">
-        <div class="card-head"><h3>Risk Severity Split</h3><span class="tag">PROPORTIONAL</span></div>
-        <div class="chart-box"><canvas id="overviewRiskChart"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-head"><h3>Pipeline Telemetry</h3><span class="tag">SERVERLESS</span></div>
-        <div class="grid two-col">
-          <div><div class="card-title">Sensor</div><b id="activeSensor" style="font-family:var(--font-mono);font-size:12px;">VIIRS_SNPP_NRT</b></div>
-          <div><div class="card-title">Alert Channel</div><b id="vaultStatus" style="font-size:13px;color:#059669;">Discord Serverless</b></div>
-          <div><div class="card-title">Last Sync</div><b id="lastUpdate" style="font-family:var(--font-mono);font-size:13px;">—</b></div>
-          <div><div class="card-title">Active Nodes</div><b id="displayed" style="font-family:var(--font-mono);font-size:13px;">—</b></div>
-        </div>
-      </div>
-    </div>
-  </div>
+ </div>
 </section>
 
 <!-- LIVE MAP -->
 <section class="page" id="mapPage">
-  <div class="page-heading">
-    <div>
-      <h2>True-Color Satellite Map Projection</h2>
-      <p>Click any thermal node to inspect coordinates, FRP, and sensor details.</p>
-    </div>
-    <span class="tag">ESRI WORLD IMAGERY</span>
+ <div class="page-heading">
+  <div>
+   <h2>True-Color Satellite Map Projection</h2>
+   <p>Click any thermal node to launch an orbital telemetry popup card.</p>
   </div>
+  <span class="tag">ESRI WORLD IMAGERY</span>
+ </div>
 
-  <div class="card">
-    <div class="card-head">
-      <h3>Global Hotspot Tracker</h3>
-      <div style="display:flex;gap:10px;align-items:center;">
-        <select id="mapRisk" onchange="renderMap()" style="width:auto;">
-          <option value="All">All Risk Tiers</option>
-          <option value="Extreme">Extreme</option>
-          <option value="High">High</option>
-          <option value="Moderate">Moderate</option>
-          <option value="Low">Low</option>
-        </select>
-        <button class="primary" onclick="fitMap()">Reset View</button>
-      </div>
-    </div>
-    <div id="map"></div>
-    <div class="legend">
-      <span><i class="low"></i>Low</span>
-      <span><i class="moderate"></i>Moderate</span>
-      <span><i class="high"></i>High</span>
-      <span><i class="extreme"></i>Extreme</span>
-    </div>
+ <div class="card">
+  <div class="card-head">
+   <h3>Global Hotspot Tracker</h3>
+   <div style="display:flex;gap:10px;align-items:center;">
+    <select id="mapRisk" onchange="renderMap()" style="width:auto;">
+     <option value="All">All Risk Tiers</option>
+     <option value="Extreme">Extreme</option>
+     <option value="High">High</option>
+     <option value="Moderate">Moderate</option>
+     <option value="Low">Low</option>
+    </select>
+    <button class="primary" onclick="fitMap()">Reset View</button>
+   </div>
   </div>
+  <div id="map" style="height:520px"></div>
+  <div class="legend">
+   <span><i class="low"></i>Low</span>
+   <span><i class="moderate"></i>Moderate</span>
+   <span><i class="high"></i>High</span>
+   <span><i class="extreme"></i>Extreme</span>
+  </div>
+ </div>
 </section>
 
 <!-- ANALYTICS -->
 <section class="page" id="analytics">
-  <div class="page-heading">
-    <div>
-      <h2>Regional Radar & Waveform Analytics</h2>
-      <p>Continental FRP distribution and observation progression.</p>
-    </div>
-    <span class="tag">CHART.JS SUITE</span>
+ <div class="page-heading">
+  <div>
+   <h2>Regional Radar & Waveform Analytics</h2>
+   <p>Continental intensity distribution and temporal progression analysis.</p>
   </div>
+  <span class="tag">CHART.JS SUITE</span>
+ </div>
 
-  <div class="grid two-col">
-    <div class="card">
-      <div class="card-head"><h3>Continental Detection Count</h3><span class="tag">RADAR</span></div>
-      <div class="chart-box" style="height:300px"><canvas id="radarChart"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="card-head"><h3>FRP Progression Sample</h3><span class="tag">WAVEFORM</span></div>
-      <div class="chart-box" style="height:300px"><canvas id="timeSeriesChart"></canvas></div>
-    </div>
+ <div class="grid two-col">
+  <div class="card">
+   <div class="card-head"><h3>Continental Intensity Radar</h3><span class="tag">RADAR</span></div>
+   <div class="chart-box" style="height:300px"><canvas id="radarChart"></canvas></div>
   </div>
+  <div class="card">
+   <div class="card-head"><h3>Thermal Waveform Timeline</h3><span class="tag">PROGRESSION</span></div>
+   <div class="chart-box" style="height:300px"><canvas id="timeSeriesChart"></canvas></div>
+  </div>
+ </div>
 </section>
 
 <!-- ALERTS -->
 <section class="page" id="alerts">
-  <div class="page-heading">
-    <div>
-      <h2>Serverless Discord Alert Dispatch</h2>
-      <p>Alerts are sent securely through <code>/api/alert</code> using server-side environment variables.</p>
-    </div>
-    <span class="tag">DISCORD WEBHOOK</span>
+ <div class="page-heading">
+  <div>
+   <h2>Encrypted Local Vault & Dual-Channel Alerts</h2>
+   <p>Credentials stay locked inside your browser vault—never exposed in public source code.</p>
+  </div>
+  <span class="tag">ZERO-EXPOSURE VAULT</span>
+ </div>
+
+ <div class="grid two-col">
+  <div class="card">
+   <div class="card-head"><h3>Private Alert Credentials</h3><span class="tag">LOCAL STORAGE</span></div>
+   <div style="padding:2px 0 12px;font-size:12px;color:var(--muted);line-height:1.6;">
+     Paste your private Discord Webhook URL and/or <b>ntfy.sh</b> topic below. Auto-alerts trigger on <b>Extreme (≥ 360 K)</b> anomalies with a 60-minute cooldown.
+   </div>
+   <div style="display:grid;gap:10px;">
+     <label style="font-size:11px;font-weight:600;color:var(--muted)">PRIVATE DISCORD WEBHOOK URL (MASKED)</label>
+     <input id="webhookUrl" type="password" placeholder="https://discord.com/api/webhooks/..." autocomplete="off">
+     
+     <label style="font-size:11px;font-weight:600;color:var(--muted)">PRIVATE NTFY.SH MOBILE TOPIC</label>
+     <input id="ntfyTopic" type="password" placeholder="e.g. salman-orbital-watch-2026" autocomplete="off">
+     
+     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+       <button class="primary" onclick="saveVaultCredentials()">🔒 Save to Vault</button>
+       <button class="secondary" onclick="toggleRevealCredentials()" id="revealBtn">👁 Show</button>
+       <button class="danger" onclick="clearVaultCredentials()">🗑 Clear</button>
+     </div>
+
+     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;padding-top:12px;border-top:1px solid var(--line);">
+       <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)" id="cooldownStatus">Cooldown: Ready</span>
+       <button class="secondary" onclick="resetCooldown()">Reset Cooldown</button>
+     </div>
+   </div>
   </div>
 
-  <div class="grid two-col">
-    <div class="card">
-      <div class="card-head"><h3>Automatic High/Extreme Alert</h3><span class="tag">/API/ALERT</span></div>
-      <p style="font-size:12px;color:var(--muted);line-height:1.6;margin-top:0;">
-        Dispatches up to 5 top High/Extreme FRP detections from the latest loaded feed to your configured Discord channel.
-      </p>
-      <button class="secondary" onclick="sendAutoAlert()">⚡ Send Top High/Extreme Alert Now</button>
+  <div class="card">
+   <div class="card-head"><h3>Manual Dual-Channel Dispatch</h3><span class="tag">LIVE TEST</span></div>
+   <div style="display:grid;gap:10px;">
+    <label style="font-size:11px;font-weight:600;color:var(--muted)">CUSTOM DISPATCH MESSAGE</label>
+    <input id="manualMsg" value="Manual global test alert: Dual-channel monitoring active (≥360K Extreme threshold).">
+    <button class="primary" onclick="sendManualAlert()" style="margin-top:5px">📡 Dispatch to Discord & Phone</button>
+    <div style="font-size:11px;color:var(--muted);line-height:1.55;margin-top:8px;padding:12px;background:#f8fafc;border-radius:10px;border:1px solid var(--line);">
+      <b>Security Guarantee:</b> Because your credentials live strictly in your browser's local storage, public visitors see empty fields and cannot extract your webhook.
     </div>
-
-    <div class="card">
-      <div class="card-head"><h3>Manual Dispatch</h3><span class="tag">LIVE TEST</span></div>
-      <div style="display:grid;gap:10px;">
-        <label style="font-size:11px;font-weight:600;color:var(--muted)">ALERT MESSAGE</label>
-        <input id="manualMsg" value="Manual wildfire telemetry check from Orbital Control Intelligence.">
-        <button class="primary" onclick="sendManualAlert()">📡 Send Manual Alert to Discord</button>
-      </div>
-    </div>
+   </div>
   </div>
+ </div>
 </section>
 
 <!-- DETECTIONS -->
 <section class="page" id="detections">
-  <div class="page-heading">
-    <div>
-      <h2>Validated Telemetry Matrix</h2>
-      <p>Search, filter, and export NASA FIRMS observation records.</p>
-    </div>
-    <button class="primary" onclick="exportCSV()">↓ Export CSV</button>
+ <div class="page-heading">
+  <div>
+   <h2>Validated Telemetry Matrix</h2>
+   <p>Search, filter, and export global NASA FIRMS observation records.</p>
+  </div>
+  <button class="primary" onclick="exportCSV()">↓ Export CSV</button>
+ </div>
+
+ <div class="card">
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px">
+   <input id="search" placeholder="Search region or coordinates..." oninput="renderTable()" style="flex:1;min-width:180px">
+   <select id="tableRisk" onchange="renderTable()" style="width:auto;">
+    <option value="All">All Risk Tiers</option>
+    <option value="Extreme">Extreme</option>
+    <option value="High">High</option>
+    <option value="Moderate">Moderate</option>
+    <option value="Low">Low</option>
+   </select>
   </div>
 
-  <div class="card">
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px">
-      <input id="search" placeholder="Search satellite, date, or coordinates..." oninput="renderTable()" style="flex:1;min-width:180px">
-      <select id="tableRisk" onchange="renderTable()" style="width:auto;">
-        <option value="All">All Risk Tiers</option>
-        <option value="Extreme">Extreme</option>
-        <option value="High">High</option>
-        <option value="Moderate">Moderate</option>
-        <option value="Low">Low</option>
-      </select>
-    </div>
-
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>SATELLITE</th>
-            <th>LATITUDE</th>
-            <th>LONGITUDE</th>
-            <th>FRP (MW)</th>
-            <th>RISK TIER</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody">
-          <tr><td colspan="5">Acquiring live telemetry...</td></tr>
-        </tbody>
-      </table>
-    </div>
+  <div class="table-wrap">
+   <table>
+    <thead>
+     <tr>
+      <th>REGION / SECTOR</th>
+      <th>LATITUDE</th>
+      <th>LONGITUDE</th>
+      <th>BRIGHTNESS (K)</th>
+      <th>RISK TIER</th>
+     </tr>
+    </thead>
+    <tbody id="tableBody">
+     <tr><td colspan="5" class="empty">Acquiring live telemetry...</td></tr>
+    </tbody>
+   </table>
   </div>
+ </div>
 </section>
 
 <footer class="footer">
-  ORBITAL CONTROL INTELLIGENCE · NASA FIRMS NEAR-REAL-TIME TELEMETRY
+ ORBITAL CONTROL INTELLIGENCE · GLOBAL WILDFIRE MONITORING · NASA FIRMS NEAR-REAL-TIME TELEMETRY
 </footer>
 
 </main>
@@ -721,20 +956,144 @@ td { padding: 12px; border-bottom: 1px solid var(--line); }
 <script>
 const $ = id => document.getElementById(id);
 
+// SAFE STORAGE WRAPPER (Prevents SecurityError freezes in restricted browsers/iframes)
+const memoryStore = {};
+const safeStorage = {
+  get(key) {
+    try { return window.localStorage.getItem(key); } catch (e) { return memoryStore[key] || null; }
+  },
+  set(key, val) {
+    try { window.localStorage.setItem(key, val); } catch (e) { memoryStore[key] = val; }
+  },
+  remove(key) {
+    try { window.localStorage.removeItem(key); } catch (e) { delete memoryStore[key]; }
+  }
+};
+
 let fires = [];
 let charts = {};
 let mapMain = null;
 let mapOverview = null;
-let mainLayer = null;
-let overviewLayer = null;
+let mainMarkers = [];
+let overviewMarkers = [];
 let bootDismissed = false;
 
+const VAULT_WEBHOOK_KEY = "sat_live_vault_discord";
+const VAULT_NTFY_KEY = "sat_live_vault_ntfy";
+const COOLDOWN_KEY = "satellite_live_last_alert_ts";
+const COOLDOWN_MS = 60 * 60 * 1000;
+
 const riskColors = {
-  Low: "#0284c7",
-  Moderate: "#10b981",
-  High: "#d97706",
-  Extreme: "#dc2626"
+  Low: "#0284c7", Moderate: "#10b981", High: "#d97706", Extreme: "#dc2626"
 };
+
+function dismissBootScreen() {
+  if (bootDismissed) return;
+  bootDismissed = true;
+  const boot = $("bootScreen");
+  const main = $("mainLayout");
+  if (boot) boot.classList.add("dismissed");
+  if (main) main.classList.add("visible");
+
+  // Force Leaflet map recalculation once dashboard becomes visible
+  setTimeout(() => {
+    if (mapOverview) mapOverview.invalidateSize();
+    if (mapMain) mapMain.invalidateSize();
+  }, 250);
+}
+
+// HEAVY ORBITAL SATELLITE BOOT SEQUENCE WITH GUARANTEED TRANSITION
+const bootLogsText = [
+  "ESTABLISHING ORBITAL HANDSHAKE...",
+  "SYNCING ESRI TRUE-COLOR SATELLITE TILES...",
+  "LOCKING VIIRS NOAA-20 THERMAL STREAM...",
+  "CALIBRATING KELVIN ANOMALY THRESHOLDS...",
+  "VERIFYING LOCAL ENCRYPTED ALERT VAULT...",
+  "ALL SYSTEMS NOMINAL. LAUNCHING CONTROL UI..."
+];
+
+function runBootSequence() {
+  let logIdx = 0;
+  const logEl = $("bootLogs");
+  const barEl = $("bootBar");
+  const totalSteps = bootLogsText.length;
+
+  // Hard failsafe: always reveal dashboard within 3.2 seconds no matter what
+  setTimeout(dismissBootScreen, 3200);
+
+  const interval = setInterval(() => {
+    if (logIdx < totalSteps) {
+      if (logEl) logEl.textContent = bootLogsText[logIdx];
+      if (barEl) barEl.style.width = `${Math.round(((logIdx + 1) / totalSteps) * 100)}%`;
+      logIdx++;
+    } else {
+      clearInterval(interval);
+      setTimeout(dismissBootScreen, 250);
+    }
+  }, 380);
+}
+
+// LOCAL STORAGE VAULT MANAGEMENT
+function loadVaultCredentials() {
+  $("webhookUrl").value = safeStorage.get(VAULT_WEBHOOK_KEY) || "";
+  $("ntfyTopic").value = safeStorage.get(VAULT_NTFY_KEY) || "";
+  updateVaultStatusUI();
+}
+
+function saveVaultCredentials() {
+  const webhook = $("webhookUrl").value.trim();
+  const ntfy = $("ntfyTopic").value.trim();
+
+  if (webhook && !webhook.startsWith("https://discord.com/api/webhooks/")) {
+    toast("Invalid Discord webhook format.");
+    return;
+  }
+
+  if (webhook) safeStorage.set(VAULT_WEBHOOK_KEY, webhook);
+  else safeStorage.remove(VAULT_WEBHOOK_KEY);
+
+  if (ntfy) safeStorage.set(VAULT_NTFY_KEY, ntfy);
+  else safeStorage.remove(VAULT_NTFY_KEY);
+
+  updateVaultStatusUI();
+  toast("Credentials securely saved to your browser's local vault.");
+}
+
+function clearVaultCredentials() {
+  safeStorage.remove(VAULT_WEBHOOK_KEY);
+  safeStorage.remove(VAULT_NTFY_KEY);
+  $("webhookUrl").value = "";
+  $("ntfyTopic").value = "";
+  updateVaultStatusUI();
+  toast("Local vault cleared.");
+}
+
+function toggleRevealCredentials() {
+  const isPassword = $("webhookUrl").type === "password";
+  $("webhookUrl").type = isPassword ? "text" : "password";
+  $("ntfyTopic").type = isPassword ? "text" : "password";
+  $("revealBtn").textContent = isPassword ? "🙈 Hide" : "👁 Show";
+}
+
+function updateVaultStatusUI() {
+  const hasWebhook = Boolean(safeStorage.get(VAULT_WEBHOOK_KEY));
+  const hasNtfy = Boolean(safeStorage.get(VAULT_NTFY_KEY));
+  const el = $("vaultStatus");
+  if (!el) return;
+  if (hasWebhook && hasNtfy) {
+    el.textContent = "Discord + ntfy Armed";
+    el.style.color = "#059669";
+  } else if (hasWebhook) {
+    el.textContent = "Discord Armed";
+    el.style.color = "#059669";
+  } else if (hasNtfy) {
+    el.textContent = "ntfy.sh Armed";
+    el.style.color = "#059669";
+  } else {
+    el.textContent = "Unconfigured";
+    el.style.color = "#64748b";
+  }
+}
 
 function toast(msg) {
   const el = $("toast");
@@ -742,371 +1101,13 @@ function toast(msg) {
   el.textContent = msg;
   el.style.display = "block";
   clearTimeout(el.timer);
-  el.timer = setTimeout(() => { el.style.display = "none"; }, 4000);
+  el.timer = setTimeout(() => el.style.display = "none", 4000);
 }
 
-function dismissBootScreen() {
-  if (bootDismissed) return;
-  bootDismissed = true;
-  $("bootScreen")?.classList.add("dismissed");
-  $("mainLayout")?.classList.add("visible");
-  setTimeout(() => {
-    mapOverview?.invalidateSize();
-    mapMain?.invalidateSize();
-  }, 250);
-}
-
-function runBootSequence() {
-  const logs = [
-    "ESTABLISHING ORBITAL HANDSHAKE...",
-    "SYNCING ESRI TRUE-COLOR TILES...",
-    "CONNECTING TO /API/FIRMS...",
-    "CALIBRATING FRP RISK ENGINE...",
-    "READY."
-  ];
-  let idx = 0;
-  setTimeout(dismissBootScreen, 2200);
-  const timer = setInterval(() => {
-    if (idx < logs.length) {
-      if ($("bootLogs")) $("bootLogs").textContent = logs[idx];
-      if ($("bootBar")) $("bootBar").style.width = `${Math.round(((idx + 1) / logs.length) * 100)}%`;
-      idx++;
-    } else {
-      clearInterval(timer);
-      setTimeout(dismissBootScreen, 200);
-    }
-  }, 300);
-}
-
-function showPage(pageId) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.querySelectorAll(".navbtn").forEach(b => b.classList.remove("active"));
-  $(pageId)?.classList.add("active");
-  document.querySelector(`.navbtn[data-page="${pageId}"]`)?.classList.add("active");
-
-  if (pageId === "overview") {
-    initMaps();
-    renderOverviewMap();
-    setTimeout(() => mapOverview?.invalidateSize(), 150);
-  } else if (pageId === "mapPage") {
-    initMaps();
-    renderMap();
-    setTimeout(() => mapMain?.invalidateSize(), 150);
-  } else if (pageId === "analytics") {
-    renderCharts();
-  }
-}
-
-document.querySelectorAll(".navbtn[data-page]").forEach(btn => {
-  btn.addEventListener("click", () => showPage(btn.dataset.page));
-});
-
-function createEsriLayer() {
-  return L.tileLayer(
-    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-    { attribution: "Leaflet | Esri, Maxar, Earthstar Geographics", maxZoom: 18 }
-  );
-}
-
-function initMaps() {
-  if (!mapOverview && $("mapOverview")) {
-    mapOverview = L.map("mapOverview", { preferCanvas: true, worldCopyJump: true }).setView([20, 0], 2);
-    createEsriLayer().addTo(mapOverview);
-    overviewLayer = L.layerGroup().addTo(mapOverview);
-  }
-  if (!mapMain && $("map")) {
-    mapMain = L.map("map", { preferCanvas: true, worldCopyJump: true }).setView([20, 0], 2);
-    createEsriLayer().addTo(mapMain);
-    mainLayer = L.layerGroup().addTo(mapMain);
-  }
-}
-
-function isValidCoord(lat, lon) {
-  return (
-    Number.isFinite(lat) &&
-    Number.isFinite(lon) &&
-    lat >= -90 && lat <= 90 &&
-    lon >= -180 && lon <= 180 &&
-    !(lat === 0 && lon === 0)
-  );
-}
-
-function drawMarkers(layerGroup, list, maxPoints) {
-  if (!layerGroup) return;
-  layerGroup.clearLayers();
-
-  const slice = list.slice(0, maxPoints);
-  for (const f of slice) {
-    const lat = Number(f.latitude);
-    const lon = Number(f.longitude);
-    if (!isValidCoord(lat, lon)) continue;
-
-    const risk = f.risk || "Low";
-    const color = riskColors[risk] || "#0284c7";
-    const frp = Number(f.frp || 0).toFixed(1);
-
-    const marker = L.circleMarker([lat, lon], {
-      renderer: L.canvas(),
-      radius: risk === "Extreme" ? 6 : risk === "High" ? 4.5 : 3.5,
-      color: "#ffffff",
-      weight: 0.6,
-      fillColor: color,
-      fillOpacity: 0.85
-    });
-
-    marker.bindPopup(
-      `<strong>${risk} Risk</strong><br>` +
-      `Coords: ${lat.toFixed(3)}, ${lon.toFixed(3)}<br>` +
-      `FRP: ${frp} MW<br>` +
-      `Sensor: ${f.satellite || "VIIRS"}`
-    );
-    marker.addTo(layerGroup);
-  }
-}
-
-function renderOverviewMap() {
-  initMaps();
-  drawMarkers(overviewLayer, fires, 1500);
-  mapOverview?.invalidateSize();
-}
-
-function renderMap() {
-  initMaps();
-  const filter = $("mapRisk")?.value || "All";
-  const filtered = filter === "All" ? fires : fires.filter(f => f.risk === filter);
-  drawMarkers(mainLayer, filtered, 3000);
-  mapMain?.invalidateSize();
-}
-
-function fitMap() {
-  mapMain?.setView([20, 0], 2);
-}
-
-function updateStats() {
-  const total = fires.length;
-  const extreme = fires.filter(f => f.risk === "Extreme").length;
-  const high = fires.filter(f => f.risk === "High").length;
-  const avgFrp = total
-    ? (fires.reduce((sum, f) => sum + (Number(f.frp) || 0), 0) / total).toFixed(1)
-    : "0.0";
-
-  $("total").textContent = total.toLocaleString();
-  $("extremeCount").textContent = extreme.toLocaleString();
-  $("highCount").textContent = high.toLocaleString();
-  $("avgFrp").textContent = `${avgFrp} MW`;
-  $("displayed").textContent = Math.min(total, 3000).toLocaleString();
-  $("lastUpdate").textContent = new Date().toLocaleTimeString();
-}
-
-function renderTable() {
-  const q = ($("search")?.value || "").trim().toLowerCase();
-  const riskFilter = $("tableRisk")?.value || "All";
-  const tbody = $("tableBody");
-  if (!tbody) return;
-
-  const rows = fires.filter(f => {
-    const matchRisk = riskFilter === "All" || f.risk === riskFilter;
-    const text = `${f.satellite || ""} ${f.latitude} ${f.longitude} ${f.risk || ""}`.toLowerCase();
-    return matchRisk && (!q || text.includes(q));
-  }).slice(0, 150);
-
-  if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="5">No matching detections found.</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = rows.map(f => `
-    <tr>
-      <td>${f.satellite || "VIIRS"}</td>
-      <td>${Number(f.latitude).toFixed(3)}</td>
-      <td>${Number(f.longitude).toFixed(3)}</td>
-      <td>${Number(f.frp || 0).toFixed(2)}</td>
-      <td><strong style="color:${riskColors[f.risk] || "#0f172a"}">${f.risk}</strong></td>
-    </tr>
-  `).join("");
-}
-
-function renderCharts() {
-  const counts = { Low: 0, Moderate: 0, High: 0, Extreme: 0 };
-  for (const f of fires) {
-    if (counts[f.risk] !== undefined) counts[f.risk]++;
-  }
-
-  if (charts.risk) charts.risk.destroy();
-  const riskCtx = $("overviewRiskChart")?.getContext("2d");
-  if (riskCtx) {
-    charts.risk = new Chart(riskCtx, {
-      type: "doughnut",
-      data: {
-        labels: ["Low", "Moderate", "High", "Extreme"],
-        datasets: [{
-          data: [counts.Low, counts.Moderate, counts.High, counts.Extreme],
-          backgroundColor: ["#0284c7", "#10b981", "#d97706", "#dc2626"]
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
-  }
-
-  const regions = { Americas: 0, "Europe & Africa": 0, "Asia & Pacific": 0 };
-  for (const f of fires) {
-    const lon = Number(f.longitude);
-    if (lon < -30) regions.Americas++;
-    else if (lon < 60) regions["Europe & Africa"]++;
-    else regions["Asia & Pacific"]++;
-  }
-
-  if (charts.radar) charts.radar.destroy();
-  const radarCtx = $("radarChart")?.getContext("2d");
-  if (radarCtx) {
-    charts.radar = new Chart(radarCtx, {
-      type: "radar",
-      data: {
-        labels: Object.keys(regions),
-        datasets: [{
-          label: "Detections",
-          data: Object.values(regions),
-          borderColor: "#2563eb",
-          backgroundColor: "rgba(37, 99, 235, 0.2)"
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
-  }
-
-  const sample = fires.slice(0, 20);
-  if (charts.line) charts.line.destroy();
-  const lineCtx = $("timeSeriesChart")?.getContext("2d");
-  if (lineCtx) {
-    charts.line = new Chart(lineCtx, {
-      type: "line",
-      data: {
-        labels: sample.map((_, i) => `#${i + 1}`),
-        datasets: [{
-          label: "FRP (MW)",
-          data: sample.map(f => Number(f.frp || 0)),
-          borderColor: "#dc2626",
-          tension: 0.3
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
-  }
-}
-
-function exportCSV() {
-  const header = "latitude,longitude,frp,risk,satellite\n";
-  const body = fires.map(f =>
-    `${f.latitude},${f.longitude},${f.frp ?? 0},${f.risk},${f.satellite || ""}`
-  ).join("\n");
-  const blob = new Blob([header + body], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "firms_wildfire_detections.csv";
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-async function sendManualAlert() {
-  const message = ($("manualMsg")?.value || "").trim();
-  if (!message) {
-    toast("Enter an alert message first.");
-    return;
-  }
-  try {
-    const res = await fetch("/api/alert", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: "manual", message })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Alert failed");
-    toast("Manual Discord alert sent!");
-  } catch (err) {
-    toast(err.message || "Unable to send alert.");
-  }
-}
-
-async function sendAutoAlert() {
-  const urgent = fires.filter(f => f.risk === "Extreme" || f.risk === "High").slice(0, 5);
-  if (!urgent.length) {
-    toast("No High or Extreme FRP detections in current feed.");
-    return;
-  }
-  try {
-    const res = await fetch("/api/alert", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: "automatic", detections: urgent })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Alert failed");
-    toast("Automatic Discord alert sent!");
-  } catch (err) {
-    toast(err.message || "Unable to send automatic alert.");
-  }
-}
-
-async function loadData(isManualSync = false) {
-  const btn = $("syncBtn");
-  const source = $("sourceSelect")?.value || "VIIRS_SNPP_NRT";
-  if ($("activeSensor")) $("activeSensor").textContent = source;
-
-  if (btn) {
-    btn.disabled = true;
-    btn.textContent = "Syncing...";
-  }
-  if ($("status")) $("status").textContent = "SYNCING...";
-
-  try {
-    // days=1 keeps payload fast and responsive
-    const res = await fetch(`/api/firms?source=${encodeURIComponent(source)}&days=1`);
-    const data = await res.json();
-    if (!res.ok || !Array.isArray(data.records)) {
-      throw new Error(data.error || "Failed to load FIRMS data.");
-    }
-
-    fires = data.records
-      .map(r => {
-        const lat = Number(r.latitude);
-        const lon = Number(r.longitude);
-        const frp = Number(r.frp ?? 0);
-        const risk = r.risk || (frp >= 100 ? "Extreme" : frp >= 30 ? "High" : frp >= 10 ? "Moderate" : "Low");
-        return { ...r, latitude: lat, longitude: lon, frp, risk };
-      })
-      .filter(r => isValidCoord(r.latitude, r.longitude))
-      .sort((a, b) => b.frp - a.frp);
-
-    updateStats();
-    renderOverviewMap();
-    renderMap();
-    renderTable();
-    renderCharts();
-
-    if ($("status")) $("status").textContent = "SATELLITE LIVE";
-    if (isManualSync) toast(`Synced ${fires.length.toLocaleString()} detections (${source}).`);
-  } catch (err) {
-    if ($("status")) $("status").textContent = "SYNC ERROR";
-    toast(err.message || "Error loading telemetry.");
-  } finally {
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = "↻ Sync Live Feed";
-    }
-  }
-}
-
-setInterval(() => {
-  if ($("clock")) $("clock").textContent = new Date().toLocaleTimeString();
-}, 1000);
-
-window.addEventListener("DOMContentLoaded", () => {
-  if ($("clock")) $("clock").textContent = new Date().toLocaleTimeString();
-  initMaps();
-  runBootSequence();
-  loadData(false);
-});
-</script>
-</body>
-</html>
+function updateCooldownUI() {
+  const el = $("cooldownStatus");
+  if (!el) return;
+  const lastTs = parseInt(safeStorage.get(COOLDOWN_KEY) || "0", 10);
+  const elapsed = Date.now() - lastTs;
+  if (!lastTs || elapsed >= COOLDOWN_MS) {
+    el.textContent = "Cooldown: 
