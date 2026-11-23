@@ -12,11 +12,4 @@ An end-to-end geospatial data engineering and monitoring pipeline for **NASA FIR
 ## Risk Tier Thresholds
 
 - **Pipeline (`app.py` & notebook)**: `Extreme` (`> 350 K`), `High` (`> 325 K`), `Moderate` (`> 300 K`), `Low` (`<= 300 K`).
-- **Web Dashboard (`index.html`)**: `Extreme` (`>= 360 K`), `High` (`>= 330 K`), `Moderate` (`>= 310 K`), `Low` (`< 310 K`).
-
-## Running Locally
-
-### Streamlit Dashboard
-```bash
-pip install streamlit streamlit-folium pandas folium requests pydantic openpyxl matplotlib seaborn
-streamlit run app.py
+- **Web Dashboard (`index.html`)**: `Extreme` (`>= 360 K`), `High` (`>= 330 K`), `Moderate` (`>= 310 K`), `Low` (`< 310 K`)
