@@ -1,4 +1,3 @@
-
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "s-maxage=240, stale-while-revalidate=60");
 
@@ -6,11 +5,11 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const key = process.env.NASA_FIRMS_MAP_KEY;
+  const key = process.env.FIRMS_MAP_KEY || process.env.NASA_FIRMS_MAP_KEY;
 
   if (!key) {
     return res.status(500).json({
-      error: "NASA FIRMS key is not configured in Vercel."
+      error: "FIRMS_MAP_KEY is not configured in Vercel."
     });
   }
 
